@@ -2,7 +2,7 @@
 import random
 import xlwt
 number_time_int = 20
-number_females = 10
+number_females = 50
 females = []
 birth_intervals = []
 
@@ -18,7 +18,7 @@ class Female:
 
     def recalcState(self, turn):
         if self.femaleState == FemaleState.cycling:
-            if rollDie(1.0/3):
+            if rollDie(66.0/100):
                 self.femaleState = FemaleState.pregnant
             else:
                 self.femaleState = FemaleState.cycling
@@ -32,14 +32,14 @@ class Female:
                 self.lasttimebirth = turn
         elif self.femaleState == FemaleState.motherzero:
             # get a 1/5 chance
-            if rollDie(1.0/5):
+            if rollDie(1.0/5): #this is altered
                 # get another 1/3 chance
-                if rollDie(1.0/3):
+                if rollDie(66.0/100):
                     self.femaleState = FemaleState.pregnant
                 else:
                     self.femaleState = FemaleState.cycling
             else:
-                self.femaleState = FemaleState.mothersix
+                self.femaleState = FemaleState.mothersix #indent me
         elif self.femaleState == FemaleState.mothersix: 
             self.femaleState = FemaleState.cycling
         return self.femaleState, self.femaleState == FemaleState.motherzero
@@ -76,8 +76,9 @@ def main():
         femaleStates.append(femaleStatesThisTurn)
         births.append(birthsThisTurn)
 
-    print birth_intervals
+    print "Birth intervals: " + str(birth_intervals)
     averagebirthinterval = (sum(birth_intervals)/len(birth_intervals)) 
+    print "Average Birth Interval: " +str(averagebirthinterval)
 
     column = 0
     for female_index in range(number_females):
@@ -88,12 +89,21 @@ def main():
     ws.write(0, column + 1, "Avg Birth Int")
     ws.write(1, column + 1, averagebirthinterval)
 
+    allbirths = []
+
     for i in range(0, number_time_int):
         column = 0
         for femaleState in femaleStates[i]:
             ws.write(i + 1, column, femaleState)
             column += 1
         ws.write(i + 1, column, births[i])
+        allbirths.append(births[i])
+
+    birthrate = (sum(allbirths)/float(number_time_int)/float(number_females)) * 2.0
+    print "Real birth rate: " + str(birthrate)
+    ws.write(4, column + 1, "Real birth rate")
+    ws.write(5, column + 1, birthrate)
+
 
     wb.save('test.xls')
 
