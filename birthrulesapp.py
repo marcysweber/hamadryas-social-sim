@@ -1,8 +1,8 @@
 #hello
 import random
 import xlwt
-number_time_int = 20
-number_females = 50
+number_time_int = 10
+number_females = 20
 females = []
 birth_intervals = []
 
@@ -14,11 +14,20 @@ class Female:
     lasttimebirth = 0.0
 
     def __init__(self):
-        self.femaleState = FemaleState.cycling
+        if rollDie(25.0/100):
+            self.femaleState = FemaleState.cycling
+        elif rollDie(50.0/100):
+            self.femaleState = FemaleState.pregnant
+        elif rollDie(75.0/100):
+            self.femaleState = FemaleState.motherzero
+        else:
+            self.femaleState = FemaleState.mothersix
+
+
 
     def recalcState(self, turn):
         if self.femaleState == FemaleState.cycling:
-            if rollDie(66.0/100):
+            if rollDie(95.0/100):
                 self.femaleState = FemaleState.pregnant
             else:
                 self.femaleState = FemaleState.cycling
@@ -32,9 +41,9 @@ class Female:
                 self.lasttimebirth = turn
         elif self.femaleState == FemaleState.motherzero:
             # get a 1/5 chance
-            if rollDie(1.0/5): #this is altered
+            if rollDie(13.0/100): #this is altered
                 # get another 1/3 chance
-                if rollDie(66.0/100):
+                if rollDie(95.0/100):
                     self.femaleState = FemaleState.pregnant
                 else:
                     self.femaleState = FemaleState.cycling
