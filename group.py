@@ -154,7 +154,7 @@ class AgentGroup():
         return females_to_male
 
     def give_birth_to_agent(
-        self, parent_agent, random_module,
+        self, mother, random_module,
         group):
         """
         makes a female agent into a parent, by generating a
@@ -167,7 +167,7 @@ class AgentGroup():
         group: group to add the new child into
         """
         #make sure that parent is female
-        assert parent_agent.sex == "f"
+        assert mother.sex == "f"
 
         #generate a new infant
         PROBABILITY_OF_MALE = 0.5
@@ -176,12 +176,15 @@ class AgentGroup():
             child_sex = "m"
         agent_index =\
          self.parent_population.get_new_agent_index()
-        clanID = parent_agent.clanID
-        bandID = parent_agent.bandID
+        clanID = mother.clanID
+        bandID = mother.bandID
+        OMUID = mother.OMUID
+        assert isinstance(OMUID, object)
         child_agent = AgentClass(
-            age = 0, sex = child_sex, femaleState = None,
-                parents = parent_agent.index, index = agent_index,
-                clanID = clanID, bandID = bandID)
+            age = 0, sex = child_sex, femaleState = None, maleState = None,
+                parents = [mother.index, OMUID], index = agent_index,
+                clanID = clanID, bandID = bandID, OMUID=OMUID)
+
 
         #if agent is young and mbale, it has to be
         #marked as 'about to migrate'
@@ -195,16 +198,7 @@ class AgentGroup():
 
         #add the new infant to the group
         group.add_agent(child_agent)
-        group.mark_as_parent(parent_agent, child_agent)
 
-        #if child is female, mark sisters
-        if (child_sex == "f"):
-            children_list = parent_agent.children
-            for child_index in children_list:
-                child = self.group_index.agent_dict[child_index]
-                if (child.sex == "f" and child.index != agent_index):
-                    self.group_index.mark_agents_as_sisters(child_agent,
-                    child)
 
     def mark_agent_as_dead(self, agent):
         """

@@ -99,13 +99,17 @@ class ControlSimulation(Simulation):
 		self.last_gen_sd_age = standard_deviation
 
 	def save_data(self,
-	 population_record_list, male_population_record_list,
-	 female_population_record_list, age_record_list, 
-	 real_birth_rate_list, real_death_rate_list,
-	 average_edges_per_agent, 
+	 population_record_list,
+     male_population_record_list,
+	 female_population_record_list,
+     age_record_list,
+	 real_birth_rate_list,
+     real_death_rate_list,
 	 adult_females_per_males_list,
 	 group_composition_list,
-	 total_agent_relationships_list):
+	 adult_males_list,
+	 adult_females_list,
+	 birth_interval_list):
 		"""
 		saves output data to global variables, which are 
 		then saved at the end of the experiment
@@ -123,8 +127,7 @@ class ControlSimulation(Simulation):
 		self.last_gen_population = population_record_list[-1]
 		self.last_gen_fpm = adult_females_per_males_list[-1]
 		#self.last_gen_epa = average_edges_per_agent[-1]
-		self.total_agent_relationships_list =\
-		 total_agent_relationships_list
+
 		self.save_group_composition_stats(group_composition_list, None)
 
 	def save_group_composition_stats(self, data_list, book):

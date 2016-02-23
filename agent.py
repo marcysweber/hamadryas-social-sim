@@ -5,6 +5,9 @@ import copy
 class FemaleState:
     underage, cycling, pregnant, nursing0, nursing1 = range(5)
 
+class MaleState:
+    juvsol, sol, fol, lea = range(4)
+
 class AgentClass:
     """
     defines an agent (in this case, a baboon) in the Simulation
@@ -12,18 +15,24 @@ class AgentClass:
     #these values are defined in class seedgenerator.
     age = 0
     sex = ""
+
     femaleState = None
+    last_birth = 0
+
     maleState = None
+
     parents = []
     children = set()
+
     index = 0
     clanID = ""
     bandID = ""
+    OMUID = ""
 
     isleader = False
 
-    def __init__(self, age, sex, femaleState,
-        index, clanID, bandID, parents, children=None):
+    def __init__(self, age, sex, femaleState, maleState,
+        index, clanID, bandID, parents, OMUID, children=None, last_birth = 0):
         """
         constructor
         -----------
@@ -52,6 +61,9 @@ class AgentClass:
         self.clanID = clanID
         self.bandID = bandID
         self.femaleState = femaleState
+        self.last_birth = last_birth
+        self.maleState = maleState
+        self.OMUID = OMUID
 
         #make sure sisters, aggressive, friends are empty lists not
         #null references

@@ -10,7 +10,7 @@ Main run loop
 
 """
 
-from agent import AgentClass, FemaleState
+from agent import FemaleState, MaleState, AgentClass
 from group import AgentGroup
 from lifetable import LifeTable
 from population import Population
@@ -38,7 +38,7 @@ class Simulation:
     output_xls_name = ""
     dot_directory = ""
     json_directory = ""
-    NUMBER_OF_GENERATIONS = 50
+    NUMBER_OF_GENERATIONS = input('Generations: ')
     NUMBER_OF_SEED_GROUPS = 10
 
     def __init__(self, output_xls_name="simulation_output_data.xls",
@@ -84,6 +84,8 @@ class Simulation:
         total_agent_relationships_list = []
 
         group_composition_list = []
+
+        birth_interval_list = []
 
         death_counter = Counter() #used to make sure the correct number
         #of deaths occur
@@ -134,7 +136,7 @@ class Simulation:
 
                 females_to_male =\
                  this_generation.get_females_to_male()
-
+ #make these into individual loops so that events happen for the whole pop in a certain order
                 for agent_index in this_generation.whole_set:
                     #print str(agent_index) + ", " + str(len(this_generation.agent_array))
 
@@ -159,7 +161,7 @@ class Simulation:
                     #check for birth
                     self.check_for_birth(this_generation, new_generation,
                         this_agent, new_agent,agent_index, lifetable, random_module,
-                        birth_counter, male_population_record_list)
+                        birth_counter, i, birth_interval_list)
 
                     #check for death
                     self.check_for_death(lifetable, females_to_male,
@@ -276,16 +278,21 @@ class Simulation:
 
 
 
-        self.save_data(population_record_list, male_population_record_list,
-         female_population_record_list, age_record_list,
-         real_birth_rate_list, real_death_rate_list,
-         edges_per_agent_list,
+        self.save_data(population_record_list,
+         male_population_record_list,
+         female_population_record_list,
+         age_record_list,
+         real_birth_rate_list,
+         real_death_rate_list,
          adult_females_per_males_list,
          group_composition_list,
-         total_agent_relationships_list)
+         adult_males_list,
+         adult_females_list,
+         birth_interval_list)
 
         print ('Total births: ' + str(total_births))
         print ('Total deaths: ' + str(total_deaths))
+        print ('Avg birth int: ' + str(6 * sum(birth_interval_list)/len(birth_interval_list)) + ' months')
 
     def per_generation_printout(self, generation_index, population_record_list=0):
         print generation_index
@@ -328,9 +335,11 @@ class Simulation:
             counter.increment()
             #print("dead")
 
+            #if this dead agent had explicit parents, and they are 1 y old or less,
+            # mother (parents[0]) resumes cycles
             if (this_agent.parents != None):
                 if (this_agent.age <= 1):
-                    new_generation.agent_dict[this_agent.parents].femaleState =\
+                    new_generation.agent_dict[this_agent.parents[0]].femaleState =\
                      FemaleState.cycling
 
 
@@ -354,7 +363,7 @@ class Simulation:
     def check_for_birth(self,
         this_generation, new_generation, this_agent, new_agent,
         agent_index, lifetable, random_module,
-        counter, male_population_record_list):
+        counter, time, list):
         """
         checks if an agent is about to give birth, by getting the
         probability of giving birth from the lifetable. If so, performs
@@ -363,6 +372,7 @@ class Simulation:
 
         parameters
         ----------
+        time : int
         this_generation:
         new_generation:
         this_agent:
@@ -385,7 +395,16 @@ class Simulation:
             if this_agent.femaleState == FemaleState.pregnant:
                 new_generation.give_birth_to_agent(
                     new_agent, random_module, new_generation)
+
                 new_agent.femaleState = FemaleState.nursing0
+
+                if (this_agent.last_birth != 0):
+                    int = (time - this_agent.last_birth)
+                    list.append(int)
+                    new_agent.last_birth = time
+                else:
+                    new_agent.last_birth = time
+
                 counter.increment()
             elif this_agent.femaleState == FemaleState.nursing0:
                 new_agent.femaleState = FemaleState.nursing1
@@ -615,13 +634,17 @@ class Simulation:
             )
 
     def save_data(self,
-     population_record_list, male_population_record_list,
-     female_population_record_list, age_record_list,
-     real_birth_rate_list, real_death_rate_list,
-     average_edges_per_agent,
+     population_record_list,
+     male_population_record_list,
+     female_population_record_list,
+     age_record_list,
+     real_birth_rate_list,
+     real_death_rate_list,
      adult_females_per_males_list,
      group_composition_list,
-     total_agent_relationships_list, adult_males_list, adult_females_list):
+     adult_males_list,
+     adult_females_list,
+     birth_interval_list):
         """
         saves output data to a file.
 
@@ -635,7 +658,7 @@ class Simulation:
             generation
         """
         book = Workbook()
-        self.save_age_stats(age_record_list, book)
+        self.save_age_stats(age_record_list)
         self.save_group_composition_stats(
             group_composition_list, book
             )
@@ -643,7 +666,7 @@ class Simulation:
             male_population_record_list, female_population_record_list,
             real_birth_rate_list, real_death_rate_list,
             average_edges_per_agent,
-            adult_females_per_males_list, book)
+            adult_females_per_males_list, birth_interval_list, book)
         output_directory =\
          constants.OUTPUT_FOLDER + self.output_xls_name
         book.save(output_directory)

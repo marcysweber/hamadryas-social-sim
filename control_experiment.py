@@ -12,11 +12,10 @@ def main():
     control_experiment = ControlExperiment()
     control_experiment.run()
 
-
 class ControlExperiment:
     OUTPUT_XLS_NAME = "control_control_output.xls"
 
-    def __init__(self, number_of_simulations=1):
+    def __init__(self, number_of_simulations = 1):
         self.NUMBER_OF_SIMULATIONS = number_of_simulations
 
     def run(self):
@@ -78,8 +77,6 @@ class ControlExperiment:
             # total_edges_per_agent_list.append(simulation.last_gen_epa)
             total_population_breakdown_list.append(
                     simulation.last_gen_population_breakdown)
-            total_population_relationships_list.append(
-                    simulation.total_agent_relationships_list)
             total_group_composition_list.append(
                     simulation.last_gen_composition)
 
