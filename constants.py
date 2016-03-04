@@ -40,10 +40,11 @@ SEX_DICT = {
 #number of females that will inhabit a single OMU
 FEMALE_OMU_MAX = 10
 
-#the age at which each sex reaches adulthood
+#the age at which each sex leaves the omu
 ADULTHOOD_AGE = {
-	"m" : 5,
-	"f" : 5
+	"m" : 3,
+	"uf": 2,
+	"af" : 5
 }
 
 #any adults over this age are killed

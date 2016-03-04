@@ -45,7 +45,7 @@ class ControlSimulation(Simulation):
 		for group in this_generation_population.groups:
 			adult_males += len(group.male_set)
 			adult_females += len(group.female_set)
-			for child_index in group.underage_set:
+			for child_index in group.infants_set:
 				child = group.agent_dict[child_index]
 				if (child.sex == "m"):
 					male_children += 1

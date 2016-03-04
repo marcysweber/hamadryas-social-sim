@@ -12,7 +12,7 @@ NOTE: Throughout this method it is assumed that
     FEMALE_MINIMUM_AGE < MALE_MINIMUM_AGE
 """
 
-from agent import AgentClass, FemaleState
+from agent import AgentClass, FemaleState, MaleState
 import copy
 import constants
 
@@ -21,7 +21,8 @@ class AgentGroup():
     agent_dict = {} #dictionary of references to group members
     female_set = set()
     male_set = set()
-    underage_set = set()
+    infants_set = set()
+    underage_females_for_takeover = set()
     in_relationships_set = set()
     whole_set = set()
 
@@ -45,7 +46,8 @@ class AgentGroup():
         self.agent_dict = {}
         self.parent_population = parent_population
         #get the minimum ages from constants.py
-        self.FEMALE_MINIMUM_AGE = constants.ADULTHOOD_AGE['f']
+        self.FEMALE_MINIMUM_AGE = constants.ADULTHOOD_AGE['uf']
+        self.FEMALE_MATUR_AGE = constants.ADULTHOOD_AGE['af']
         self.MALE_MINIMUM_AGE = constants.ADULTHOOD_AGE['m']
 
     def __deepcopy__(self, memo):
@@ -59,8 +61,8 @@ class AgentGroup():
          copy.deepcopy(self.female_set)
         new_group.male_set =\
          copy.deepcopy(self.male_set)
-        new_group.underage_set =\
-         copy.deepcopy(self.underage_set)
+        new_group.infants_set =\
+         copy.deepcopy(self.infants_set)
         new_group.in_relationships_set =\
          copy.deepcopy(self.in_relationships_set)
         new_group.whole_set =\
@@ -82,7 +84,8 @@ class AgentGroup():
         """
         self.female_set = set()
         self.male_set = set()
-        self.underage_set = set()
+        self.infants_set = set()
+        self.underage_females_for_takeover = set()
         self.in_relationships_set = set()
         self.whole_set = set()
         self.agent_dict = {}
@@ -230,7 +233,7 @@ class AgentGroup():
             pass
 
         try:
-            self.underage_set.remove(agent.index)
+            self.infants_set.remove(agent.index)
         except:
             pass
 
@@ -305,10 +308,10 @@ class AgentGroup():
         ----------
         agent: agent to promote
         """
-        if agent.age > self.MALE_MINIMUM_AGE:
-            agent.age = agent.age + .5
+        if agent.age  == 0:
+            self.infants_set.add(agent.index)
 
-        elif agent.age == (self.MALE_MINIMUM_AGE - 1) and agent.sex == "m":
+        elif agent.age == (self.MALE_MINIMUM_AGE) and agent.sex == "m":
             """
             because males are dispersed from group to group,
             it is possible for a male on the cusp of
@@ -316,7 +319,7 @@ class AgentGroup():
             Therefore, don't panic if key not found
             """
             try:
-                self.underage_set.remove(agent.index)
+                self.infants_set.remove(agent.index)
             except KeyError:
                 pass
             """
@@ -326,16 +329,26 @@ class AgentGroup():
                 self.add_male_to_aggressives(agent)
             """
             self.male_set.add(agent.index)
-            agent.age = agent.age + .5
+            agent.maleState = MaleState.juvsol
+
+        elif agent.age == 6 and agent.sex == "m":
+            agent.maleState = MaleState.sol
 
         elif agent.age == (self.FEMALE_MINIMUM_AGE) and agent.sex == "f":
-            self.underage_set.remove(agent.index)
+            try:
+                self.infants_set.remove(agent.index)
+            except KeyError:
+                pass
             self.female_set.add(agent.index)
-            agent.femaleState = FemaleState.cycling
-            agent.age = agent.age + .5
+            self.underage_females_for_takeover.add(agent.index)
+            agent.femaleState = FemaleState.underage
 
-        else:
-            agent.age = agent.age + .5
+
+        elif agent.age == (self.FEMALE_MATUR_AGE) and agent.sex == "f":
+            agent.femaleState = FemaleState.cycling
+
+
+        agent.age = agent.age + .5
 
     def add_agent(self, agent):
         """
@@ -352,7 +365,7 @@ class AgentGroup():
         #first check if female or male
         if (agent.sex == "m"):
             if (agent.age <= self.MALE_MINIMUM_AGE):
-                    self.underage_set.add(agent.index)
+                    self.infants_set.add(agent.index)
 
             else:
                     self.male_set.add(agent.index)
@@ -368,7 +381,7 @@ class AgentGroup():
 
             else:
                 assert (agent.age <= self.FEMALE_MINIMUM_AGE)
-                self.underage_set.add(agent.index)
+                self.infants_set.add(agent.index)
 
 
     def remove_agent(self, agent):
@@ -383,10 +396,10 @@ class AgentGroup():
         self.whole_set.remove(agent.index)
 
         if (agent.age < self.FEMALE_MINIMUM_AGE):
-            self.underage_set.remove(agent.index)
+            self.infants_set.remove(agent.index)
 
         elif (agent.age < self.MALE_MINIMUM_AGE and agent.sex == "m"):
-            self.underage_set.remove(agent.index)
+            self.infants_set.remove(agent.index)
 
         elif (agent.index in self.male_set):
             self.male_set.remove(agent.index)
@@ -585,7 +598,7 @@ class AgentGroup():
         del self.agent_dict
         self.female_set.clear()
         self.male_set.clear()
-        self.underage_set.clear()
+        self.infants_set.clear()
         self.in_relationships_set.clear()
         self.whole_set.clear()
 

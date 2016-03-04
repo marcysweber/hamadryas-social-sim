@@ -20,6 +20,9 @@ class AgentClass:
     last_birth = 0
 
     maleState = None
+    females = []
+    malefol = []
+    lottery = []
 
     parents = []
     children = set()
@@ -29,10 +32,10 @@ class AgentClass:
     bandID = ""
     OMUID = ""
 
-    isleader = False
+
 
     def __init__(self, age, sex, femaleState, maleState,
-        index, clanID, bandID, parents, OMUID, children=None, last_birth = 0):
+        index, clanID, bandID, parents, OMUID, females = None, malefol = None, children=None, last_birth = 0, lottery = []):
         """
         constructor
         -----------
@@ -63,7 +66,10 @@ class AgentClass:
         self.femaleState = femaleState
         self.last_birth = last_birth
         self.maleState = maleState
+        self.females = females
+        self.malefol = malefol
         self.OMUID = OMUID
+        self.lottery = lottery
 
         #make sure sisters, aggressive, friends are empty lists not
         #null references
@@ -97,13 +103,19 @@ class AgentClass:
         a population
         """
         self.index += top_index
-        if self.parents:
-            self.parents += top_index
 
-        children_list = list(self.children)
-        for i in range(len(children_list)):
-            children_list[i] += top_index
-        self.children = set(children_list)
+        if self.maleState == MaleState.lea:
+            for i in range(0, len(self.females)):
+                self.females[i] += top_index
+            if self.malefol:
+                self.malefol[0] += top_index
+
+        if self.OMUID != "":
+            self.OMUID += top_index
+        #this is correct
+
+        self.clanID += top_index
+
 
     def get_dot_string(self, parent_group):
         """

@@ -14,16 +14,18 @@ from agent import FemaleState, MaleState, AgentClass
 from group import AgentGroup
 from lifetable import LifeTable
 from population import Population
-import friendships
+import dispersal
 import seed
 import copy
 import loader
 from random_module import RandomModule
+from random import shuffle, choice
 import math
 import data_saver
 from xlwt import Workbook
 import constants
 from counter import Counter
+
 
 def main():
     simulation = Simulation()
@@ -119,6 +121,9 @@ class Simulation:
             this_generation_adult_females = 0
             this_generation_group_composition_list = []
 
+            this_generation_avail_females = []
+            this_generation_eligible_males = []
+
             #reset counters
             death_counter.reset()
             birth_counter.reset()
@@ -134,12 +139,34 @@ class Simulation:
                 this_generation = this_generation_population.groups[j]
                 new_generation = next_generation_population.groups[j]
 
+                this_generation_eligible_males = []
+
                 females_to_male =\
                  this_generation.get_females_to_male()
+
  #make these into individual loops so that events happen for the whole pop in a certain order
                 for agent_index in this_generation.whole_set:
                     #print str(agent_index) + ", " + str(len(this_generation.agent_array))
+                    this_agent =\
+                     this_generation.agent_dict[agent_index]
+                    new_agent =\
+                     new_generation.agent_dict[agent_index]
+                    #check for death (also puts surviving males into eligible_males)
+                    self.check_for_death(lifetable, females_to_male,
+                        this_agent, new_agent, new_generation,
+                        random_module, death_counter, this_generation_avail_females,
+                        this_generation_eligible_males)
 
+
+
+                if this_generation_avail_females:
+                    dispersal.opportun_takeover(this_generation = this_generation, new_generation = new_generation,
+                        avail_females=this_generation_avail_females, random_module=random_module,
+                        eligible_males=this_generation_eligible_males)
+
+                this_generation_avail_females = []
+
+                for agent_index in this_generation.whole_set:
                     this_agent =\
                      this_generation.agent_dict[agent_index]
                     new_agent =\
@@ -147,6 +174,9 @@ class Simulation:
 
                     #increment age
                     new_generation.promote_agent(new_agent)
+
+                    #check if leaders are still leaders
+                    self.check_leader(this_agent, new_agent)
 
                     #check birth_rate
                     if this_agent.index in this_generation.female_set:
@@ -163,10 +193,6 @@ class Simulation:
                         this_agent, new_agent,agent_index, lifetable, random_module,
                         birth_counter, i, birth_interval_list)
 
-                    #check for death
-                    self.check_for_death(lifetable, females_to_male,
-                        this_agent, new_agent, new_generation,
-                        random_module, death_counter)
 
                     #check for dispersal
                     self.check_for_dispersal(dispersal_table, females_to_male,
@@ -276,6 +302,9 @@ class Simulation:
                 female_population_record_list.append([])
             population_record_list.append(this_population_record)
 
+            assert(this_generation_avail_females == [])
+            #END OF GENERATION LOOP
+
 
 
         self.save_data(population_record_list,
@@ -292,7 +321,9 @@ class Simulation:
 
         print ('Total births: ' + str(total_births))
         print ('Total deaths: ' + str(total_deaths))
-        print ('Avg birth int: ' + str(6 * sum(birth_interval_list)/len(birth_interval_list)) + ' months')
+
+        if len(birth_interval_list) != 0:
+            print ('Avg birth int: ' + str(6 * sum(birth_interval_list)/len(birth_interval_list)) + ' months')
 
     def per_generation_printout(self, generation_index, population_record_list=0):
         print generation_index
@@ -316,8 +347,15 @@ class Simulation:
         """
         pass
 
+    def check_leader(self, this_agent, new_agent):
+        if (this_agent.sex == "m"):
+            if this_agent.maleState == MaleState.lea:
+                if this_agent.females == []:
+                    new_agent.maleState = MaleState.sol
+
+
     def check_for_death(self, lifetable, females_to_male, this_agent,
-        new_agent, new_generation, random_module, counter):
+        new_agent, new_generation, random_module, counter, avail_females, eligible_males):
         """
         checks if an agent should die by getting the probability
         from the lifetable, then performing a dieroll for that
@@ -342,6 +380,29 @@ class Simulation:
                     new_generation.agent_dict[this_agent.parents[0]].femaleState =\
                      FemaleState.cycling
 
+            if this_agent.sex == "m":
+                if this_agent.maleState == MaleState.lea:
+
+                    #if the male was a leader, his followers get a
+                    # 90% chance of gaining 1 of his females
+                    dispersal.inherit_female(new_generation, this_agent.females,
+                        this_agent.malefol, this_agent, random_module)
+
+                    #after that, remaining females "go on the market"
+                    #append the females in his OMU to avail_females
+                    avail_females += this_agent.females
+
+                    #remaining followers get put into eligible set
+                    #b/c they were effectively solitary this turn
+                    eligible_males += this_agent.malefol
+                    for i in range(0, len(this_agent.malefol)):
+                        new_generation.agent_dict[this_agent.malefol[i]].maleState = MaleState.sol
+        else:
+            #  if the individual doesn't die, and it's a male leader or solitary,
+            #  it's an "eligible male" for oppurtunistic takeovers
+            if this_agent.sex == "m":
+                if this_agent.maleState == MaleState.lea or MaleState.sol:
+                    eligible_males += [this_agent.index]
 
     def check_for_preg(self,
         this_generation, new_generation, this_agent, new_agent,

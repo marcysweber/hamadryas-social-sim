@@ -15,7 +15,7 @@ of this module
 import xlrd
 import constants
 from common import read_CSV
-from agent import AgentClass, FemaleState
+from agent import AgentClass, FemaleState, MaleState
 from group import AgentGroup
 from population import Population
 
@@ -101,11 +101,12 @@ class SeedGenerator:
         for row_index in range (self.STARTING_ROW, seedsheet.nrows):
 
             #get parameters
-            clan_index = seedsheet.cell_value(row_index, 0)
+            clan_index = int(float(seedsheet.cell_value(row_index, 0)))
 
-            omu_index = seedsheet.cell_value(row_index, 1)
+            if seedsheet.cell_value(row_index, 1) != "":
+                omu_index = int(float(seedsheet.cell_value(row_index, 1)))
 
-            agent_index = seedsheet.cell_value(row_index, 2)
+            agent_index = int(seedsheet.cell_value(row_index, 2))
 
             sex = seedsheet.cell_value(row_index, 3)
 
@@ -113,6 +114,16 @@ class SeedGenerator:
 
             if sex == "M":
                 maleState = seedsheet.cell_value(row_index, 6)
+                if maleState == MaleState.lea:
+                    females = str(seedsheet.cell_value(row_index, 7)).split(",")
+                    for i in range(0, len(females)):
+                        females[i] = int(float(females[i]))
+                    fols = seedsheet.cell_value(row_index, 8)
+                    if fols == '':
+                        fols = []
+                    else:
+                        fols = [int(fols)]
+
             else:
                 maleState = None
 
@@ -121,10 +132,11 @@ class SeedGenerator:
             else:
                 femaleState = None
 
-            this_agent = AgentClass(age = age_in_years, sex = sex, \
-                femaleState = femaleState, maleState= maleState, last_birth= 0, \
-                                    index = agent_index, clanID = clan_index, \
-                                    bandID = None, OMUID = omu_index, parents=None, \
+            this_agent = AgentClass(age = age_in_years, sex = sex,
+                femaleState = femaleState, maleState= maleState, females = females,
+                                    malefol=fols, last_birth= 0,
+                                    index = agent_index, clanID = clan_index,
+                                    bandID = None, OMUID = omu_index, parents=None,
                                     children=None)
 
 
