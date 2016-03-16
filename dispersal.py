@@ -13,9 +13,26 @@ functions to add/move:
 - follow
 """
 import random
-from agent import MaleState, FemaleState, AgentClass
+from agent import MaleState, FemaleState, AgentClass, CompAbility
 from group import AgentGroup
 from random_module import RandomModule
+
+class Competitive:
+    competitive_ability = {}
+
+    def compability(self, comptype, age, sex):
+        assert sex == "m"
+
+        if comptype == CompAbility.type1:
+            ability = self.competitive_ability[age][1]
+        elif comptype == CompAbility.type2:
+            ability = self.competitive_ability[age][2]
+        elif comptype == CompAbility.type3:
+            ability = self.competitive_ability[age][3]
+        elif comptype == CompAbility.type4:
+            ability = self.competitive_ability[age][4]
+
+        return ability
 
 #def attempt_initial_unit(self, )
 

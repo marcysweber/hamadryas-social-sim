@@ -17,15 +17,7 @@ class LifeTable:
 	def chance_of_death(self, females_to_male, age, sex):
 		"""
 		returns the probability of an individual dying this year.
-		chance_of_death = chance_of_death_by_age * chance_of_death_by_proportion
-
-		for females:
-			chance_of_death_by_proportion = 120 - (10 * females_to_male)
-
-		for males:
-			chance_of_death_by_proportion = 70 + (10 * females_to_male)
-
-		chance_of_death_by_proportion is always > 0
+		chance_of_death = chance_of_death_by_age
 
 		parameters
 		----------

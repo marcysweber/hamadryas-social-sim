@@ -137,7 +137,7 @@ class SeedGenerator:
                                     malefol=fols, last_birth= 0,
                                     index = agent_index, clanID = clan_index,
                                     bandID = None, OMUID = omu_index, parents=None,
-                                    children=None)
+                                    children=None, compability=None)
 
 
             #add agent to group

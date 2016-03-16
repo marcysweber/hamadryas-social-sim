@@ -8,6 +8,9 @@ class FemaleState:
 class MaleState:
     juvsol, sol, fol, lea = range(4)
 
+class CompAbility:
+    type1, type2, type3, type4 = range(4)
+
 class AgentClass:
     """
     defines an agent (in this case, a baboon) in the Simulation
@@ -23,6 +26,7 @@ class AgentClass:
     females = []
     malefol = []
     lottery = []
+    compability = None
 
     parents = []
     children = set()
@@ -35,7 +39,9 @@ class AgentClass:
 
 
     def __init__(self, age, sex, femaleState, maleState,
-        index, clanID, bandID, parents, OMUID, females = None, malefol = None, children=None, last_birth = 0, lottery = []):
+        index, clanID, bandID, parents, OMUID, compability, females = None,
+                 malefol = None, children=None, last_birth = 0, lottery = [],
+                 ):
         """
         constructor
         -----------
@@ -70,6 +76,7 @@ class AgentClass:
         self.malefol = malefol
         self.OMUID = OMUID
         self.lottery = lottery
+        self.compability = compability
 
         #make sure sisters, aggressive, friends are empty lists not
         #null references

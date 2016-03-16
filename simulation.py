@@ -65,8 +65,7 @@ class Simulation:
         seed_group = seed.load_group(this_generation_population)
         table_data = loader.load_data()
         lifetable = table_data.life_table
-        dispersal_table =\
-         table_data.dispersal_table
+
         random_module = RandomModule()
 
         #create analytics lists
@@ -193,13 +192,6 @@ class Simulation:
                         this_agent, new_agent,agent_index, lifetable, random_module,
                         birth_counter, i, birth_interval_list)
 
-
-                    #check for dispersal
-                    self.check_for_dispersal(dispersal_table, females_to_male,
-                        this_agent, new_agent, this_generation,
-                        new_generation,
-                        this_generation_population,
-                        next_generation_population, random_module)
 
                     #check for friendships
                     """
@@ -726,7 +718,7 @@ class Simulation:
         data_saver.save_number_of_indivs(population_record_list,
             male_population_record_list, female_population_record_list,
             real_birth_rate_list, real_death_rate_list,
-            average_edges_per_agent,
+            None,
             adult_females_per_males_list, birth_interval_list, book)
         output_directory =\
          constants.OUTPUT_FOLDER + self.output_xls_name

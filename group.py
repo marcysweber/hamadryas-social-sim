@@ -12,7 +12,8 @@ NOTE: Throughout this method it is assumed that
     FEMALE_MINIMUM_AGE < MALE_MINIMUM_AGE
 """
 
-from agent import AgentClass, FemaleState, MaleState
+from agent import AgentClass, FemaleState, MaleState, CompAbility
+import random
 import copy
 import constants
 
@@ -175,8 +176,12 @@ class AgentGroup():
         #generate a new infant
         PROBABILITY_OF_MALE = 0.5
         child_sex = "f"
+        child_ability = None
+
         if (random_module.roll(PROBABILITY_OF_MALE)):
             child_sex = "m"
+
+
         agent_index =\
          self.parent_population.get_new_agent_index()
         clanID = mother.clanID
@@ -186,7 +191,7 @@ class AgentGroup():
         child_agent = AgentClass(
             age = 0, sex = child_sex, femaleState = None, maleState = None,
                 parents = [mother.index, OMUID], index = agent_index,
-                clanID = clanID, bandID = bandID, OMUID=OMUID)
+                clanID = clanID, bandID = bandID, OMUID=OMUID, compability=child_ability)
 
 
         #if agent is young and mbale, it has to be
@@ -366,9 +371,18 @@ class AgentGroup():
         if (agent.sex == "m"):
             if (agent.age <= self.MALE_MINIMUM_AGE):
                     self.infants_set.add(agent.index)
-
             else:
                     self.male_set.add(agent.index)
+
+            compdraw = random.randrange(4)
+            if compdraw == 0:
+                agent.compability = CompAbility.type1
+            elif compdraw == 1:
+                agent.compability = CompAbility.type2
+            elif compdraw == 2:
+                agent.compability = CompAbility.type3
+            elif compdraw == 3:
+                agent.compability = CompAbility.type4
 
         else:
             assert(agent.sex == "f")
