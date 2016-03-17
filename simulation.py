@@ -139,25 +139,27 @@ class Simulation:
                 new_generation = next_generation_population.groups[j]
 
                 this_generation_eligible_males = []
+                this_generation_lea_for_fol = []
+                this_generation_leaders = []
+                #  these are filled in the check_for_death function
 
                 females_to_male =\
                  this_generation.get_females_to_male()
 
- #make these into individual loops so that events happen for the whole pop in a certain order
+ #  make these into individual loops so that events happen for the whole pop in a certain order
                 for agent_index in this_generation.whole_set:
-                    #print str(agent_index) + ", " + str(len(this_generation.agent_array))
+                    #  print str(agent_index) + ", " + str(len(this_generation.agent_array))
                     this_agent =\
                      this_generation.agent_dict[agent_index]
                     new_agent =\
                      new_generation.agent_dict[agent_index]
-                    #check for death (also puts surviving males into eligible_males)
+                    #  check for death (also puts surviving males into eligible_males)
                     self.check_for_death(lifetable, females_to_male,
                         this_agent, new_agent, new_generation,
                         random_module, death_counter, this_generation_avail_females,
-                        this_generation_eligible_males)
+                        this_generation_eligible_males, this_generation_lea_for_fol)
 
-
-
+                #  disperse females whose male died
                 if this_generation_avail_females:
                     dispersal.opportun_takeover(this_generation = this_generation, new_generation = new_generation,
                         avail_females=this_generation_avail_females, random_module=random_module,
@@ -171,11 +173,17 @@ class Simulation:
                     new_agent =\
                      new_generation.agent_dict[agent_index]
 
-                    #increment age
+                    #  increment age
                     new_generation.promote_agent(new_agent)
 
-                    #check if leaders are still leaders
-                    self.check_leader(this_agent, new_agent)
+                    if this_agent.sex == "m":
+                        #check if leaders are still leaders
+                        self.check_leader(this_agent, new_agent, this_generation_leaders)
+                        #  other male checks
+                        self.male_checks(this_generation, new_generation, this_agent,
+                            new_agent, random_module, this_generation_lea_for_fol,
+                            this_generation_leaders,this_generation_avail_females,
+                            this_generation_eligible_males)
 
                     #check birth_rate
                     if this_agent.index in this_generation.female_set:
@@ -339,15 +347,27 @@ class Simulation:
         """
         pass
 
-    def check_leader(self, this_agent, new_agent):
+    def check_leader(self, this_agent, new_agent, leaders):
         if (this_agent.sex == "m"):
             if this_agent.maleState == MaleState.lea:
                 if this_agent.females == []:
                     new_agent.maleState = MaleState.sol
+                else:
+                    leaders += [this_agent.index]
 
+    def male_checks(self, this_generation, new_generation, this_agent,
+                    new_agent, randommodule, lea_for_fol, leaders,
+                    avail_females, eligible_males):
+        #  FOLLOWERS CHOOSE FIRST
+        if this_agent.maleState == MaleState.fol:
+            dispersal.follower_choices(new_generation, this_generation, new_agent, randommodule)
+
+        if this_agent.maleState == MaleState.sol:
+            dispersal.solitary_choices(new_generation, this_generation, new_agent,
+                                   lea_for_fol, leaders)
 
     def check_for_death(self, lifetable, females_to_male, this_agent,
-        new_agent, new_generation, random_module, counter, avail_females, eligible_males):
+        new_agent, new_generation, random_module, counter, avail_females, eligible_males, lea_for_fol):
         """
         checks if an agent should die by getting the probability
         from the lifetable, then performing a dieroll for that
@@ -393,7 +413,12 @@ class Simulation:
             #  if the individual doesn't die, and it's a male leader or solitary,
             #  it's an "eligible male" for oppurtunistic takeovers
             if this_agent.sex == "m":
-                if this_agent.maleState == MaleState.lea or MaleState.sol:
+                if this_agent.maleState == MaleState.lea:
+                    eligible_males += [this_agent.index]
+                    if len(this_agent.females) >= 4:
+                        if len(this_agent.malefol) < 2:
+                            lea_for_fol += [this_agent.index]
+                elif this_agent.maleState == MaleState.sol:
                     eligible_males += [this_agent.index]
 
     def check_for_preg(self,

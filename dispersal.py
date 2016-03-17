@@ -20,7 +20,13 @@ from random_module import RandomModule
 class Competitive:
     competitive_ability = {}
 
-    def compability(self, comptype, age, sex):
+    def compability(self, agent):
+        ability = 0
+
+        age = agent.age
+        sex = agent.sex
+        comptype = agent.compability
+
         assert sex == "m"
 
         if comptype == CompAbility.type1:
@@ -34,10 +40,66 @@ class Competitive:
 
         return ability
 
-#def attempt_initial_unit(self, )
+def attempt_initial_unit(this_generation, next_generation, female, male):
+    this_female = next_generation.agent_dict[female]
+    this_male = next_generation.agent_dict[male]
+    draw = random.randrange(1, 100)
 
-#def solitary_choices(new_generation, this_generation, male, randommodule):
-#    randommodule.roll()
+    if this_male.OMUID == this_female.OMUID:
+        if draw <= 85:
+            add_female_to_OMU(next_generation, female=this_female, male=this_male)
+    else:
+        if draw <= 50:
+            add_female_to_OMU(next_generation, this_female, this_male)
+
+def solitary_choices(new_generation, this_generation, male, lea_for_fol, leaders):
+    clan_lea_for_fol = []
+    clan_leaders = []
+
+    for agent in lea_for_fol:
+        if new_generation.agent_dict[agent].clanID == male.clanID:
+            clan_lea_for_fol += [agent]
+    for agent in clan_leaders:
+        if new_generation.agent_dict[agent].clanID == male.clanID:
+            clan_leaders += [agent]
+
+    draw = random.randrange(1, 100)
+    if draw <= 50:
+        if this_generation.underage_females_for_takeover:
+            attempt_initial_unit(this_generation, new_generation,
+                random.choice(this_generation.underage_females_for_takeover), male = male.index)
+    elif lea_for_fol:
+        follow(this_generation, new_generation, random.choice(clan_lea_for_fol), male, lea_for_fol)
+    else:
+        challenge(this_generation, new_generation, male, random.choice(clan_leaders))
+
+def follower_choices(new_generation, this_generation, male):
+    if this_generation.underage_females_for_takeover:
+        random.shuffle(this_generation.underage_females_for_takeover)
+        for female in this_generation.underage_females_for_takeover:
+            if new_generation.agent_dict[female].OMUID == male.OMUID:
+                add_female_to_OMU(new_generation, new_generation.agent_dict[female],
+                                  male)
+                break #  so it'll go randomly thru underage females until it finds one and then stops
+    #  we can come back and put that followers might go back to being sol
+
+def challenge(this_generation, new_generation, challenger, leaderindex):
+    leader = new_generation.agent_dict[leaderindex]
+    if self.compability(agent=leader) > compability(challenger):
+
+    else:
+
+
+def follow(this_generation, new_generation, leader, newfollower, lea_for_fol):
+    follower = new_generation.agent_dict[newfollower]
+    leadermale = new_generation.agent_dict[leader]
+
+    follower.OMUID = leadermale.index
+    follower.maleState = MaleState.fol
+
+    leadermale.malefol += [follower.index]
+    if leadermale.malefol >= 2:
+        lea_for_fol -= [leadermale.index]
 
 def inherit_female(new_generation, omufemales, OMUfol, deadleader, random_module):
         """
@@ -137,16 +199,6 @@ def opportun_takeover(this_generation, new_generation,
                 add_female_to_OMU(new_generation, this_female, this_male)
                 eligible_males.remove(this_male.index)
 
-#def challenge(this_generation, new_generation, challenger, leader):
-
-
-
-#def follow(this_generation, new_generation, leader, newfollower):
-
-
-
-#def attempt_initial_unit(this_generation, new_generation, male, female):
-
 
 def add_female_to_OMU(new_generation, female, male):
     female.OMUID = male.index
@@ -163,4 +215,9 @@ def add_female_to_OMU(new_generation, female, male):
         #if the children set is not empty
         new_generation.agent_dict[female.children].OMUID = male.index
 
+    if male.maleState == MaleState.fol:
+        new_generation.agent_dict[male.OMUID].malefol -= male.index
+        #  removes that former follower from old leaders' list
+        new_generation.agent_dict[male.OMUID].females -= female.index
+        male.OMUID = male.index
     male.maleState = MaleState.lea
