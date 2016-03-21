@@ -14,7 +14,7 @@ class LifeTable:
 	male_life_table = {}
 	female_life_table = {}
 
-	def chance_of_death(self, females_to_male, age, sex):
+	def chance_of_death(self, age, sex):
 		"""
 		returns the probability of an individual dying this year.
 		chance_of_death = chance_of_death_by_age

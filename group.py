@@ -16,37 +16,40 @@ from agent import AgentClass, FemaleState, MaleState, CompAbility
 import random
 import copy
 import constants
+import dispersal
+from random_module import RandomModule
+
 
 class AgentGroup():
     group_index = 0
-    agent_dict = {} #dictionary of references to group members
+    agent_dict = {}  # dictionary of references to group members
     female_set = set()
     male_set = set()
     infants_set = set()
-    underage_females_for_takeover = set()
+    underage_females_for_takeover = []
     in_relationships_set = set()
     whole_set = set()
 
-    #aggressive relationships in a group are a chain
-    #of relationships, in order of age. The youngest
-    #agent is added to this chain as the lowest link.
-    #these relationships are represented in an implicit
-    #linked list, instead of a traditional linked list
-    #because collisions can be very common in this list
-    #, since agents can often have the same age
+    # aggressive relationships in a group are a chain
+    # of relationships, in order of age. The youngest
+    # agent is added to this chain as the lowest link.
+    # these relationships are represented in an implicit
+    # linked list, instead of a traditional linked list
+    # because collisions can be very common in this list
+    # , since agents can often have the same age
     aggressive_chain_head = None
 
-    #this is a stack of agents who have immigrated
-    #but are yet to form aggressive relationships
-    #agents only get added here if there are no male
-    #agents in the group when they immigrate
+    # this is a stack of agents who have immigrated
+    # but are yet to form aggressive relationships
+    # agents only get added here if there are no male
+    # agents in the group when they immigrate
     aggressive_relationship_stack = set()
     parent_population = None
 
     def __init__(self, parent_population):
         self.agent_dict = {}
         self.parent_population = parent_population
-        #get the minimum ages from constants.py
+        # get the minimum ages from constants.py
         self.FEMALE_MINIMUM_AGE = constants.ADULTHOOD_AGE['uf']
         self.FEMALE_MATUR_AGE = constants.ADULTHOOD_AGE['af']
         self.MALE_MINIMUM_AGE = constants.ADULTHOOD_AGE['m']
@@ -56,26 +59,28 @@ class AgentGroup():
         NOTE: parent_population set to none in new copy
         """
         new_group = AgentGroup(None)
-        new_group.agent_dict =\
-         copy.deepcopy(self.agent_dict)
-        new_group.female_set =\
-         copy.deepcopy(self.female_set)
-        new_group.male_set =\
-         copy.deepcopy(self.male_set)
-        new_group.infants_set =\
-         copy.deepcopy(self.infants_set)
-        new_group.in_relationships_set =\
-         copy.deepcopy(self.in_relationships_set)
-        new_group.whole_set =\
-         copy.deepcopy(self.whole_set)
-        new_group.group_index =\
-         self.group_index
-        new_group.aggressive_chain_head =\
-         self.aggressive_chain_head
-        new_group.aggressive_relationship_stack =\
-         self.aggressive_relationship_stack
-        new_group.parent_population =\
-         self.parent_population
+        new_group.agent_dict = \
+            copy.deepcopy(self.agent_dict)
+        new_group.female_set = \
+            copy.deepcopy(self.female_set)
+        new_group.male_set = \
+            copy.deepcopy(self.male_set)
+        new_group.infants_set = \
+            copy.deepcopy(self.infants_set)
+        new_group.in_relationships_set = \
+            copy.deepcopy(self.in_relationships_set)
+        new_group.whole_set = \
+            copy.deepcopy(self.whole_set)
+        new_group.group_index = \
+            self.group_index
+        new_group.aggressive_chain_head = \
+            self.aggressive_chain_head
+        new_group.aggressive_relationship_stack = \
+            self.aggressive_relationship_stack
+        new_group.parent_population = \
+            self.parent_population
+        new_group.underage_females_for_takeover = \
+            self.underage_females_for_takeover
         return new_group
 
     def clear(self):
@@ -86,7 +91,7 @@ class AgentGroup():
         self.female_set = set()
         self.male_set = set()
         self.infants_set = set()
-        self.underage_females_for_takeover = set()
+        self.underage_females_for_takeover = []
         self.in_relationships_set = set()
         self.whole_set = set()
         self.agent_dict = {}
@@ -117,9 +122,9 @@ class AgentGroup():
 
             list_of_agents_to_add.append(agent)
 
-        #self.aggressive_chain_head += top_index
+        # self.aggressive_chain_head += top_index
 
-        #clear the group and re-add agents
+        # clear the group and re-add agents
         self.clear()
 
         for agent in list_of_agents_to_add:
@@ -137,8 +142,8 @@ class AgentGroup():
         for agent_key in self.whole_set:
             agent = self.agent_dict[agent_key]
             outputstring += agent.get_dot_string(self)
-            outputstring += "g" + str(self.group_index) +\
-            " -> " + str(agent_key) + " [style=dotted];\n"
+            outputstring += "g" + str(self.group_index) + \
+                            " -> " + str(agent_key) + " [style=dotted];\n"
 
         return outputstring
 
@@ -151,15 +156,15 @@ class AgentGroup():
         males = len(self.male_set)
 
         if (males == 0):
-            males = 0.00001 #avoid division by 0
+            males = 0.00001  # avoid division by 0
 
-        females_to_male = int(females/males)
+        females_to_male = int(females / males)
 
         return females_to_male
 
     def give_birth_to_agent(
-        self, mother, random_module,
-        group):
+            self, mother, random_module,
+            group):
         """
         makes a female agent into a parent, by generating a
         new infant, and marking the parent_agent as a parent
@@ -170,10 +175,10 @@ class AgentGroup():
         random_module: used to generate randomness
         group: group to add the new child into
         """
-        #make sure that parent is female
+        # make sure that parent is female
         assert mother.sex == "f"
 
-        #generate a new infant
+        # generate a new infant
         PROBABILITY_OF_MALE = 0.5
         child_sex = "f"
         child_ability = None
@@ -181,34 +186,32 @@ class AgentGroup():
         if (random_module.roll(PROBABILITY_OF_MALE)):
             child_sex = "m"
 
-
-        agent_index =\
-         self.parent_population.get_new_agent_index()
+        agent_index = \
+            self.parent_population.get_new_agent_index()
         clanID = mother.clanID
         bandID = mother.bandID
         OMUID = mother.OMUID
         assert isinstance(OMUID, object)
         child_agent = AgentClass(
-            age = 0, sex = child_sex, femaleState = None, maleState = None,
-                parents = [mother.index, OMUID], index = agent_index,
-                clanID = clanID, bandID = bandID, OMUID=OMUID, compability=child_ability)
+            age=0, sex=child_sex, femaleState=None, maleState=None,
+            parents=[mother.index, OMUID], index=agent_index,
+            clanID=clanID, bandID=bandID, OMUID=OMUID, compability=child_ability)
 
-
-        #if agent is young and mbale, it has to be
-        #marked as 'about to migrate'
-        #if child_sex == "m":
+        # if agent is young and mbale, it has to be
+        # marked as 'about to migrate'
+        # if child_sex == "m":
         #	child_agent.young_migration = False
 
-        #if agent in female, they have to be marked underage so
-        #that they eventually start cycling
+        # if agent in female, they have to be marked underage so
+        # that they eventually start cycling
         if child_sex == "f":
             child_agent.femaleState = FemaleState.underage
 
-        #add the new infant to the group
+        # add the new infant to the group
         group.add_agent(child_agent)
 
-
-    def mark_agent_as_dead(self, agent):
+    def mark_agent_as_dead(self, agent, new_generation, counter, avail_females, eligible_males,
+                           random_module):
         """
         marks an agent as having died. Since the self.all_agents
         set contains all living agents, by removing the agent
@@ -218,20 +221,65 @@ class AgentGroup():
         ----------
         agent: agent to mark as dead
         """
-        #remove all agent's friends
-        #self.unmark_agents_friends(agent)
+        print (str(agent.index) + " died!")
+        counter.increment()
 
-        #remove agent from sexed sets, and don't panic
-        #for the same reason as below
+        #  if this dead agent had explicit parents, and they are 1 y old or less,
+        # mother (parents[0]) resumes cycles
+        if agent.parents:
+            if agent.age <= 1:
+                try:
+                    new_generation.agent_dict[agent.parents[0]].femaleState = \
+                        FemaleState.cycling
+                except KeyError:
+                    pass
+
+        if agent.sex == "m":
+            if agent.maleState == MaleState.lea:
+
+                #  if the male was a leader, his followers get a
+                # 90% chance of gaining 1 of his females
+                dispersal.inherit_female(new_generation, agent.females,
+                                         agent.malefol, agent, random_module, counter)
+
+                #  after that, remaining females "go on the market"
+                #  append the females in his OMU to avail_females
+                avail_females += agent.females
+                print("added " + str(agent.females) + " to avail females")
+
+                #  remaining followers get put into eligible set
+                #  b/c they were effectively solitary this turn
+                eligible_males += agent.malefol
+                for i in range(0, len(agent.malefol)):
+                    new_generation.agent_dict[agent.malefol[i]].maleState = MaleState.sol
+                print("added " + str(agent.malefol) + " to elig males")
+
+            elif agent.maleState == MaleState.fol:
+                try:
+                    new_generation.agent_dict[agent.OMUID].malefol.remove(agent.index)
+                except ValueError:
+                    pass
+
+        #  quickly remove dead female from available females and as leader's female
+        elif agent.sex == "f":
+            try:
+                new_generation.agent_dict[agent.OMUID].females.remove(agent.index)
+            except (ValueError, KeyError):
+                pass
+            if agent.index in avail_females:
+                avail_females.remove(agent.index)
+            try:
+                new_generation.underage_females_for_takeover.remove(agent.index)
+            except ValueError:
+                pass
+
         try:
-            if (agent.sex == 'm'):
-                #self.remove_male_from_aggressives(agent)
-                self.male_set.remove(agent.index)
-                #clear the agent's parent
-                #to prevent a relationship from
-                #skewing the SNG
-
-
+            new_generation.agent_dict.pop(agent.index)
+        except KeyError:
+            pass
+        try:
+            if agent.sex == 'm':
+                new_generation.male_set.remove(agent.index)
             else:
                 self.female_set.remove(agent.index)
         except KeyError:
@@ -242,11 +290,11 @@ class AgentGroup():
         except:
             pass
 
-        #since this method recursively marks all
-        #children as being dead, it can be called
-        #several times for a given agent in a single
-        #run. Hence, don't panic if the agent is already
-        #dead when the method is called
+        # since this method recursively marks all
+        # children as being dead, it can be called
+        # several times for a given agent in a single
+        # run. Hence, don't panic if the agent is already
+        # dead when the method is called
         marked = False
         try:
             self.whole_set.remove(agent.index)
@@ -293,6 +341,7 @@ class AgentGroup():
         agent.children.add(child_or_children.index)
         child_or_children.parents.add(agent.index)
         """
+
     def mark_as_in_relationship(self, agent):
         """
         marks an agent as being in a relationship,
@@ -313,7 +362,7 @@ class AgentGroup():
         ----------
         agent: agent to promote
         """
-        if agent.age  == 0:
+        if agent.age == 0:
             self.infants_set.add(agent.index)
 
         elif agent.age == (self.MALE_MINIMUM_AGE) and agent.sex == "m":
@@ -345,13 +394,12 @@ class AgentGroup():
             except KeyError:
                 pass
             self.female_set.add(agent.index)
-            self.underage_females_for_takeover.add(agent.index)
+            self.underage_females_for_takeover.append(agent.index)
             agent.femaleState = FemaleState.underage
 
 
         elif agent.age == (self.FEMALE_MATUR_AGE) and agent.sex == "f":
             agent.femaleState = FemaleState.cycling
-
 
         agent.age = agent.age + .5
 
@@ -367,12 +415,12 @@ class AgentGroup():
         self.agent_dict[agent.index] = agent
         self.whole_set.add(agent.index)
 
-        #first check if female or male
+        # first check if female or male
         if (agent.sex == "m"):
             if (agent.age <= self.MALE_MINIMUM_AGE):
-                    self.infants_set.add(agent.index)
+                self.infants_set.add(agent.index)
             else:
-                    self.male_set.add(agent.index)
+                self.male_set.add(agent.index)
 
             compdraw = random.randrange(4)
             if compdraw == 0:
@@ -385,18 +433,17 @@ class AgentGroup():
                 agent.compability = CompAbility.type4
 
         else:
-            assert(agent.sex == "f")
+            assert (agent.sex == "f")
 
-            #except for the first gen, where adult agents are
-            #added to the population from the seed group
-            #adult females are NEVER added to a group
+            # except for the first gen, where adult agents are
+            # added to the population from the seed group
+            # adult females are NEVER added to a group
             if agent.age > self.FEMALE_MINIMUM_AGE:
                 self.female_set.add(agent.index)
 
             else:
                 assert (agent.age <= self.FEMALE_MINIMUM_AGE)
                 self.infants_set.add(agent.index)
-
 
     def remove_agent(self, agent):
         """
@@ -434,19 +481,20 @@ class AgentGroup():
         -------
         list of unrelated members, or [] if there are none
         """
-        #note that underage members are not in the sexed sets
-        #first check if agent is male or female
+        # note that underage members are not in the sexed sets
+        # first check if agent is male or female
         if (agent.sex == "m"):
-            eligible_females =\
-             self.female_set.difference(
-                self.in_relationships_set)
+            eligible_females = \
+                self.female_set.difference(
+                    self.in_relationships_set)
             return eligible_females
 
         else:
-            eligible_males =\
-             self.male_set.difference(
-                self.in_relationships_set)
+            eligible_males = \
+                self.male_set.difference(
+                    self.in_relationships_set)
             return eligible_males
+
     """
     def mark_agents_as_friends(self, agent_a, agent_b):
         ""
@@ -493,8 +541,8 @@ class AgentGroup():
         ----------
         agent_a, agent_b: agents to mark as sisters
         """
-        assert(agent_a != agent_b)
-        assert(agent_a.index != agent_b.index)
+        assert (agent_a != agent_b)
+        assert (agent_a.index != agent_b.index)
         agent_a.sisters.append(agent_b.index)
         agent_b.sisters.append(agent_a.index)
         self.in_relationships_set.add(agent_a.index)
@@ -511,38 +559,38 @@ class AgentGroup():
         ----------
         agent: target agent
         """
-        #reset the agent's agg_next and agg_prev
+        # reset the agent's agg_next and agg_prev
         if (self.aggressive_chain_head == agent.index):
-            #agent is at head of list
+            # agent is at head of list
             if (agent.aggressive_next == None):
-                #agent is the only male in list
+                # agent is the only male in list
                 self.aggressive_chain_head = None
 
             else:
-                #there are others in the list
-                list_next_male =\
-                self.agent_dict[agent.aggressive_next]
-                self.aggressive_chain_head =\
-                list_next_male.index
+                # there are others in the list
+                list_next_male = \
+                    self.agent_dict[agent.aggressive_next]
+                self.aggressive_chain_head = \
+                    list_next_male.index
                 list_next_male.aggressive_prev = None
 
         elif (agent.aggressive_prev != None):
             if (agent.aggressive_next == None):
-                #agent is at tail of list
-                list_prev_male =\
-                self.agent_dict[agent.aggressive_prev]
+                # agent is at tail of list
+                list_prev_male = \
+                    self.agent_dict[agent.aggressive_prev]
                 list_prev_male.aggressive_next = None
 
             else:
-                #agent is the the middle of the list
-                list_prev_male =\
-                self.agent_dict[agent.aggressive_prev]
-                list_next_male =\
-                self.agent_dict[agent.aggressive_next]
-                list_next_male.aggressive_prev =\
-                list_prev_male.index
-                list_prev_male.aggressive_next =\
-                list_next_male.index
+                # agent is the the middle of the list
+                list_prev_male = \
+                    self.agent_dict[agent.aggressive_prev]
+                list_next_male = \
+                    self.agent_dict[agent.aggressive_next]
+                list_next_male.aggressive_prev = \
+                    list_prev_male.index
+                list_prev_male.aggressive_next = \
+                    list_next_male.index
 
         agent.aggressive_next = None
         agent.aggressive_prev = None
@@ -556,44 +604,44 @@ class AgentGroup():
         ----------
         agent: target agent
         """
-        #make sure the agent has been removed
-        #from the previous group correctly
-        assert(agent.sex == 'm')
-        assert(agent.aggressive_next == None)
-        assert(agent.aggressive_prev == None)
+        # make sure the agent has been removed
+        # from the previous group correctly
+        assert (agent.sex == 'm')
+        assert (agent.aggressive_next == None)
+        assert (agent.aggressive_prev == None)
 
         if (self.aggressive_chain_head == None):
             self.aggressive_chain_head = agent.index
 
         else:
-            #traverse the list until the correct spot is found
+            # traverse the list until the correct spot is found
             current_list_agent_index = self.aggressive_chain_head
-            current_list_agent =\
-             self.agent_dict[current_list_agent_index]
+            current_list_agent = \
+                self.agent_dict[current_list_agent_index]
 
-            while (current_list_agent.age < agent.age and\
-                current_list_agent.aggressive_next != None):
-                current_list_agent_index =\
-                 current_list_agent.aggressive_next
-                current_list_agent =\
-                 self.agent_dict[current_list_agent_index]
+            while (current_list_agent.age < agent.age and \
+                               current_list_agent.aggressive_next != None):
+                current_list_agent_index = \
+                    current_list_agent.aggressive_next
+                current_list_agent = \
+                    self.agent_dict[current_list_agent_index]
 
             if current_list_agent.aggressive_next == None:
-                #tail of list has been reached
-                current_list_agent.aggressive_next =\
-                 agent.index
+                # tail of list has been reached
+                current_list_agent.aggressive_next = \
+                    agent.index
                 agent.aggressive_prev = current_list_agent.index
 
             else:
-                #insert in middle of list
-                agent.aggressive_next =\
-                 current_list_agent.aggressive_next
+                # insert in middle of list
+                agent.aggressive_next = \
+                    current_list_agent.aggressive_next
                 agent.aggressive_prev = current_list_agent.index
 
-                current_list_agent.aggressive_next =\
-                 agent.index
+                current_list_agent.aggressive_next = \
+                    agent.index
                 next_list_agent = self.agent_dict[
-                 agent.aggressive_next]
+                    agent.aggressive_next]
                 next_list_agent.aggressive_prev = agent.index
 
     def mark_agents_as_having_a_relationship(self, agent):
@@ -615,4 +663,3 @@ class AgentGroup():
         self.infants_set.clear()
         self.in_relationships_set.clear()
         self.whole_set.clear()
-

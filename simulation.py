@@ -31,6 +31,7 @@ def main():
     simulation = Simulation()
     simulation.run_simulation()
 
+
 class Simulation:
     """
     defines a single simulation, with a given set of activities
@@ -44,7 +45,7 @@ class Simulation:
     NUMBER_OF_SEED_GROUPS = 10
 
     def __init__(self, output_xls_name="simulation_output_data.xls",
-     dot_directory="dot/", json_directory="json/"):
+                 dot_directory="dot/", json_directory="json/"):
         """
         constructor
 
@@ -58,7 +59,7 @@ class Simulation:
         self.json_directory = json_directory
 
     def run_simulation(self, save_to_dot=True, save_to_json=True):
-        #import Seed and lifetable data
+        # import Seed and lifetable data
         this_generation_population = Population()
         next_generation_population = None
 
@@ -68,7 +69,7 @@ class Simulation:
 
         random_module = RandomModule()
 
-        #create analytics lists
+        # create analytics lists
         age_record_list = []
         population_record_list = []
         male_population_record_list = []
@@ -88,13 +89,13 @@ class Simulation:
 
         birth_interval_list = []
 
-        death_counter = Counter() #used to make sure the correct number
-        #of deaths occur
-        birth_counter = Counter() #used to make sure the correct number
-        #of births take place
+        death_counter = Counter()  # used to make sure the correct number
+        # of deaths occur
+        birth_counter = Counter()  # used to make sure the correct number
+        # of births take place
 
-        #assign all_groups by creating several copies of the
-        #seed generation
+        # assign all_groups by creating several copies of the
+        # seed generation
         for i in range(0, self.NUMBER_OF_SEED_GROUPS + 1):
             this_generation_population.add_group(copy.deepcopy(seed_group))
 
@@ -108,137 +109,145 @@ class Simulation:
         total_births = 0
         total_deaths = 0
 
-        for i in range (0, self.NUMBER_OF_GENERATIONS):
+        for i in range(0, self.NUMBER_OF_GENERATIONS):
             self.per_generation_printout(i)
-            #analytics
+            # analytics
             this_age_record = []
-            this_population_record = 0 #quick fix error
+            this_population_record = 0  # quick fix error
             this_male_population_record = 0
             this_female_population_record = 0
-            #this_edges_per_agent = 0
+            # this_edges_per_agent = 0
             this_generation_adult_males = 0
             this_generation_adult_females = 0
             this_generation_group_composition_list = []
 
-            this_generation_avail_females = []
-            this_generation_eligible_males = []
+            # both of these refer to the whole population for one year, which is what we want
+            avail_females = []
+            eligible_males = []
+            new_generation_population_dict = {}
 
-            #reset counters
+            # reset counters
             death_counter.reset()
             birth_counter.reset()
 
-            #make the next gen population a copy of this gen's pop
+            # make the next gen population a copy of this gen's pop
             this_generation_population.generation = i
 
-            next_generation_population =\
-             copy.deepcopy(this_generation_population)
+            next_generation_population = \
+                copy.deepcopy(this_generation_population)
 
-            #run the simulation for each sub_group.
+            #  FILL ELIGIBLE MALES FROM THE WHOLE POP, DEATH
+            for x in range(0, len(this_generation_population.groups)):
+                for agent_index in this_generation_population.groups[x].whole_set:
+                    this_agent = this_generation_population.groups[x].agent_dict[agent_index]
+                    new_agent = next_generation_population.groups[x].agent_dict[agent_index]
+
+                    if self.check_for_death(lifetable, this_agent, new_agent, next_generation_population.groups[x],
+                                         random_module, death_counter, avail_females,
+                                         eligible_males):
+                        new_generation_population_dict[agent_index] = new_agent
+
+            #  debugging loop
+            for agent in eligible_males:
+                assert agent in new_generation_population_dict
+            for agent in avail_females:
+                assert agent in new_generation_population_dict
+
+            # disperse females whose male died naturally this year
+            if avail_females:
+                dispersal.opportun_takeover(new_generation=new_generation_population_dict,
+                                            avail_females=avail_females,
+                                            eligible_males=eligible_males,
+                                            deathcounter=death_counter)
+
+            avail_females = []
+
+            # run non-dispersal stuff for each sub_group.
             for j in range(0, len(this_generation_population.groups)):
                 this_generation = this_generation_population.groups[j]
                 new_generation = next_generation_population.groups[j]
 
-                this_generation_eligible_males = []
+                #  within this loop, generation only refers to this group
+
                 this_generation_lea_for_fol = []
                 this_generation_leaders = []
                 #  these are filled in the check_for_death function
 
-                females_to_male =\
-                 this_generation.get_females_to_male()
-
- #  make these into individual loops so that events happen for the whole pop in a certain order
-                for agent_index in this_generation.whole_set:
-                    #  print str(agent_index) + ", " + str(len(this_generation.agent_array))
-                    this_agent =\
-                     this_generation.agent_dict[agent_index]
-                    new_agent =\
-                     new_generation.agent_dict[agent_index]
-                    #  check for death (also puts surviving males into eligible_males)
-                    self.check_for_death(lifetable, females_to_male,
-                        this_agent, new_agent, new_generation,
-                        random_module, death_counter, this_generation_avail_females,
-                        this_generation_eligible_males, this_generation_lea_for_fol)
-
-                #  disperse females whose male died
-                if this_generation_avail_females:
-                    dispersal.opportun_takeover(this_generation = this_generation, new_generation = new_generation,
-                        avail_females=this_generation_avail_females, random_module=random_module,
-                        eligible_males=this_generation_eligible_males)
-
-                this_generation_avail_females = []
+                females_to_male = \
+                    this_generation.get_females_to_male()
 
                 for agent_index in this_generation.whole_set:
-                    this_agent =\
-                     this_generation.agent_dict[agent_index]
-                    new_agent =\
-                     new_generation.agent_dict[agent_index]
+                    if agent_index in new_generation_population_dict:
+                        this_agent = \
+                            this_generation.agent_dict[agent_index]
+                        new_agent = \
+                            new_generation.agent_dict[agent_index]
 
-                    #  increment age
-                    new_generation.promote_agent(new_agent)
+                        #  increment age
+                        new_generation.promote_agent(new_agent)
 
-                    if this_agent.sex == "m":
-                        #check if leaders are still leaders
-                        self.check_leader(this_agent, new_agent, this_generation_leaders)
-                        #  other male checks
-                        self.male_checks(this_generation, new_generation, this_agent,
-                            new_agent, random_module, this_generation_lea_for_fol,
-                            this_generation_leaders,this_generation_avail_females,
-                            this_generation_eligible_males)
+                        if this_agent.sex == "m":
+                            # check if leaders are still leaders
+                            self.male_check(this_agent, new_agent, this_generation_leaders, this_generation_lea_for_fol)
+                            #  other male checks
+                            self.male_choices(this_generation, new_generation, this_agent,
+                                             new_agent, random_module, this_generation_lea_for_fol,
+                                             this_generation_leaders, death_counter)
 
-                    #check birth_rate
-                    if this_agent.index in this_generation.female_set:
-                        chance_of_birth =\
-                         lifetable.chance_of_birth(this_agent.age, this_agent.femaleState)
+                        # check for preg
+                        self.check_for_preg(this_generation, new_generation,
+                                            this_agent, new_agent, females_to_male, agent_index, lifetable,
+                                            random_module, birth_counter, male_population_record_list)
 
-                    #check for preg
-                    self.check_for_preg(this_generation, new_generation,
-                        this_agent, new_agent, females_to_male, agent_index, lifetable,
-                        random_module, birth_counter, male_population_record_list)
+                        # check for birth
+                        self.check_for_birth(this_generation, new_generation,
+                                             this_agent, new_agent, agent_index, lifetable, random_module,
+                                             birth_counter, i, birth_interval_list)
 
-                    #check for birth
-                    self.check_for_birth(this_generation, new_generation,
-                        this_agent, new_agent,agent_index, lifetable, random_module,
-                        birth_counter, i, birth_interval_list)
+                        # check for friendships
+                        """
+                        friendships.check_for_friendships(this_agent,
+                            new_agent, this_generation, new_generation,
+                            random_module)
+                        """
 
-
-                    #check for friendships
-                    """
-                    friendships.check_for_friendships(this_agent,
-                        new_agent, this_generation, new_generation,
-                        random_module)
-                    """
-
-                    #unique changes
-                    self.conduct_changes_unique_to_experiment_at_agent(
-                        this_generation_population,
-                        next_generation_population,
-                        this_generation, new_generation, this_agent,
-                        new_agent, females_to_male, lifetable,
-                        random_module, table_data
+                        # unique changes
+                        self.conduct_changes_unique_to_experiment_at_agent(
+                            this_generation_population,
+                            next_generation_population,
+                            this_generation, new_generation, this_agent,
+                            new_agent, females_to_male, lifetable,
+                            random_module, table_data
                         )
 
-                    #analytics
-                    #this_edges_per_agent += this_agent.edges()
+                        # analytics
+                        # this_edges_per_agent += this_agent.edges()
 
-                    this_age_record.append(this_agent.age)
-                    this_population_record += 1
+                        this_age_record.append(this_agent.age)
+                        this_population_record += 1
 
-                    if (this_agent.index in this_generation.male_set):
-                        this_male_population_record += 1
-                    elif (this_agent.index in this_generation.female_set):
-                        this_female_population_record += 1
+                        if (this_agent.index in this_generation.male_set):
+                            this_male_population_record += 1
+                        elif (this_agent.index in this_generation.female_set):
+                            this_female_population_record += 1
 
-                this_generation_adult_males +=\
-                 len(this_generation.male_set)
-                this_generation_adult_females +=\
-                 len(this_generation.female_set)
+                if avail_females:
+                    dispersal.opportun_takeover(new_generation=new_generation_population_dict,
+                                                avail_females=avail_females, eligible_males=eligible_males)
+
+                avail_females = []
+
+                this_generation_adult_males += \
+                    len(this_generation.male_set)
+                this_generation_adult_females += \
+                    len(this_generation.female_set)
 
                 this_generation_group_composition_list.append(
                     len(this_generation.whole_set)
-                    )
+                )
 
             print ('Population: ' + str(this_population_record - death_counter.getCount()))
-            if (birth_counter.count < 1):
+            if birth_counter.count < 1:
                 print ('births: 0')
             else:
                 print ("births: " + str(birth_counter.count))
@@ -250,46 +259,46 @@ class Simulation:
                 this_generation_population, next_generation_population,
                 i, self.NUMBER_OF_GENERATIONS, table_data)
 
-            #set the old gen to the new one
+            # set the old gen to the new one
             this_generation_population = next_generation_population
 
             group_composition_list.append(this_generation_group_composition_list)
 
             number_of_groups = len(this_generation_population.groups)
 
-            adult_males_per_group =\
-             float(this_generation_adult_males)/number_of_groups
-            adult_females_per_group =\
-             float(this_generation_adult_females)/number_of_groups
+            adult_males_per_group = \
+                float(this_generation_adult_males) / number_of_groups
+            adult_females_per_group = \
+                float(this_generation_adult_females) / number_of_groups
             adult_males_list.append(adult_males_per_group)
             adult_females_list.append(adult_females_per_group)
 
-            #handle div by 0 errors in calculating
-            #females per male
+            # handle div by 0 errors in calculating
+            # females per male
             if (adult_males_per_group == 0):
                 adult_females_per_males_list.append(
-                    adult_females_per_group/1
-                    )
+                    adult_females_per_group / 1
+                )
             elif (adult_females_per_group == 0):
                 adult_females_per_males_list.append(0)
             else:
                 adult_females_per_males_list.append(
-                    float(adult_females_per_group)/float(adult_males_per_group)
-                    )
+                    float(adult_females_per_group) / float(adult_males_per_group)
+                )
 
             if (save_to_dot):
                 self.save_data_to_dot(this_generation_population.get_dot_string(), i)
             if (save_to_json):
                 self.save_data_to_json(this_generation_population.get_json_string(), i)
 
-            #average_edges_per_agent =\
-             #float(this_edges_per_agent)/this_population_record
-            #edges_per_agent_list.append(average_edges_per_agent)
+                # average_edges_per_agent =\
+                # float(this_edges_per_agent)/this_population_record
+            # edges_per_agent_list.append(average_edges_per_agent)
             if (this_population_record != 0):
                 real_death_rate_list.append(
-                    float(death_counter.getCount())/this_population_record)
+                    float(death_counter.getCount()) / this_population_record)
                 real_birth_rate_list.append(
-                    float(birth_counter.getCount())/this_population_record)
+                    float(birth_counter.getCount()) / this_population_record)
                 age_record_list.append(this_age_record)
                 male_population_record_list.append(this_male_population_record)
                 female_population_record_list.append(
@@ -302,35 +311,33 @@ class Simulation:
                 female_population_record_list.append([])
             population_record_list.append(this_population_record)
 
-            assert(this_generation_avail_females == [])
-            #END OF GENERATION LOOP
-
-
+            assert (avail_females == [])
+            # END OF GENERATION LOOP
 
         self.save_data(population_record_list,
-         male_population_record_list,
-         female_population_record_list,
-         age_record_list,
-         real_birth_rate_list,
-         real_death_rate_list,
-         adult_females_per_males_list,
-         group_composition_list,
-         adult_males_list,
-         adult_females_list,
-         birth_interval_list)
+                       male_population_record_list,
+                       female_population_record_list,
+                       age_record_list,
+                       real_birth_rate_list,
+                       real_death_rate_list,
+                       adult_females_per_males_list,
+                       group_composition_list,
+                       adult_males_list,
+                       adult_females_list,
+                       birth_interval_list)
 
         print ('Total births: ' + str(total_births))
         print ('Total deaths: ' + str(total_deaths))
 
         if len(birth_interval_list) != 0:
-            print ('Avg birth int: ' + str(6 * sum(birth_interval_list)/len(birth_interval_list)) + ' months')
+            print ('Avg birth int: ' + str(6 * sum(birth_interval_list) / len(birth_interval_list)) + ' months')
 
     def per_generation_printout(self, generation_index, population_record_list=0):
         print generation_index
 
     def conduct_changes_unique_to_experiment_at_gen(self,
-        this_generation_population, next_generation_population,
-        generation_index, number_of_generations, table_data):
+                                                    this_generation_population, next_generation_population,
+                                                    generation_index, number_of_generations, table_data):
         """
         this method can be overloaded to add changes unique
         to the simulation
@@ -338,36 +345,40 @@ class Simulation:
         pass
 
     def conduct_changes_unique_to_experiment_at_agent(self,
-        this_generation_population, next_generation_population,
-        this_generation, new_generation, this_agent, new_agent,
-        females_to_male, lifetable, random_module, table_data):
+                                                      this_generation_population, next_generation_population,
+                                                      this_generation, new_generation, this_agent, new_agent,
+                                                      females_to_male, lifetable, random_module, table_data):
         """
         this method can be overloaded to add changes unique
         to this simulation
         """
         pass
 
-    def check_leader(self, this_agent, new_agent, leaders):
-        if (this_agent.sex == "m"):
+    def male_check(self, this_agent, new_agent, leaders, lea_for_fol):
+        if this_agent.sex == "m":
             if this_agent.maleState == MaleState.lea:
-                if this_agent.females == []:
+                if not this_agent.females:
                     new_agent.maleState = MaleState.sol
                 else:
                     leaders += [this_agent.index]
+                    if len(this_agent.females) >= 4:
+                        if len(this_agent.malefol) < 2:
+                            lea_for_fol += [this_agent.index]
 
-    def male_checks(self, this_generation, new_generation, this_agent,
+    def male_choices(self, this_generation, new_generation, this_agent,
                     new_agent, randommodule, lea_for_fol, leaders,
-                    avail_females, eligible_males):
+                    deathcounter):
+
         #  FOLLOWERS CHOOSE FIRST
         if this_agent.maleState == MaleState.fol:
-            dispersal.follower_choices(new_generation, this_generation, new_agent, randommodule)
+            dispersal.follower_choices(new_generation, this_generation, new_agent, deathcounter)
 
         if this_agent.maleState == MaleState.sol:
             dispersal.solitary_choices(new_generation, this_generation, new_agent,
-                                   lea_for_fol, leaders)
+                                       lea_for_fol, leaders, deathcounter)
 
-    def check_for_death(self, lifetable, females_to_male, this_agent,
-        new_agent, new_generation, random_module, counter, avail_females, eligible_males, lea_for_fol):
+    def check_for_death(self, lifetable, this_agent,
+                        new_agent, new_generation, random_module, counter, avail_females, eligible_males):
         """
         checks if an agent should die by getting the probability
         from the lifetable, then performing a dieroll for that
@@ -379,69 +390,46 @@ class Simulation:
 
         """
         chance_of_death = lifetable.chance_of_death(
-            females_to_male, this_agent.age, this_agent.sex)
-        if (random_module.roll(chance_of_death)):
-            new_generation.mark_agent_as_dead(new_agent)
-            counter.increment()
-            #print("dead")
+            this_agent.age, this_agent.sex)
+        if random_module.roll(chance_of_death):
+            new_generation.mark_agent_as_dead(new_agent, new_generation, counter, avail_females, eligible_males,
+                                              random_module)
+            #  print("dead")
+            return False
 
-            #if this dead agent had explicit parents, and they are 1 y old or less,
-            # mother (parents[0]) resumes cycles
-            if (this_agent.parents != None):
-                if (this_agent.age <= 1):
-                    new_generation.agent_dict[this_agent.parents[0]].femaleState =\
-                     FemaleState.cycling
-
-            if this_agent.sex == "m":
-                if this_agent.maleState == MaleState.lea:
-
-                    #if the male was a leader, his followers get a
-                    # 90% chance of gaining 1 of his females
-                    dispersal.inherit_female(new_generation, this_agent.females,
-                        this_agent.malefol, this_agent, random_module)
-
-                    #after that, remaining females "go on the market"
-                    #append the females in his OMU to avail_females
-                    avail_females += this_agent.females
-
-                    #remaining followers get put into eligible set
-                    #b/c they were effectively solitary this turn
-                    eligible_males += this_agent.malefol
-                    for i in range(0, len(this_agent.malefol)):
-                        new_generation.agent_dict[this_agent.malefol[i]].maleState = MaleState.sol
         else:
             #  if the individual doesn't die, and it's a male leader or solitary,
             #  it's an "eligible male" for oppurtunistic takeovers
             if this_agent.sex == "m":
                 if this_agent.maleState == MaleState.lea:
                     eligible_males += [this_agent.index]
-                    if len(this_agent.females) >= 4:
-                        if len(this_agent.malefol) < 2:
-                            lea_for_fol += [this_agent.index]
                 elif this_agent.maleState == MaleState.sol:
                     eligible_males += [this_agent.index]
 
+            return True
+
+
     def check_for_preg(self,
-        this_generation, new_generation, this_agent, new_agent,
-        females_to_male, agent_index, lifetable, random_module,
-        counter, male_population_record_list):
+                       this_generation, new_generation, this_agent, new_agent,
+                       females_to_male, agent_index, lifetable, random_module,
+                       counter, male_population_record_list):
         """
         checks if an agent conceives this turn, and then should give
         birth the next turn (unless transferred, maybe)
         """
         if (agent_index in this_generation.female_set):
             if this_agent.femaleState == FemaleState.cycling:
-                chance_of_giving_birth =\
-                 lifetable.chance_of_birth(this_agent.age, this_agent.femaleState)
+                chance_of_giving_birth = \
+                    lifetable.chance_of_birth(this_agent.age, this_agent.femaleState)
 
-                #do a die roll
+                # do a die roll
                 if random_module.roll(float(chance_of_giving_birth)):
                     new_agent.femaleState = FemaleState.pregnant
 
     def check_for_birth(self,
-        this_generation, new_generation, this_agent, new_agent,
-        agent_index, lifetable, random_module,
-        counter, time, list):
+                        this_generation, new_generation, this_agent, new_agent,
+                        agent_index, lifetable, random_module,
+                        counter, time, list):
         """
         checks if an agent is about to give birth, by getting the
         probability of giving birth from the lifetable. If so, performs
@@ -455,7 +443,6 @@ class Simulation:
         new_generation:
         this_agent:
         new_agent:
-        females_to_male:
         agent_index:
         lifetable:
         random_module:
@@ -468,7 +455,7 @@ class Simulation:
         this function now also checks for switching femaleState
         back to cycling
         """
-        #check for birth
+        # check for birth
         if (agent_index in this_generation.female_set):
             if this_agent.femaleState == FemaleState.pregnant:
                 new_generation.give_birth_to_agent(
@@ -495,127 +482,7 @@ class Simulation:
                 then mother should femaleState = 0 (cycling)
                 """
 
-    def check_for_dispersal(self, dispersal_table, females_to_male,
-        this_agent, new_agent, this_generation, new_generation,
-        this_generation_population,
-        next_generation_population, random_module):
-        """
-        checks if this agent is due to be ejected from his group
-        and established in a new one by determining the probability
-        of dispersal using the dispersal table, then tossing a coin
-        with that chance. If the 'coin-toss' comes up heads, the
-        simulation ejects the male from this group.
 
-        In the wild, males emigrate once between the ages of 4 and
-        6, and approximately once every 5 years after they reach
-        adulthood.
-
-        In order to simulate this, the simulation first checks if
-        the agent is a child. If the agent is a child who has not
-        migrated yet, the probability of emigration is then determined
-        and a coin is tossed to check for emigration. Once the child
-        is determined to be emigrating in this year, a counter is
-        started, which measures the number of years since the last
-        time the agent has migrated. Once the agent reaches adulthood,
-        it is made to emigrate every five years according to this counter.
-        However, once a child has migrated once, it is not made
-        to migrate again until it reaches adulthood.
-
-        If the agent is an adult, the simulation checks if the
-        number of females to a male is more than the constant
-        EMIGRATION_THRESHOLD_OF_FTM. The male is only made to emigrate
-        if the number of females per male is less than that threshold.
-        If this is so, the simulation next checks if the
-        number of years since the last emigration is greater than
-        5. If this is also true, a coin is tossed to determine
-        whether the agent is made to emigrate.
-
-        Once a coin has been tossed, if it comes up heads,
-        the simulation randomly shuffles all the other groups
-        and checks if the male is accepted into a group. This is done
-        by checking each group in turn. For each group, the
-        probability of acceptance is first calculated using the
-        dispersal_table. Then, a coin toss of that probability is
-        made. If the toss results in a 'heads', the male is added
-        to the new group.
-
-        If the male is not added to this group, a coin toss is done to
-        check if he should die, using the probability in the dispersal
-        table. If the toss comes up heads, the agent is left dead. If it
-        does not come up heads, the next group in the shuffled set is
-        selected and this process is repeated. If the male is rejected
-        from two groups, it is left marked as dead.
-
-        returns
-        -------
-        true if the agent is leaving this group
-        """
-        #check if live mature male
-        #make sure the new_agent isn't dead
-        """
-        if (this_agent.sex == "m") and new_agent.index in this_generation.whole_set:
-            #check if child or adult
-            if (this_agent.index not in this_generation.male_set and\
-                this_agent.young_migration):
-                #check if child has migrated
-                #if so, don't check for migration
-                return
-
-            elif (this_agent.last_migration < \
-                constants.MIGRATION_COUNTER_CAP or\
-                females_to_male > \
-                constants.EMIGRATION_THRESHOLD_OF_FTM):
-                #if the adult has been stationary for
-                #less than 5 years, or if the number of
-                #females in a group is greater than the
-                #threshold defined in constants, then
-                #don't bother him
-                return
-
-            else:
-                #find the probability of emigration
-                probability_of_emigration =\
-                 dispersal_table.chance_of_emigration(
-                    females_to_male, this_agent.age)
-
-                #toss a coin with that probability
-                toss =\
-                 random_module.roll(probability_of_emigration)
-
-                #if toss comes up heads, male is emigrating
-                if (toss):
-                    #start by marking this agent as being dead
-                    new_generation.mark_agent_as_dead(new_agent)
-                    #now shuffle all groups (while removing this)
-                    #one.
-                    groups = this_generation_population.groups
-                    max_group_index = len(groups)
-                    group_indices = range(0, max_group_index)
-
-                    tries = 0
-                    while (tries < 3):
-                        #shuffle groups
-                        random_module.shuffle(group_indices)
-                        target_group_index = group_indices[0]
-
-                        if (target_group_index != this_generation.group_index):
-                            target_group = this_generation_population.\
-                             groups[target_group_index]
-                            group_females_per_male =\
-                             target_group.get_females_to_male()
-                            chance_of_acceptance =\
-                             dispersal_table.chance_of_acceptance(
-                                females_to_male, this_agent.age)
-                            if (random_module.roll(chance_of_acceptance[tries])):
-                                next_generation_population.groups[target_group_index].add_agent(new_agent)
-                                return
-                            else:
-                                #check if it dies
-                                if (random_module.roll(chance_of_acceptance[tries+1])):
-                                    return
-                                else:
-                                    tries += 2
-    """
     def save_age_stats(self, data_list, book):
         """
         collates and saves age-related stats.
@@ -635,28 +502,28 @@ class Simulation:
             if len(generation) != 0:
                 number_of_agents = len(generation)
             else:
-                number_of_agents = 0.00001 #avoid div by 0
+                number_of_agents = 0.00001  # avoid div by 0
 
-            #first calculate the average age
+            # first calculate the average age
             for agent_age in generation:
                 average_age += agent_age
 
-            average_age = float(average_age)/float(number_of_agents)
+            average_age = float(average_age) / float(number_of_agents)
 
-            #now calculate standard dev
+            # now calculate standard dev
             for agent_age in generation:
-                standard_deviation_increment =\
-                 math.pow((agent_age - average_age), 2)
-                standard_deviation_aggregate +=\
-                 standard_deviation_increment
+                standard_deviation_increment = \
+                    math.pow((agent_age - average_age), 2)
+                standard_deviation_aggregate += \
+                    standard_deviation_increment
 
             standard_deviation = math.sqrt(
-                (standard_deviation_aggregate/number_of_agents)
-                )
+                (standard_deviation_aggregate / number_of_agents)
+            )
 
             output_list.append((average_age, standard_deviation))
 
-        #save the average age
+        # save the average age
         data_saver.save_age_data(output_list, book)
 
     def save_group_composition_stats(self, data_list, book):
@@ -685,44 +552,44 @@ class Simulation:
             if len(generation) != 0:
                 number_of_groups = len(generation)
             else:
-                number_of_groups = 0.00001 #avoid div by 0
+                number_of_groups = 0.00001  # avoid div by 0
 
-            #first calculate the average age
+            # first calculate the average age
             for group_population in generation:
                 average_population += group_population
 
-            average_population = average_population/\
-             number_of_groups
+            average_population = average_population / \
+                                 number_of_groups
 
-            #now calculate standard dev
+            # now calculate standard dev
             for group_population in generation:
-                standard_deviation_increment =\
-                 math.pow((group_population - average_population), 2)
-                standard_deviation_aggregate +=\
-                 standard_deviation_increment
+                standard_deviation_increment = \
+                    math.pow((group_population - average_population), 2)
+                standard_deviation_aggregate += \
+                    standard_deviation_increment
 
             standard_deviation = math.sqrt(
-                (standard_deviation_aggregate/number_of_groups)
-                )
-
-            output_list.append((average_population, standard_deviation))
-        #save the average age
-        data_saver.save_group_composition_data_for_simulation(
-            output_list, book
+                (standard_deviation_aggregate / number_of_groups)
             )
 
+            output_list.append((average_population, standard_deviation))
+        # save the average age
+        data_saver.save_group_composition_data_for_simulation(
+            output_list, book
+        )
+
     def save_data(self,
-     population_record_list,
-     male_population_record_list,
-     female_population_record_list,
-     age_record_list,
-     real_birth_rate_list,
-     real_death_rate_list,
-     adult_females_per_males_list,
-     group_composition_list,
-     adult_males_list,
-     adult_females_list,
-     birth_interval_list):
+                  population_record_list,
+                  male_population_record_list,
+                  female_population_record_list,
+                  age_record_list,
+                  real_birth_rate_list,
+                  real_death_rate_list,
+                  adult_females_per_males_list,
+                  group_composition_list,
+                  adult_males_list,
+                  adult_females_list,
+                  birth_interval_list):
         """
         saves output data to a file.
 
@@ -739,14 +606,14 @@ class Simulation:
         self.save_age_stats(age_record_list)
         self.save_group_composition_stats(
             group_composition_list, book
-            )
+        )
         data_saver.save_number_of_indivs(population_record_list,
-            male_population_record_list, female_population_record_list,
-            real_birth_rate_list, real_death_rate_list,
-            None,
-            adult_females_per_males_list, birth_interval_list, book)
-        output_directory =\
-         constants.OUTPUT_FOLDER + self.output_xls_name
+                                         male_population_record_list, female_population_record_list,
+                                         real_birth_rate_list, real_death_rate_list,
+                                         None,
+                                         adult_females_per_males_list, birth_interval_list, book)
+        output_directory = \
+            constants.OUTPUT_FOLDER + self.output_xls_name
         book.save(output_directory)
 
     def save_data_to_dot(self, dot_string, generation_number):
@@ -760,6 +627,7 @@ class Simulation:
         filename = self.json_directory + generation_number_string + ".json"
         destination_file = open(filename, "w+")
         destination_file.write(data_string)
+
 
 if __name__ == '__main__':
     main()
