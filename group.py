@@ -115,7 +115,7 @@ class AgentGroup():
 
         for agent_index in self.agent_dict:
             agent = self.agent_dict[agent_index]
-            agent.update_indices(top_index)
+            agent.update_index(top_index)
 
             if (agent.index > new_top_index):
                 new_top_index = agent.index
@@ -210,8 +210,9 @@ class AgentGroup():
         # add the new infant to the group
         group.add_agent(child_agent)
 
-    def mark_agent_as_dead(self, agent, new_generation, counter, avail_females, eligible_males,
-                           random_module):
+    def mark_agent_as_dead(self, agent, new_generation, counter,
+                           avail_females, eligible_males,
+                           leaders, lea_for_fol, random_module, population_dict=None):
         """
         marks an agent as having died. Since the self.all_agents
         set contains all living agents, by removing the agent
@@ -223,6 +224,18 @@ class AgentGroup():
         """
         print (str(agent.index) + " died!")
         counter.increment()
+        try:
+            new_generation.agent_dict.pop(agent.index)
+        except KeyError:
+            pass
+        try:
+            population_dict.pop(agent.index)
+        except (AttributeError, KeyError):
+            pass
+        try:
+            new_generation.remove_agent(agent)
+        except ValueError:
+            pass
 
         #  if this dead agent had explicit parents, and they are 1 y old or less,
         # mother (parents[0]) resumes cycles
@@ -235,6 +248,26 @@ class AgentGroup():
                     pass
 
         if agent.sex == "m":
+            print(str(agent.index) + "'s malestate is " + str(agent.maleState))
+            try:
+                eligible_males.remove(agent.index)
+                print "removed " + str(agent.index) + " from eligible_males"
+            except ValueError:
+                pass
+            if leaders:
+                try:
+                    leaders.remove(agent.index)
+                    print "removed " + str(agent.index) + " from leaders"
+                except ValueError:
+                    pass
+
+            try:
+                lea_for_fol.remove(agent.index)
+                print "removed " + str(agent.index) + " from lea_for_fol"
+
+            except ValueError:
+                pass
+
             if agent.maleState == MaleState.lea:
 
                 #  if the male was a leader, his followers get a
@@ -249,34 +282,36 @@ class AgentGroup():
 
                 #  remaining followers get put into eligible set
                 #  b/c they were effectively solitary this turn
-                eligible_males += agent.malefol
                 for i in range(0, len(agent.malefol)):
                     new_generation.agent_dict[agent.malefol[i]].maleState = MaleState.sol
+                eligible_males += agent.malefol
+
                 print("added " + str(agent.malefol) + " to elig males")
 
             elif agent.maleState == MaleState.fol:
                 try:
                     new_generation.agent_dict[agent.OMUID].malefol.remove(agent.index)
-                except ValueError:
+                    print(str(agent.index) + " removed from " + str(agent.OMUID) + "'s OMU")
+                except (KeyError, ValueError):
                     pass
 
         #  quickly remove dead female from available females and as leader's female
         elif agent.sex == "f":
             try:
                 new_generation.agent_dict[agent.OMUID].females.remove(agent.index)
+                print("removed female " + str(agent.index) + " from females list of " + str(agent.OMUID))
             except (ValueError, KeyError):
                 pass
             if agent.index in avail_females:
                 avail_females.remove(agent.index)
+                print("removed " + str(agent.index) + " from avail fems")
             try:
                 new_generation.underage_females_for_takeover.remove(agent.index)
+                print("removed " + str(agent.index) + " from underage fems")
             except ValueError:
                 pass
 
-        try:
-            new_generation.agent_dict.pop(agent.index)
-        except KeyError:
-            pass
+
         try:
             if agent.sex == 'm':
                 new_generation.male_set.remove(agent.index)
@@ -384,6 +419,7 @@ class AgentGroup():
             """
             self.male_set.add(agent.index)
             agent.maleState = MaleState.juvsol
+            agent.OMUID = ""
 
         elif agent.age == 6 and agent.sex == "m":
             agent.maleState = MaleState.sol
@@ -413,6 +449,7 @@ class AgentGroup():
         agent: agent to add
         """
         self.agent_dict[agent.index] = agent
+        agent.bandID = self.group_index
         self.whole_set.add(agent.index)
 
         # first check if female or male
@@ -454,7 +491,10 @@ class AgentGroup():
         ----------
         agent: agent to remove
         """
-        self.whole_set.remove(agent.index)
+        try:
+            self.whole_set.remove(agent)
+        except KeyError:
+            pass
 
         if (agent.age < self.FEMALE_MINIMUM_AGE):
             self.infants_set.remove(agent.index)
@@ -465,196 +505,16 @@ class AgentGroup():
         elif (agent.index in self.male_set):
             self.male_set.remove(agent.index)
 
-        else:
-            self.female_set.remove(agent.index)
-
-    def get_unrelated_members_of_age(self, agent):
-        """
-        returns members of the set who are unrelated and are
-        not underage
-
-        parameters
-        ----------
-        agent: the one whose unrelated members are sought
-
-        returns
-        -------
-        list of unrelated members, or [] if there are none
-        """
-        # note that underage members are not in the sexed sets
-        # first check if agent is male or female
-        if (agent.sex == "m"):
-            eligible_females = \
-                self.female_set.difference(
-                    self.in_relationships_set)
-            return eligible_females
+        elif agent.index in self.underage_females_for_takeover:
+            self.underage_females_for_takeover.remove(agent.index)
 
         else:
-            eligible_males = \
-                self.male_set.difference(
-                    self.in_relationships_set)
-            return eligible_males
-
-    """
-    def mark_agents_as_friends(self, agent_a, agent_b):
-        ""
-        marks 2 agents as being each other's friends
-
-        parameters
-        ----------
-        agent_a, agent_b: agents to mark as friends
-        ""
-        if (agent_a.index in self.whole_set and\
-            agent_b.index in self.whole_set):
-            agent_a.friends.add(agent_b.index)
-            agent_b.friends.add(agent_a.index)
-            self.in_relationships_set.add(agent_a.index)
-            self.in_relationships_set.add(agent_b.index)
-            assert(agent_a.index in agent_b.friends)
-        //	assert(agent_b.index in agent_a.friends)
-
-
-    def unmark_agents_friends(self, agent):
-        ""
-        removes all friendships from an agent
-
-        parameters
-        ----------
-        agent: target agent
-        ""
-        for friend_index in agent.friends:
-            friend = self.agent_dict[friend_index]
             try:
-                friend.friends.remove(agent.index)
-            except:
-                #if the friend doesn't recognize you,
-                #don't panic
+                self.female_set.remove(agent.index)
+            except KeyError:
                 pass
-        agent.friends = set()
-        """
 
-    def mark_agents_as_sisters(self, agent_a, agent_b):
-        """
-        marks 2 agents as being each other's sisters
 
-        parameters
-        ----------
-        agent_a, agent_b: agents to mark as sisters
-        """
-        assert (agent_a != agent_b)
-        assert (agent_a.index != agent_b.index)
-        agent_a.sisters.append(agent_b.index)
-        agent_b.sisters.append(agent_a.index)
-        self.in_relationships_set.add(agent_a.index)
-        self.in_relationships_set.add(agent_b.index)
-
-    def remove_male_from_aggressives(self, agent):
-        """
-        removes the male from this group's chain
-        of aggressive relationships. This method is
-        called prior to the male emigrating from the
-        group
-
-        parameters
-        ----------
-        agent: target agent
-        """
-        # reset the agent's agg_next and agg_prev
-        if (self.aggressive_chain_head == agent.index):
-            # agent is at head of list
-            if (agent.aggressive_next == None):
-                # agent is the only male in list
-                self.aggressive_chain_head = None
-
-            else:
-                # there are others in the list
-                list_next_male = \
-                    self.agent_dict[agent.aggressive_next]
-                self.aggressive_chain_head = \
-                    list_next_male.index
-                list_next_male.aggressive_prev = None
-
-        elif (agent.aggressive_prev != None):
-            if (agent.aggressive_next == None):
-                # agent is at tail of list
-                list_prev_male = \
-                    self.agent_dict[agent.aggressive_prev]
-                list_prev_male.aggressive_next = None
-
-            else:
-                # agent is the the middle of the list
-                list_prev_male = \
-                    self.agent_dict[agent.aggressive_prev]
-                list_next_male = \
-                    self.agent_dict[agent.aggressive_next]
-                list_next_male.aggressive_prev = \
-                    list_prev_male.index
-                list_prev_male.aggressive_next = \
-                    list_next_male.index
-
-        agent.aggressive_next = None
-        agent.aggressive_prev = None
-
-    def add_male_to_aggressives(self, agent):
-        """
-        adds the agent to the chain of aggressive
-        relationships in the group
-
-        parameters
-        ----------
-        agent: target agent
-        """
-        # make sure the agent has been removed
-        # from the previous group correctly
-        assert (agent.sex == 'm')
-        assert (agent.aggressive_next == None)
-        assert (agent.aggressive_prev == None)
-
-        if (self.aggressive_chain_head == None):
-            self.aggressive_chain_head = agent.index
-
-        else:
-            # traverse the list until the correct spot is found
-            current_list_agent_index = self.aggressive_chain_head
-            current_list_agent = \
-                self.agent_dict[current_list_agent_index]
-
-            while (current_list_agent.age < agent.age and \
-                               current_list_agent.aggressive_next != None):
-                current_list_agent_index = \
-                    current_list_agent.aggressive_next
-                current_list_agent = \
-                    self.agent_dict[current_list_agent_index]
-
-            if current_list_agent.aggressive_next == None:
-                # tail of list has been reached
-                current_list_agent.aggressive_next = \
-                    agent.index
-                agent.aggressive_prev = current_list_agent.index
-
-            else:
-                # insert in middle of list
-                agent.aggressive_next = \
-                    current_list_agent.aggressive_next
-                agent.aggressive_prev = current_list_agent.index
-
-                current_list_agent.aggressive_next = \
-                    agent.index
-                next_list_agent = self.agent_dict[
-                    agent.aggressive_next]
-                next_list_agent.aggressive_prev = agent.index
-
-    def mark_agents_as_having_a_relationship(self, agent):
-        """
-        marks an agent as having a relationship. Agents who have
-        one of any kind of relationships are ineligible to become
-        friends
-
-        parameters
-        ----------
-        agent: the agent whom to mark as having a related_members
-        """
-        self.in_relationships_set.add(agent.index)
 
     def __del__(self):
         del self.agent_dict

@@ -39,8 +39,8 @@ class AgentClass:
 
 
     def __init__(self, age, sex, femaleState, maleState,
-        index, clanID, bandID, parents, OMUID, compability, females = None,
-                 malefol = None, children=None, last_birth = 0, lottery = [],
+        index, clanID, bandID, parents, OMUID, compability, females = [],
+                 malefol = [], children = set(), last_birth = 0, lottery = [],
                  ):
         """
         constructor
@@ -103,26 +103,31 @@ class AgentClass:
 
         return selfstring
 
-    def update_indices(self, top_index):
+    def update_index(self, top_index):
         """
         increments all indices by top_index, to
         keep a unique index for an individual across
         a population
         """
         self.index += top_index
+        self.clanID += top_index
+        self.bandID += top_index
 
         if self.maleState == MaleState.lea:
             for i in range(0, len(self.females)):
                 self.females[i] += top_index
-            if self.malefol:
-                self.malefol[0] += top_index
+
+            for i in range(0, len(self.malefol)):
+                self.malefol[i] += top_index
+
+            unique_male_fols = list(set(self.malefol))
+            assert(self.malefol == unique_male_fols)
+            assert self.index not in self.malefol
 
         if self.OMUID != "":
             self.OMUID += top_index
+
         #this is correct
-
-        self.clanID += top_index
-
 
     def get_dot_string(self, parent_group):
         """

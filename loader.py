@@ -16,7 +16,7 @@ structured as follows:
 
 import xlrd
 from lifetable import LifeTable
-from dispersal import Competitive
+import dispersal
 from dispersaltable import DispersalTable
 from translocation_table import TranslocationTable
 
@@ -151,7 +151,7 @@ class Loader:
         end_flag = True #used to let user customize number of rows in excel
                          #file by setting an END flag at the end of the table
 
-        competitive_table = Competitive()
+        competitive_table = dispersal.Competitive()
 
         for row_index in range (self.STARTING_ROW, competitive_table_sheet.nrows):
 

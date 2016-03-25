@@ -100,6 +100,12 @@ class SeedGenerator:
         #iterate through the rows
         for row_index in range (self.STARTING_ROW, seedsheet.nrows):
 
+            fols = []
+            females = []
+            maleState = None
+            femaleState = None
+            omu_index = ""
+
             #get parameters
             clan_index = int(float(seedsheet.cell_value(row_index, 0)))
 
@@ -124,13 +130,8 @@ class SeedGenerator:
                     else:
                         fols = [int(fols)]
 
-            else:
-                maleState = None
-
             if sex == "F":
                 femaleState = FemaleState.cycling
-            else:
-                femaleState = None
 
             this_agent = AgentClass(age = age_in_years, sex = sex,
                 femaleState = femaleState, maleState= maleState, females = females,
