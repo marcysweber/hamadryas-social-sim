@@ -14,6 +14,7 @@ unique indices are used to construct a graph of each
 stage of the simulation.
 """
 import collections
+from agent import AgentClass
 import copy
 import json
 
@@ -51,7 +52,6 @@ class Population():
 		adds a new group into the population
 		"""
         new_group.parent_population = self
-        self.group_top_index += 1
         new_group.group_index = self.group_top_index
 
         # go through the group, and increment all indices
@@ -61,6 +61,7 @@ class Population():
         # unique
         self.top_index = new_group.update_indices(self.top_index)
         self.groups.append(new_group)
+        self.group_top_index += 1
 
     def get_new_agent_index(self):
         """
@@ -68,6 +69,13 @@ class Population():
 		"""
         self.top_index += 1  # pre increment the top_index
         return self.top_index  # send the old top_index
+
+    def move_agent_to_group(self, agent, destination):
+        self.groups[agent.bandID].remove_agent(agent)
+        self.groups[agent.bandID].agent_dict.pop(agent.index)
+
+        self.groups[destination].add_agent(agent)
+        agent.move_agent_to_group(destination)
 
     def get_json_string(self):
         """

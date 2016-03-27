@@ -41,7 +41,7 @@ class Simulation:
     output_xls_name = ""
     dot_directory = ""
     json_directory = ""
-    NUMBER_OF_GENERATIONS = input('Generations: ')
+    NUMBER_OF_GENERATIONS = 100
     NUMBER_OF_SEED_GROUPS = 10
 
     def __init__(self, output_xls_name="simulation_output_data.xls",
@@ -100,12 +100,8 @@ class Simulation:
         for i in range(0, self.NUMBER_OF_SEED_GROUPS + 1):
             this_generation_population.add_group(copy.deepcopy(seed_group))
 
-        """
-        I was having a strange error where the 0th group
-        was loaded incorrectly. This is a temporary fix
-
-        """
-        del this_generation_population.groups[0]
+        for group in this_generation_population.groups:
+            group.check_group()
 
         total_births = 0
         total_deaths = 0
@@ -149,6 +145,8 @@ class Simulation:
                                          eligible_males=eligible_males, population_dict=new_generation_population_dict):
                         new_generation_population_dict[agent_index] = new_agent
 
+            self.check_followers(new_generation_population_dict)
+
             #  debugging loop
             for agent in eligible_males:
                 assert agent in new_generation_population_dict
@@ -160,10 +158,11 @@ class Simulation:
                 dispersal.opportun_takeover(new_generation=new_generation_population_dict,
                                             avail_females=avail_females,
                                             eligible_males=eligible_males,
-                                            deathcounter=death_counter)
+                                            deathcounter=death_counter,
+                                            population=next_generation_population)
 
             avail_females = []
-            print "Opp takeovers done."
+            print "Opp takeovers 1 done."
 
             # run non-dispersal stuff for each sub_group.
             for j in range(0, len(this_generation_population.groups)):
@@ -180,7 +179,7 @@ class Simulation:
                     this_generation.get_females_to_male()
 
                 for agent_index in this_generation.whole_set:
-                    if agent_index in new_generation_population_dict:
+                    if agent_index in new_generation_population_dict and agent_index in new_generation.agent_dict:
                         this_agent = \
                             this_generation.agent_dict[agent_index]
                         new_agent = \
@@ -188,13 +187,15 @@ class Simulation:
 
                         if this_agent.sex == "m":
                             # check if leaders are still leaders
-                            self.male_check(this_agent, new_agent, this_generation_leaders, this_generation_lea_for_fol)
+                            self.male_check(this_agent, new_agent, this_generation_leaders, this_generation_lea_for_fol,
+                                            new_generation)
+
                             #  other male checks
                         #  these must be separate
-                print "Male checks done. Leaders: " + str(this_generation_leaders)
+                print "Male checks done."
 
                 for agent_index in this_generation.whole_set:
-                    if agent_index in new_generation_population_dict:
+                    if agent_index in new_generation_population_dict and agent_index in new_generation.agent_dict:
                         this_agent = \
                             this_generation.agent_dict[agent_index]
                         new_agent = \
@@ -266,7 +267,7 @@ class Simulation:
             if avail_females:
                 dispersal.opportun_takeover(new_generation=new_generation_population_dict,
                                             avail_females=avail_females, eligible_males=eligible_males,
-                                            deathcounter=death_counter)
+                                            deathcounter=death_counter, population=next_generation_population)
 
             avail_females = []
             print "Second op takeovers done."
@@ -378,18 +379,46 @@ class Simulation:
         """
         pass
 
-    def male_check(self, this_agent, new_agent, leaders, lea_for_fol):
+    def male_check(self, this_agent, new_agent, leaders, lea_for_fol, new_generation):
         if this_agent.sex == "m":
-            if new_agent.maleState == MaleState.lea or this_agent.maleState == MaleState.lea:
+            if new_agent.maleState == MaleState.lea:
                 assert this_agent.index not in this_agent.malefol
-                if this_agent.females:
+                if new_agent.females:
+                    new_agent.maleState = MaleState.lea
                     leaders += [this_agent.index]
                     if len(this_agent.females) >= 4:
                         if len(this_agent.malefol) < 2:
                             lea_for_fol += [this_agent.index]
-                else:
-                    new_agent.maleState = MaleState.sol
+                    if new_agent.malefol:
+                        for follower_index in new_agent.malefol:
+                            follower = new_generation.agent_dict[follower_index]
+                            assert follower.OMUID == new_agent.index
+                            assert follower.females == []
+                            assert follower.malefol == []
 
+                elif not new_agent.females:
+                    print str(new_agent) + " has no females, solitarifying"
+                    new_agent.maleState = MaleState.sol
+                    new_agent.OMUID = ""
+                    if new_agent.malefol:
+                        for follower_index in new_agent.malefol:
+                            print "\t" + str(follower_index) + " no longer follows " + str(new_agent)
+                            follower = new_generation.agent_dict[follower_index]
+                            follower.maleState = MaleState.sol
+                            follower.OMUID = ""
+                    new_agent.malefol = []
+
+            elif new_agent.maleState == MaleState.fol:
+                assert new_agent.OMUID != new_agent.index
+                assert not new_agent.malefol
+                assert not new_agent.females
+                assert new_generation.agent_dict[new_agent.OMUID].maleState == MaleState.lea
+                # if new_generation.agent_dict[new_agent.OMUID].maleState != MaleState.lea:
+                #     new_agent.maleState = MaleState.sol
+                #     new_agent.OMUID = ""
+            elif new_agent.maleState == MaleState.sol:
+                assert not new_agent.females
+                assert not new_agent.malefol
 
     def male_choices(self, this_generation, new_generation, this_agent,
                     new_agent, randommodule, lea_for_fol, leaders,
@@ -657,6 +686,17 @@ class Simulation:
         destination_file = open(filename, "w+")
         destination_file.write(data_string)
 
+    def check_followers(self, population_dict):
+        all_processed_followers = {}
+        for agent_index in population_dict:
+            agent = population_dict[agent_index]
+            if agent.sex == "m":
+                if agent.malefol:
+                    for new_follower_index in agent.malefol:
+                        follower = population_dict[new_follower_index]
+                        assert new_follower_index not in all_processed_followers
+                        assert follower.malefol == []
+                        all_processed_followers[new_follower_index] = agent_index
 
 if __name__ == '__main__':
     main()

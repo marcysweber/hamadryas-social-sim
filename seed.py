@@ -145,7 +145,6 @@ class SeedGenerator:
 
             group.add_agent(this_agent)
 
-
         #make a pass through the group marking parents
         """
         for agent_key in group.agent_dict:
@@ -156,8 +155,9 @@ class SeedGenerator:
                         group.agent_dict[int(agent.parent)],
                         agent)
         """
-        return group
+        group.check_group()
 
+        return group
 
 
 if __name__ == '__main__':

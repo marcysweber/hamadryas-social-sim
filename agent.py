@@ -36,11 +36,12 @@ class AgentClass:
     bandID = ""
     OMUID = ""
 
+    dispersed = False
 
 
     def __init__(self, age, sex, femaleState, maleState,
         index, clanID, bandID, parents, OMUID, compability, females = [],
-                 malefol = [], children = set(), last_birth = 0, lottery = [],
+                 malefol = [], children = set(), last_birth = 0, lottery = [], dispersed = False
                  ):
         """
         constructor
@@ -77,6 +78,7 @@ class AgentClass:
         self.OMUID = OMUID
         self.lottery = lottery
         self.compability = compability
+        self.dispersed = dispersed
 
         #make sure sisters, aggressive, friends are empty lists not
         #null references
@@ -128,6 +130,9 @@ class AgentClass:
             self.OMUID += top_index
 
         #this is correct
+
+    def move_agent_to_group(self, destination):
+        self.bandID = destination
 
     def get_dot_string(self, parent_group):
         """

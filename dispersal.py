@@ -45,17 +45,22 @@ class Competitive:
         return ability
 
 
-def attempt_initial_unit(this_generation, next_generation, female, male, deathcounter):
-    this_female = next_generation.agent_dict[female]
-    this_male = next_generation.agent_dict[male]
+def attempt_initial_unit(this_generation, new_generation, female, male, deathcounter, population):
+    this_female = new_generation.agent_dict[female]
+    this_male = new_generation.agent_dict[male]
     draw = random.randrange(1, 100)
 
     if this_male.OMUID == this_female.OMUID:
         if draw <= 85:
-            add_female_to_OMU(next_generation, this_female, this_male, deathcounter)
+            print "solitary's initial unit"
+            add_female_to_OMU(new_generation, this_female, this_male, deathcounter, population)
+            new_generation.underage_females_for_takeover.remove(this_female.index)
     else:
         if draw <= 50:
-            add_female_to_OMU(next_generation, this_female, this_male, deathcounter)
+            print "Solitary's initial unit"
+            add_female_to_OMU(new_generation, this_female, this_male, deathcounter, population)
+            new_generation.underage_females_for_takeover.remove(this_female.index)
+
 
 
 def solitary_choices(new_generation, this_generation, male, lea_for_fol, leaders, deathcounter, avail_females,
@@ -75,8 +80,8 @@ def solitary_choices(new_generation, this_generation, male, lea_for_fol, leaders
     if draw <= 50:
         if this_generation.underage_females_for_takeover:
             attempt_initial_unit(this_generation, new_generation,
-                                 random.choice(this_generation.underage_females_for_takeover),
-                                 male=male.index, deathcounter=deathcounter)
+                                 random.choice(new_generation.underage_females_for_takeover),
+                                 male=male.index, deathcounter=deathcounter, population=[])
     elif clan_lea_for_fol:
         follow(this_generation, new_generation, random.choice(clan_lea_for_fol), male, lea_for_fol)
     elif clan_leaders:
@@ -85,12 +90,14 @@ def solitary_choices(new_generation, this_generation, male, lea_for_fol, leaders
 
 
 def follower_choices(new_generation, this_generation, male, deathcounter):
-    if this_generation.underage_females_for_takeover:
-        random.shuffle(this_generation.underage_females_for_takeover)
-        for female in this_generation.underage_females_for_takeover:
+    if new_generation.underage_females_for_takeover:
+        random.shuffle(new_generation.underage_females_for_takeover)
+        for female in new_generation.underage_females_for_takeover:
             if new_generation.agent_dict[female].OMUID == male.OMUID:
+                print "Follower's Initial Unit"
                 add_female_to_OMU(new_generation, new_generation.agent_dict[female],
-                                  male, deathcounter)
+                                  male, deathcounter, [])
+                new_generation.underage_females_for_takeover.remove(female)
                 break  # so it'll go randomly thru underage females until it finds one and then stops
                 #  we can come back later and put that followers might go back to being sol here
 
@@ -102,16 +109,24 @@ def challenge(this_generation, new_generation, challenger, leader_index, deathco
 
     print(str(challenger.index) + " challenged " + str(leader_index))
 
-    if Competitive().compability(agent=leader) > Competitive().compability(challenger):
+    leaderability = Competitive().compability(agent=leader)
+    challability = Competitive().compability(challenger)
+
+    print str(leader_index) + "'s ability is " + str(leaderability)
+    print str(challenger.index) + "'s ability is " + str(challability)
+
+    if leaderability > challability:
         #  leader wins
+        print str(leader_index) + " won."
         if random.choice(["dead", "alive"]) == "dead":
             new_generation.mark_agent_as_dead(challenger, new_generation, deathcounter, avail_females, eligible_males,
                                               leaders, lea_for_fol, random_module, population_dict=population_dict)
     else:
         #  challenger wins
+        print str(challenger.index) + " won."
         if leader.females:
             add_female_to_OMU(new_generation, new_generation.agent_dict[random.choice(leader.females)],
-                          challenger, deathcounter)
+                          challenger, deathcounter, [])
         else:
             print "It doesn't look like he had any females."
 
@@ -121,12 +136,16 @@ def challenge(this_generation, new_generation, challenger, leader_index, deathco
                                               population_dict=population_dict)
 
 
-def follow(this_generation, new_generation, leader, newfollower, lea_for_fol):
+def follow(this_generation, new_generation, leader_index, newfollower, lea_for_fol):
+    print str(newfollower.index) + " is about to follow " + str(leader_index)
     follower = new_generation.agent_dict[newfollower.index]
-    leadermale = new_generation.agent_dict[leader]
+    leadermale = new_generation.agent_dict[leader_index]
 
+    assert leader_index == leadermale.index
     assert follower.maleState == MaleState.sol
     assert follower.index != leadermale.index
+    assert follower.females == []
+    assert follower.malefol == []
 
     follower.maleState = MaleState.fol
     follower.OMUID = leadermale.index
@@ -137,7 +156,7 @@ def follow(this_generation, new_generation, leader, newfollower, lea_for_fol):
 
 
 
-def inherit_female(new_generation, omufemales, OMUfol, deadleader, random_module, deathcounter):
+def inherit_female(new_generation, omufemales, OMUfol, deadleader, random_module, deathcounter, eligible_males):
     """
         when the function is called, the male's followers have a high chance of
         "inheriting" one of his females
@@ -145,21 +164,30 @@ def inherit_female(new_generation, omufemales, OMUfol, deadleader, random_module
 
     # loop over the males, give random female
     if OMUfol:
-        for agent_index in OMUfol:
-            this_male = new_generation.agent_dict[agent_index]
-            this_female = new_generation.agent_dict[random.choice(omufemales)]
-            # choice randomly picks an item from the list
+        if omufemales:
+            for agent_index in OMUfol:
+                this_male = new_generation.agent_dict[agent_index]
+                this_female = new_generation.agent_dict[random.choice(omufemales)]
+                # choice randomly picks an item from the list
 
-            if random_module.roll(0.9):
-                add_female_to_OMU(new_generation, this_female, this_male, deathcounter)
-                try:
-                    deadleader.females.remove(this_female.index)
-                except ValueError:
-                    pass
-                # remove inherited females from deadleader.females
+                if random_module.roll(0.9):
+                    print "Inheritance"
+                    add_female_to_OMU(new_generation, this_female, this_male, deathcounter)
+                    try:
+                        deadleader.females.remove(this_female.index)
+                    except ValueError:
+                        pass
+                    eligible_males.remove(this_male.index)
+                    print str(this_male.index) + " removed from eligible males"
+                    # remove inherited females from deadleader.females
+        else:
+            for agent_index in OMUfol:
+                this_male = new_generation.agent_dict[agent_index]
+                this_male.maleState = MaleState.sol
 
 
-def opportun_takeover(new_generation, avail_females, eligible_males, deathcounter):
+
+def opportun_takeover(new_generation, avail_females, eligible_males, deathcounter, population):
     """
     goes thru the females in avail_females and distributes them to
     "eligible" males
@@ -180,12 +208,11 @@ def opportun_takeover(new_generation, avail_females, eligible_males, deathcounte
         this_female = new_generation[agent_index]
         assert (this_female.sex == "f")
 
-        lottery = 0
+        lottery = []
 
         for magent_index in eligible_males:
             this_male = new_generation[magent_index]
             assert (this_male.sex == "m")
-            this_male.lottery = []
 
             #  each male gets 1 or more lottery numbers
 
@@ -195,25 +222,18 @@ def opportun_takeover(new_generation, avail_females, eligible_males, deathcounte
                     #  certain chance of success
                     if not this_male.malefol:
                         #  if male doesn't have followers, half success
-                        this_male.lottery = [lottery]
-                        lottery += 1
+                        for i in range(0, 1):
+                            lottery += [this_male.index]
                     else:
                         #  male must have followers
-                        this_male.lottery = [lottery]
-                        lottery += 1
-                        this_male.lottery += [lottery]
-                        lottery += 1
-                        this_male.lottery += [lottery]
-                        lottery += 1
+                        for i in range(0, 4):
+                            lottery += [this_male.index]
+
 
                 else:
                     #  higher chance of success
-                    this_male.lottery = [lottery]
-                    lottery += 1
-                    this_male.lottery += [lottery]
-                    lottery += 1
-                    this_male.lottery += [lottery]
-                    lottery += 1
+                    for i in range(0, 4):
+                        lottery += [this_male.index]
 
             else:
                 #  in same band but different clan
@@ -221,54 +241,62 @@ def opportun_takeover(new_generation, avail_females, eligible_males, deathcounte
                     if this_male.bandID == this_female.bandID:
                         if this_male.age > 14:
                             #  male must be older, but has equal success
-                            this_male.lottery = [lottery]
-                            lottery += 1
-                            this_male.lottery = [lottery]
-                            lottery += 1
+                            for i in range(0, 1):
+                                lottery += [this_male.index]
                     else:
                         if this_male.age > 14:
                             #  male must be older, but has equal success
-                            this_male.lottery = [lottery]
-                            lottery += 1
+                            lottery += [this_male.index]
 
-        draw = random.randrange(lottery)
+        chosen_male = random.choice(lottery)
         #  lottery draw
-
-        for male in eligible_males:
-            this_male = new_generation[male]
-            if this_male.lottery == draw:
-                add_female_to_OMU(new_generation, this_female, this_male, deathcounter)
+        the_male = new_generation[chosen_male]
+        print "Opportunistic"
+        add_female_to_OMU(new_generation, this_female, the_male, deathcounter, population)
     #  so eligible_males is not emptied here, which is GOOD b/c then we can recall the func
                 #  without repopulating this_generation_eligible_males
 
 
-def add_female_to_OMU(new_generation, female, male, deathcounter):
+def add_female_to_OMU(new_generation, female, male, deathcounter, population = None):
+    if population:
+        her_generation = population.groups[female.bandID]
+        his_generation = population.groups[male.bandID]
+    else:
+        her_generation = new_generation
+        his_generation = new_generation
+
     random_module = RandomModule()
-    if bool(female.children):
-        assert (new_generation.agent_dict[female.children].age < 5)
+    if len(female.children) != 0: # if the children set is not empty
+        for child in her_generation.agent_dict[female.children]:
+            assert child.age < 5
+            # INFANTICIDE, 60%
+            if random_module.roll(0.6):
+                her_generation.mark_agent_as_dead(
+                    child, new_generation, deathcounter, None, None, random_module)
+            print "child " + str(child.index) + " now follows " + str(male.index)
+            child.OMUID = male.index
 
-        # INFANTICIDE, 60%
-        if random_module.roll(0.6):
-            new_generation.mark_agent_as_dead(
-                new_generation.agent_dict[female.children], new_generation, deathcounter, None, None, random_module)
-        # if the children set is not empty
-        new_generation.agent_dict[female.children].OMUID = male.index
-
-    if male.maleState == MaleState.fol:
-        try:
-            new_generation.agent_dict[male.OMUID].malefol.remove(male.index)
-        #  makes sure removes that former follower from old leaders' list
-        except (KeyError, ValueError):
-            pass
     try:
-        new_generation.agent_dict[female.OMUID].females.remove(female.index)
+        his_generation.agent_dict[male.OMUID].malefol.remove(male.index)
+    #  makes sure removes that former follower from old leaders' list
+    except (KeyError, ValueError):
+        pass
+    try:
+        her_generation.agent_dict[female.OMUID].females.remove(female.index)
+        print " removed " + str(female.index) + " from OMU " + str(female.OMUID)
     except (ValueError, KeyError):
         pass
 
+    print str(male.OMUID) + " is now a leader! Hooray!"
     male.OMUID = male.index
     male.maleState = MaleState.lea
     male.females.append(female.index)
 
     female.OMUID = male.index
     female.clanID = male.clanID
+    if female.bandID != male.bandID:
+        population.move_agent_to_group(female, male.bandID)
+    female.dispersed = True
+
+    print str(female.index) + "was added to " + str(male.index) + "'s OMU"
     """  IF SHE'S FROM ANOTHER GROUP SHE NEEDS TO BE ADDED TO HER NEW MALE'S GROUP"""
