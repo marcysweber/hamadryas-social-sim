@@ -12,12 +12,12 @@ NOTE: Throughout this method it is assumed that
     FEMALE_MINIMUM_AGE < MALE_MINIMUM_AGE
 """
 
-from agent import AgentClass, FemaleState, MaleState, CompAbility
-import random
 import copy
+import random
+
 import constants
 import dispersal
-from random_module import RandomModule
+from agent import AgentClass, FemaleState, MaleState, CompAbility
 
 
 class AgentGroup():
@@ -190,7 +190,7 @@ class AgentGroup():
             self.parent_population.get_new_agent_index()
         clanID = mother.clanID
         bandID = mother.bandID
-        OMUID = mother.OMUID
+        OMUID = mother.getOMUID()
         assert isinstance(OMUID, object)
         child_agent = AgentClass(
                 age=0, sex=child_sex, femaleState=None, maleState=None,
@@ -209,7 +209,7 @@ class AgentGroup():
 
         # add the new infant to the group
         group.add_agent(child_agent)
-        print str(child_agent.index) + " was born to " + str(child_agent.OMUID) + "'s OMU!"
+        print str(child_agent.index) + " was born to " + str(child_agent.getOMUID()) + "'s OMU!"
 
     def mark_agent_as_dead(self, agent, new_generation, counter,
                            avail_females, eligible_males,
@@ -278,13 +278,15 @@ class AgentGroup():
 
                 #  remaining followers get put into eligible set
                 #  b/c they were effectively solitary this turn
-                for i in range(0, len(agent.malefol)):
-                    new_generation.agent_dict[agent.malefol[i]].maleState = MaleState.sol
+                malefol = agent.getMaleFol()
+                for i in range(0, len(malefol)):
+                    new_generation.agent_dict[malefol[i]].maleState = MaleState.sol
+                agent.setMaleFol(malefol)
 
-                eligible_males += agent.malefol
-                print("added " + str(agent.malefol) + " to elig males")
+                eligible_males += agent.getMaleFol()
+                print("added " + str(agent.getMaleFol()) + " to elig males")
                 dispersal.inherit_female(new_generation, agent.females,
-                                         agent.malefol, agent, random_module, counter, eligible_males)
+                                         agent.getMaleFol(), agent, random_module, counter, eligible_males)
                 avail_females += agent.females
                 print("added " + str(agent.females) + " to avail females")
 
@@ -292,8 +294,8 @@ class AgentGroup():
 
             elif agent.maleState == MaleState.fol:
                 try:
-                    new_generation.agent_dict[agent.OMUID].malefol.remove(agent.index)
-                    print(str(agent.index) + " removed from " + str(agent.OMUID) + "'s OMU")
+                    new_generation.agent_dict[agent.getOMUID()].getMaleFol().remove(agent.index)
+                    print(str(agent.index) + " removed from " + str(agent.getOMUID()) + "'s OMU")
                 except (KeyError, ValueError):
                     pass
 
@@ -302,8 +304,8 @@ class AgentGroup():
             if agent.index not in avail_females and agent.dispersed:
                 #  if her male's not dead AND she's not still in her dad's OMU, try to remove her from his list
                 try:
-                    new_generation.agent_dict[agent.OMUID].females.remove(agent.index)
-                    print("removed female " + str(agent.index) + " from females list of " + str(agent.OMUID))
+                    new_generation.agent_dict[agent.getOMUID()].females.remove(agent.index)
+                    print("removed female " + str(agent.index) + " from females list of " + str(agent.getOMUID()))
                 except ValueError:
                     pass
             if agent.index in avail_females:
@@ -422,7 +424,7 @@ class AgentGroup():
             """
             self.male_set.add(agent.index)
             agent.maleState = MaleState.juvsol
-            agent.OMUID = ""
+            agent.setOMUID("")
             agent.females = []
 
         elif agent.age == 6 and agent.sex == "m":
@@ -524,17 +526,17 @@ class AgentGroup():
             if agent.sex == "m":
                 assert agent.females != None
                 for female in agent.females:
-                    assert self.agent_dict[female].OMUID == agent.index
+                    assert self.agent_dict[female].getOMUID() == agent.index
 
                 if agent.maleState == MaleState.lea:
-                    for follower_index in agent.malefol:
+                    for follower_index in agent.getMaleFol():
                         follower = self.agent_dict[follower_index]
                         assert follower.maleState == MaleState.fol
-                        assert follower.OMUID == agent_index
+                        assert follower.getOMUID() == agent_index
                 elif agent.maleState == MaleState.sol or\
                     agent.maleState == MaleState.fol:
                     assert not agent.females
-                    assert not agent.malefol
+                    assert not agent.getMaleFol()
 
         print "group passes checks"
 

@@ -10,21 +10,20 @@ Main run loop
 
 """
 
-from agent import FemaleState, MaleState, AgentClass
-from group import AgentGroup
-from lifetable import LifeTable
-from population import Population
-import dispersal
-import seed
 import copy
-import loader
-from random_module import RandomModule
-from random import shuffle, choice
 import math
-import data_saver
+
 from xlwt import Workbook
+
 import constants
+import data_saver
+import dispersal
+import loader
+import seed
+from agent import FemaleState, MaleState
 from counter import Counter
+from population import Population
+from random_module import RandomModule
 
 
 def main():
@@ -216,7 +215,7 @@ class Simulation:
                         if this_agent.sex =="f":
                             # check for preg
 
-                            assert this_agent.OMUID
+                            assert this_agent.getOMUID()
 
                             self.check_for_preg(this_generation, new_generation,
                                                 this_agent, new_agent, females_to_male, agent_index, lifetable,
@@ -382,43 +381,43 @@ class Simulation:
     def male_check(self, this_agent, new_agent, leaders, lea_for_fol, new_generation):
         if this_agent.sex == "m":
             if new_agent.maleState == MaleState.lea:
-                assert this_agent.index not in this_agent.malefol
+                assert this_agent.index not in this_agent.getMaleFol()
                 if new_agent.females:
                     new_agent.maleState = MaleState.lea
                     leaders += [this_agent.index]
                     if len(this_agent.females) >= 4:
-                        if len(this_agent.malefol) < 2:
+                        if len(this_agent.getMaleFol()) < 2:
                             lea_for_fol += [this_agent.index]
-                    if new_agent.malefol:
-                        for follower_index in new_agent.malefol:
+                    if new_agent.getMaleFol():
+                        for follower_index in new_agent.getMaleFol():
                             follower = new_generation.agent_dict[follower_index]
-                            assert follower.OMUID == new_agent.index
+                            assert follower.getOMUID() == new_agent.index
                             assert follower.females == []
-                            assert follower.malefol == []
+                            assert follower.getMaleFol() == []
 
                 elif not new_agent.females:
                     print str(new_agent) + " has no females, solitarifying"
                     new_agent.maleState = MaleState.sol
-                    new_agent.OMUID = ""
-                    if new_agent.malefol:
-                        for follower_index in new_agent.malefol:
+                    new_agent.setOMUID("")
+                    if new_agent.getMaleFol():
+                        for follower_index in new_agent.getMaleFol():
                             print "\t" + str(follower_index) + " no longer follows " + str(new_agent)
                             follower = new_generation.agent_dict[follower_index]
                             follower.maleState = MaleState.sol
-                            follower.OMUID = ""
-                    new_agent.malefol = []
+                            follower.setOMUID("")
+                    new_agent.setMaleFol([])
 
             elif new_agent.maleState == MaleState.fol:
-                assert new_agent.OMUID != new_agent.index
-                assert not new_agent.malefol
+                assert new_agent.getOMUID() != new_agent.index
+                assert not new_agent.getMaleFol()
                 assert not new_agent.females
-                assert new_generation.agent_dict[new_agent.OMUID].maleState == MaleState.lea
+                assert new_generation.agent_dict[new_agent.getOMUID()].maleState == MaleState.lea
                 # if new_generation.agent_dict[new_agent.OMUID].maleState != MaleState.lea:
                 #     new_agent.maleState = MaleState.sol
                 #     new_agent.OMUID = ""
             elif new_agent.maleState == MaleState.sol:
                 assert not new_agent.females
-                assert not new_agent.malefol
+                assert not new_agent.getMaleFol()
 
     def male_choices(self, this_generation, new_generation, this_agent,
                     new_agent, randommodule, lea_for_fol, leaders,
@@ -691,11 +690,12 @@ class Simulation:
         for agent_index in population_dict:
             agent = population_dict[agent_index]
             if agent.sex == "m":
-                if agent.malefol:
-                    for new_follower_index in agent.malefol:
+                if agent.getMaleFol():
+                    for new_follower_index in agent.getMaleFol():
                         follower = population_dict[new_follower_index]
+                        assert follower.getOMUID() == agent_index
                         assert new_follower_index not in all_processed_followers
-                        assert follower.malefol == []
+                        assert follower.getMaleFol() == []
                         all_processed_followers[new_follower_index] = agent_index
 
 if __name__ == '__main__':

@@ -13,8 +13,9 @@ functions to add/move:
 - follow
 """
 import random
+
 import loader
-from agent import MaleState, FemaleState, AgentClass, CompAbility
+from agent import MaleState, CompAbility
 from random_module import RandomModule
 
 
@@ -50,7 +51,7 @@ def attempt_initial_unit(this_generation, new_generation, female, male, deathcou
     this_male = new_generation.agent_dict[male]
     draw = random.randrange(1, 100)
 
-    if this_male.OMUID == this_female.OMUID:
+    if this_male.getOMUID() == this_female.getOMUID():
         if draw <= 85:
             print "solitary's initial unit"
             add_female_to_OMU(new_generation, this_female, this_male, deathcounter, population)
@@ -93,7 +94,7 @@ def follower_choices(new_generation, this_generation, male, deathcounter):
     if new_generation.underage_females_for_takeover:
         random.shuffle(new_generation.underage_females_for_takeover)
         for female in new_generation.underage_females_for_takeover:
-            if new_generation.agent_dict[female].OMUID == male.OMUID:
+            if new_generation.agent_dict[female].getOMUID() == male.getOMUID():
                 print "Follower's Initial Unit"
                 add_female_to_OMU(new_generation, new_generation.agent_dict[female],
                                   male, deathcounter, [])
@@ -145,12 +146,12 @@ def follow(this_generation, new_generation, leader_index, newfollower, lea_for_f
     assert follower.maleState == MaleState.sol
     assert follower.index != leadermale.index
     assert follower.females == []
-    assert follower.malefol == []
+    assert follower.getMaleFol() == []
 
     follower.maleState = MaleState.fol
-    follower.OMUID = leadermale.index
-    leadermale.malefol += [follower.index]
-    if len(leadermale.malefol) >= 2:
+    follower.setOMUID(leadermale.index)
+    leadermale.setMaleFol(leadermale.getMaleFol() + [follower.index])
+    if len(leadermale.getMaleFol()) >= 2:
         lea_for_fol.remove(leadermale.index)
     print str(newfollower.index) + " is following " + str(leadermale)
 
@@ -220,7 +221,7 @@ def opportun_takeover(new_generation, avail_females, eligible_males, deathcounte
                 # males from within the clan
                 if this_male.maleState == MaleState.lea:
                     #  certain chance of success
-                    if not this_male.malefol:
+                    if not this_male.getMaleFol():
                         #  if male doesn't have followers, half success
                         for i in range(0, 1):
                             lottery += [this_male.index]
@@ -274,25 +275,25 @@ def add_female_to_OMU(new_generation, female, male, deathcounter, population = N
                 her_generation.mark_agent_as_dead(
                     child, new_generation, deathcounter, None, None, random_module)
             print "child " + str(child.index) + " now follows " + str(male.index)
-            child.OMUID = male.index
+            child.setOMUID(male.index)
 
     try:
-        his_generation.agent_dict[male.OMUID].malefol.remove(male.index)
+        his_generation.agent_dict[male.getOMUID()].getMaleFol().remove(male.index)
     #  makes sure removes that former follower from old leaders' list
     except (KeyError, ValueError):
         pass
     try:
-        her_generation.agent_dict[female.OMUID].females.remove(female.index)
-        print " removed " + str(female.index) + " from OMU " + str(female.OMUID)
+        her_generation.agent_dict[female.getOMUID()].females.remove(female.index)
+        print " removed " + str(female.index) + " from OMU " + str(female.getOMUID())
     except (ValueError, KeyError):
         pass
 
-    print str(male.OMUID) + " is now a leader! Hooray!"
-    male.OMUID = male.index
+    print str(male.getOMUID()) + " is now a leader! Hooray!"
+    male.setOMUID(male.index)
     male.maleState = MaleState.lea
     male.females.append(female.index)
 
-    female.OMUID = male.index
+    female.setOMUID(male.index)
     female.clanID = male.clanID
     if female.bandID != male.bandID:
         population.move_agent_to_group(female, male.bandID)

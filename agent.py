@@ -1,6 +1,6 @@
 
 import constants
-import copy
+
 
 class FemaleState:
     underage, cycling, pregnant, nursing0, nursing1 = range(5)
@@ -24,7 +24,7 @@ class AgentClass:
 
     maleState = None
     females = []
-    malefol = []
+    malefols = []
     lottery = []
     compability = None
 
@@ -34,7 +34,7 @@ class AgentClass:
     index = 0
     clanID = ""
     bandID = ""
-    OMUID = ""
+    OMU = ""
 
     dispersed = False
 
@@ -74,8 +74,8 @@ class AgentClass:
         self.last_birth = last_birth
         self.maleState = maleState
         self.females = females
-        self.malefol = malefol
-        self.OMUID = OMUID
+        self.setMaleFol(malefol)
+        self.setOMUID(OMUID)
         self.lottery = lottery
         self.compability = compability
         self.dispersed = dispersed
@@ -88,6 +88,20 @@ class AgentClass:
 
         #make sure that children is a set
         #assert(type(self.children) is set)
+
+    def setOMUID(self, OMUID):
+        print str(self.index) + "'s OMU ID is now " + str(OMUID)
+        self.OMU = OMUID
+
+    def getOMUID(self):
+        return self.OMU
+
+    def setMaleFol(self, malefol):
+        print str(self.index) + "'s malefols are now " + str(malefol)
+        self.malefols = malefol
+
+    def getMaleFol(self):
+        return self.malefols
 
     def get_selfstring(self):
         """
@@ -119,15 +133,18 @@ class AgentClass:
             for i in range(0, len(self.females)):
                 self.females[i] += top_index
 
-            for i in range(0, len(self.malefol)):
-                self.malefol[i] += top_index
+            malefol = self.getMaleFol()
+            for i in range(0, len(malefol)):
+                malefol[i] += top_index
 
-            unique_male_fols = list(set(self.malefol))
-            assert(self.malefol == unique_male_fols)
-            assert self.index not in self.malefol
+            self.setMaleFol(malefol)
 
-        if self.OMUID != "":
-            self.OMUID += top_index
+            unique_male_fols = list(set(self.getMaleFol()))
+            assert (self.getMaleFol() == unique_male_fols)
+            assert self.index not in self.getMaleFol()
+
+        if self.getOMUID() != "":
+            self.setOMUID(self.getOMUID() + top_index)
 
         #this is correct
 
