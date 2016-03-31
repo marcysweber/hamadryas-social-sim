@@ -38,7 +38,7 @@ def load_group(parent_population):
 
 def print_seed_group(destination_filename):
     """
-    prints seed group, by writing to a file in dot syntax
+    utilities.consolator(s seed group, by writing to a file in dot syntax
     """
     parent_population = Population()
     generator = SeedGenerator()

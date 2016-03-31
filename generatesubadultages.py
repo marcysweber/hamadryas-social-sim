@@ -1,4 +1,5 @@
 import random
+import utilities
 numbersubadults = 29
 subadultages = []
 
@@ -57,7 +58,7 @@ def main():
 			else:
 				subadultages.append(54)
 
-	print subadultages
+	utilities.consolator( subadultages)
 
 
 if __name__ == "__main__":

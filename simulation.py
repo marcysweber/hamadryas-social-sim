@@ -24,7 +24,8 @@ from agent import FemaleState, MaleState
 from counter import Counter
 from population import Population
 from random_module import RandomModule
-
+import utilities
+import relatedness
 
 def main():
     simulation = Simulation()
@@ -56,6 +57,13 @@ class Simulation:
         self.output_xls_name = output_xls_name
         self.dot_directory = dot_directory
         self.json_directory = json_directory
+
+        #relatedness
+        self.parentage = {}
+        self.withinmean = ""
+        self.withinsd = ""
+        self.acrossmean = ""
+        self.acrosssd = ""
 
     def run_simulation(self, save_to_dot=True, save_to_json=True):
         # import Seed and lifetable data
@@ -89,6 +97,9 @@ class Simulation:
 
         birth_interval_list = []
 
+        #  relatedness
+
+
         death_counter = Counter()  # used to make sure the correct number
         # of deaths occur
         birth_counter = Counter()  # used to make sure the correct number
@@ -106,7 +117,7 @@ class Simulation:
         total_deaths = 0
 
         for i in range(0, self.NUMBER_OF_GENERATIONS):
-            self.per_generation_printout(i)
+            self.per_generation_print_out(i)
             # analytics
             this_age_record = []
             this_population_record = 0  # quick fix error
@@ -161,7 +172,7 @@ class Simulation:
                                             population=next_generation_population)
 
             avail_females = []
-            print "Opp takeovers 1 done."
+            utilities.consolator( "Opp takeovers 1 done.")
 
             # run non-dispersal stuff for each sub_group.
             for j in range(0, len(this_generation_population.groups)):
@@ -191,7 +202,7 @@ class Simulation:
 
                             #  other male checks
                         #  these must be separate
-                print "Male checks done."
+                utilities.consolator( "Male checks done.")
 
                 for agent_index in this_generation.whole_set:
                     if agent_index in new_generation_population_dict and agent_index in new_generation.agent_dict:
@@ -200,7 +211,7 @@ class Simulation:
                         new_agent = \
                             new_generation.agent_dict[agent_index]
                         #  increment age
-                        new_generation.promote_agent(new_agent)
+                        new_generation.promote_agent(new_agent, self)
 
 
                         if this_agent.sex == "m":
@@ -262,21 +273,21 @@ class Simulation:
                 this_generation_group_composition_list.append(
                     len(this_generation.whole_set)
                 )
-            print "Main loop done."
+            utilities.consolator( "Main loop done.")
             if avail_females:
                 dispersal.opportun_takeover(new_generation=new_generation_population_dict,
                                             avail_females=avail_females, eligible_males=eligible_males,
                                             deathcounter=death_counter, population=next_generation_population)
 
             avail_females = []
-            print "Second op takeovers done."
-            print ('Population: ' + str(this_population_record - death_counter.getCount()))
+            utilities.consolator( "Second op takeovers done.")
+            utilities.consolator('Population: ' + str(this_population_record - death_counter.getCount()))
             if birth_counter.count < 1:
-                print ('births: 0')
+                utilities.consolator( ('births: 0'))
             else:
-                print ("births: " + str(birth_counter.count))
+                utilities.consolator( ("births: " + str(birth_counter.count)))
                 total_births += birth_counter.count
-            print ("deaths: " + str(death_counter.getCount()) + '\n')
+            utilities.consolator("deaths: " + str(death_counter.getCount()) + '\n')
             total_deaths += death_counter.getCount()
 
             self.conduct_changes_unique_to_experiment_at_gen(
@@ -338,6 +349,17 @@ class Simulation:
             assert (avail_females == [])
             # END OF GENERATION LOOP
 
+        #  here add OMUID to every living female
+        female_OMU_dict = {}
+        for group in this_generation_population:
+            for agent in group.agent_dict:
+                if agent.sex == "f" and agent.age >= 5:
+                    female_OMU_dict[agent.index] = agent.OMUID
+
+        #  a function for calculating relatedness
+        relatedness.main(self.recognition, female_OMU_dict, self.parentage)
+
+
         self.save_data(population_record_list,
                        male_population_record_list,
                        female_population_record_list,
@@ -350,13 +372,13 @@ class Simulation:
                        adult_females_list,
                        birth_interval_list)
 
-        print ('Total births: ' + str(total_births))
-        print ('Total deaths: ' + str(total_deaths))
+        utilities.consolator( ('Total births: ' + str(total_births)))
+        utilities.consolator( ('Total deaths: ' + str(total_deaths)))
 
         if len(birth_interval_list) != 0:
-            print ('Avg birth int: ' + str(6 * sum(birth_interval_list) / len(birth_interval_list)) + ' months')
+            utilities.consolator( ('Avg birth int: ' + str(6 * sum(birth_interval_list) / len(birth_interval_list)) + ' months'))
 
-    def per_generation_printout(self, generation_index, population_record_list=0):
+    def per_generation_print_out(self, generation_index, population_record_list=0):
         print generation_index
 
     def conduct_changes_unique_to_experiment_at_gen(self,
@@ -396,12 +418,12 @@ class Simulation:
                             assert follower.getMaleFol() == []
 
                 elif not new_agent.females:
-                    print str(new_agent) + " has no females, solitarifying"
+                    utilities.consolator( str(new_agent) + " has no females, solitarifying")
                     new_agent.maleState = MaleState.sol
                     new_agent.setOMUID("")
                     if new_agent.getMaleFol():
                         for follower_index in new_agent.getMaleFol():
-                            print "\t" + str(follower_index) + " no longer follows " + str(new_agent)
+                            utilities.consolator( "\t" + str(follower_index) + " no longer follows " + str(new_agent))
                             follower = new_generation.agent_dict[follower_index]
                             follower.maleState = MaleState.sol
                             follower.setOMUID("")
@@ -451,7 +473,7 @@ class Simulation:
             new_generation.mark_agent_as_dead(new_agent, new_generation, counter, avail_females, eligible_males,
                                               random_module=random_module, leaders=leaders, lea_for_fol=lea_for_fol,
                                               population_dict=population_dict)
-            #  print("dead")
+            #  utilities.consolator(("dead")
             return False
 
         else:
@@ -660,15 +682,15 @@ class Simulation:
             generation
         """
         book = Workbook()
-        self.save_age_stats(age_record_list)
-        self.save_group_composition_stats(
-            group_composition_list, book
-        )
+        self.save_age_stats(age_record_list, book)
+        self.save_group_composition_stats(group_composition_list, book)
         data_saver.save_number_of_indivs(population_record_list,
                                          male_population_record_list, female_population_record_list,
                                          real_birth_rate_list, real_death_rate_list,
                                          None,
                                          adult_females_per_males_list, birth_interval_list, book)
+
+
         output_directory = \
             constants.OUTPUT_FOLDER + self.output_xls_name
         book.save(output_directory)

@@ -81,13 +81,13 @@ def main():
             state, isBirth = female.recalcState(i)
             femaleStatesThisTurn.append(state)
             birthsThisTurn += isBirth
-        print str(femaleStatesThisTurn) + ", Births: " + str(birthsThisTurn)
+        utilities.consolator( str(femaleStatesThisTurn) + ", Births: " + str(birthsThisTurn)
         femaleStates.append(femaleStatesThisTurn)
         births.append(birthsThisTurn)
 
-    print "Birth intervals: " + str(birth_intervals)
+    utilities.consolator( "Birth intervals: " + str(birth_intervals)
     averagebirthinterval = (sum(birth_intervals)/len(birth_intervals)) 
-    print "Average Birth Interval: " +str(averagebirthinterval)
+    utilities.consolator( "Average Birth Interval: " +str(averagebirthinterval)
 
     column = 0
     for female_index in range(number_females):
@@ -109,7 +109,7 @@ def main():
         allbirths.append(births[i])
 
     birthrate = (sum(allbirths)/float(number_time_int)/float(number_females)) * 2.0
-    print "Real birth rate: " + str(birthrate)
+    utilities.consolator( "Real birth rate: " + str(birthrate)
     ws.write(4, column + 1, "Real birth rate")
     ws.write(5, column + 1, birthrate)
 

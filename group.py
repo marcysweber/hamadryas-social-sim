@@ -18,6 +18,8 @@ import random
 import constants
 import dispersal
 from agent import AgentClass, FemaleState, MaleState, CompAbility
+import utilities
+import simulation
 
 
 class AgentGroup():
@@ -209,7 +211,7 @@ class AgentGroup():
 
         # add the new infant to the group
         group.add_agent(child_agent)
-        print str(child_agent.index) + " was born to " + str(child_agent.getOMUID()) + "'s OMU!"
+        utilities.consolator( str(child_agent.index) + " was born to " + str(child_agent.getOMUID()) + "'s OMU!")
 
     def mark_agent_as_dead(self, agent, new_generation, counter,
                            avail_females, eligible_males,
@@ -223,7 +225,7 @@ class AgentGroup():
         ----------
         agent: agent to mark as dead
         """
-        print (str(agent.index) + " died!")
+        utilities.consolator( (str(agent.index) + " died!"))
         counter.increment()
         try:
             new_generation.agent_dict.pop(agent.index)
@@ -249,22 +251,22 @@ class AgentGroup():
                     pass
 
         if agent.sex == "m":
-            print(str(agent.index) + "'s malestate is " + str(agent.maleState))
+            utilities.consolator((str(agent.index) + "'s malestate is " + str(agent.maleState)))
             try:
                 eligible_males.remove(agent.index)
-                print "removed " + str(agent.index) + " from eligible_males"
+                utilities.consolator( "removed " + str(agent.index) + " from eligible_males")
             except ValueError:
                 pass
             if leaders:
                 try:
                     leaders.remove(agent.index)
-                    print "removed " + str(agent.index) + " from leaders"
+                    utilities.consolator( "removed " + str(agent.index) + " from leaders")
                 except ValueError:
                     pass
 
             try:
                 lea_for_fol.remove(agent.index)
-                print "removed " + str(agent.index) + " from lea_for_fol"
+                utilities.consolator( "removed " + str(agent.index) + " from lea_for_fol")
 
             except ValueError:
                 pass
@@ -284,18 +286,18 @@ class AgentGroup():
                 agent.setMaleFol(malefol)
 
                 eligible_males += agent.getMaleFol()
-                print("added " + str(agent.getMaleFol()) + " to elig males")
+                utilities.consolator(("added " + str(agent.getMaleFol()) + " to elig males"))
                 dispersal.inherit_female(new_generation, agent.females,
                                          agent.getMaleFol(), agent, random_module, counter, eligible_males)
                 avail_females += agent.females
-                print("added " + str(agent.females) + " to avail females")
+                utilities.consolator(("added " + str(agent.females) + " to avail females"))
 
 
 
             elif agent.maleState == MaleState.fol:
                 try:
                     new_generation.agent_dict[agent.getOMUID()].getMaleFol().remove(agent.index)
-                    print(str(agent.index) + " removed from " + str(agent.getOMUID()) + "'s OMU")
+                    utilities.consolator((str(agent.index) + " removed from " + str(agent.getOMUID()) + "'s OMU"))
                 except (KeyError, ValueError):
                     pass
 
@@ -305,15 +307,15 @@ class AgentGroup():
                 #  if her male's not dead AND she's not still in her dad's OMU, try to remove her from his list
                 try:
                     new_generation.agent_dict[agent.getOMUID()].females.remove(agent.index)
-                    print("removed female " + str(agent.index) + " from females list of " + str(agent.getOMUID()))
+                    utilities.consolator(("removed female " + str(agent.index) + " from females list of " + str(agent.getOMUID())))
                 except ValueError:
                     pass
             if agent.index in avail_females:
                 avail_females.remove(agent.index)
-                print("removed " + str(agent.index) + " from avail fems")
+                utilities.consolator(("removed " + str(agent.index) + " from avail fems"))
             try:
                 new_generation.underage_females_for_takeover.remove(agent.index)
-                print("removed " + str(agent.index) + " from underage fems")
+                utilities.consolator(("removed " + str(agent.index) + " from underage fems"))
             except ValueError:
                 pass
 
@@ -393,7 +395,7 @@ class AgentGroup():
         """
         self.in_relationships_set.add(agent)
 
-    def promote_agent(self, agent):
+    def promote_agent(self, agent, simulation):
         """
         makes an agent older, and if need be, removes them from the
         underage_set
@@ -416,16 +418,13 @@ class AgentGroup():
                 self.infants_set.remove(agent.index)
             except KeyError:
                 pass
-            """
-            if(self.aggressive_chain_head != agent.index and\
-                agent.aggressive_next == None and\
-                agent.aggressive_prev == None):
-                self.add_male_to_aggressives(agent)
-            """
+
             self.male_set.add(agent.index)
             agent.maleState = MaleState.juvsol
             agent.setOMUID("")
             agent.females = []
+            if agent.parents:
+                simulation.parentage[agent.index] = agent.parents
 
         elif agent.age == 6 and agent.sex == "m":
             agent.maleState = MaleState.sol
@@ -439,6 +438,8 @@ class AgentGroup():
             self.female_set.add(agent.index)
             self.underage_females_for_takeover.append(agent.index)
             agent.femaleState = FemaleState.underage
+            if agent.parents:
+                simulation.parentage[agent.index] = agent.parents
 
 
         elif agent.age == (self.FEMALE_MATUR_AGE) and agent.sex == "f":
@@ -538,7 +539,7 @@ class AgentGroup():
                     assert not agent.females
                     assert not agent.getMaleFol()
 
-        print "group passes checks"
+        utilities.consolator( "group passes checks")
 
     def __del__(self):
         del self.agent_dict

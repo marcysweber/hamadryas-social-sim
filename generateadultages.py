@@ -1,4 +1,5 @@
 from random import randint
+import utilities
 numberadults = 36
 adultages = []
 
@@ -7,4 +8,4 @@ for i in range (numberadults):
 	age = (n/2.0) + 5.0
 	adultages.append(age)
 
-print adultages
+utilities.consolator( adultages)

@@ -4,6 +4,7 @@ import data_saver
 import constants
 import math
 import gc
+import utilities
 
 
 def main():
@@ -14,6 +15,7 @@ def main():
 
 class ControlExperiment:
     OUTPUT_XLS_NAME = "control_control_output.xls"
+    recognition = False
 
     def __init__(self, number_of_simulations = 10):
         self.NUMBER_OF_SIMULATIONS = number_of_simulations
@@ -29,6 +31,13 @@ class ControlExperiment:
         total_population_relationships_list = []
         total_group_composition_list = []
 
+        #  these pertaining to relatedness
+        total_withinmean_list = []
+        total_withinsd_list = []
+        total_acrossmean_list = []
+        total_acrosssd_list = []
+
+
         self.run_loop(total_population_record_list,
                       total_age_record_list,
                       total_age_sd_record_list,
@@ -37,7 +46,9 @@ class ControlExperiment:
                       total_edges_per_agent_list,
                       total_population_breakdown_list,
                       total_population_relationships_list,
-                      total_group_composition_list)
+                      total_group_composition_list,
+                      total_withinmean_list, total_withinsd_list,
+                      total_acrossmean_list, total_acrosssd_list)
 
         self.save_output_data(total_population_record_list,
                               total_age_record_list,
@@ -49,6 +60,17 @@ class ControlExperiment:
                               total_population_relationships_list,
                               total_group_composition_list)
 
+        if self.recognition:
+            #  write to excel file recognitionrelatedness
+            output_xl_name = "recognitionrelatedness.xls"
+        else:
+            #  write to excel file controlrelatedness
+            output_xl_name = "controlrelatedness.xls"
+
+        data_saver.save_relatedness_data(total_withinmean_list, total_withinsd_list,
+                                         total_acrossmean_list, total_acrosssd_list,
+                                         output_xl_name, self.NUMBER_OF_SIMULATIONS)
+
     def run_loop(self, total_population_record_list,
                  total_age_record_list,
                  total_age_sd_record_list,
@@ -57,7 +79,9 @@ class ControlExperiment:
                  total_edges_per_agent_list,
                  total_population_breakdown_list,
                  total_population_relationships_list,
-                 total_group_composition_list):
+                 total_group_composition_list,
+                 total_withinmean_list, total_withinsd_list,
+                 total_acrossmean_list, total_acrosssd_list):
         for i in range(self.NUMBER_OF_SIMULATIONS):
             simulation = ControlSimulation()
             simulation.simulation_index = i
@@ -80,7 +104,14 @@ class ControlExperiment:
             total_group_composition_list.append(
                     simulation.last_gen_composition)
 
-            print ('End of simulation #' + str(i + 1))
+            #  relatedness
+            total_withinmean_list.append(simulation.withinmean)
+            total_withinsd_list.append(simulation.withinsd)
+            total_acrossmean_list.append(simulation.acrossmean)
+            total_acrosssd_list.append(simulation.acrosssd)
+
+
+            utilities.consolator( ('End of simulation #' + str(i + 1)))
 
     def save_output_data(self, total_population_record_list,
                          total_age_record_list,

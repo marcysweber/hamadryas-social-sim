@@ -19,6 +19,7 @@ from lifetable import LifeTable
 import dispersal
 from dispersaltable import DispersalTable
 from translocation_table import TranslocationTable
+import utilities
 
 def load_data():
     """
@@ -59,7 +60,7 @@ class Loader:
         competitive_table_sheet = book.sheet_by_index(1)
         self.competitive_table = self.load_competitive_table(competitive_table_sheet)
 
-        print self.competitive_table
+        utilities.consolator( self.competitive_table)
 
     def load_data(self):
         """

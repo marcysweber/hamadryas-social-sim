@@ -1,5 +1,6 @@
 
 import constants
+import utilities
 
 
 class FemaleState:
@@ -90,14 +91,14 @@ class AgentClass:
         #assert(type(self.children) is set)
 
     def setOMUID(self, OMUID):
-        print str(self.index) + "'s OMU ID is now " + str(OMUID)
+        utilities.consolator( str(self.index) + "'s OMU ID is now " + str(OMUID))
         self.OMU = OMUID
 
     def getOMUID(self):
         return self.OMU
 
     def setMaleFol(self, malefol):
-        print str(self.index) + "'s malefols are now " + str(malefol)
+        utilities.consolator( str(self.index) + "'s malefols are now " + str(malefol))
         self.malefols = malefol
 
     def getMaleFol(self):

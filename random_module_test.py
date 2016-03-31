@@ -22,7 +22,7 @@ class TestRandomModule(unittest.TestCase):
 		self.assertTrue(
 			chance_counter < 6000 and chance_counter > 4000)
 
-		print chance_counter
+		utilities.consolator( chance_counter
 
 
 if __name__ == '__main__':

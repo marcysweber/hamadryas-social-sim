@@ -13,11 +13,10 @@ functions to add/move:
 - follow
 """
 import random
-
 import loader
 from agent import MaleState, CompAbility
 from random_module import RandomModule
-
+import utilities
 
 class Competitive:
     competitive_ability = {}
@@ -53,12 +52,12 @@ def attempt_initial_unit(this_generation, new_generation, female, male, deathcou
 
     if this_male.getOMUID() == this_female.getOMUID():
         if draw <= 85:
-            print "solitary's initial unit"
+            utilities.consolator( "solitary's initial unit")
             add_female_to_OMU(new_generation, this_female, this_male, deathcounter, population)
             new_generation.underage_females_for_takeover.remove(this_female.index)
     else:
         if draw <= 50:
-            print "Solitary's initial unit"
+            utilities.consolator( "Solitary's initial unit")
             add_female_to_OMU(new_generation, this_female, this_male, deathcounter, population)
             new_generation.underage_females_for_takeover.remove(this_female.index)
 
@@ -95,7 +94,7 @@ def follower_choices(new_generation, this_generation, male, deathcounter):
         random.shuffle(new_generation.underage_females_for_takeover)
         for female in new_generation.underage_females_for_takeover:
             if new_generation.agent_dict[female].getOMUID() == male.getOMUID():
-                print "Follower's Initial Unit"
+                utilities.consolator("Follower's Initial Unit")
                 add_female_to_OMU(new_generation, new_generation.agent_dict[female],
                                   male, deathcounter, [])
                 new_generation.underage_females_for_takeover.remove(female)
@@ -108,28 +107,28 @@ def challenge(this_generation, new_generation, challenger, leader_index, deathco
     #  loss of challenge by either side leads to a 50% chance of death
     leader = new_generation.agent_dict[leader_index]
 
-    print(str(challenger.index) + " challenged " + str(leader_index))
+    utilities.consolator((str(challenger.index) + " challenged " + str(leader_index)))
 
     leaderability = Competitive().compability(agent=leader)
     challability = Competitive().compability(challenger)
 
-    print str(leader_index) + "'s ability is " + str(leaderability)
-    print str(challenger.index) + "'s ability is " + str(challability)
+    utilities.consolator(str(leader_index) + "'s ability is " + str(leaderability))
+    utilities.consolator(str(challenger.index) + "'s ability is " + str(challability))
 
     if leaderability > challability:
         #  leader wins
-        print str(leader_index) + " won."
+        utilities.consolator(str(leader_index) + " won.")
         if random.choice(["dead", "alive"]) == "dead":
             new_generation.mark_agent_as_dead(challenger, new_generation, deathcounter, avail_females, eligible_males,
                                               leaders, lea_for_fol, random_module, population_dict=population_dict)
     else:
         #  challenger wins
-        print str(challenger.index) + " won."
+        utilities.consolator(str(challenger.index) + " won.")
         if leader.females:
             add_female_to_OMU(new_generation, new_generation.agent_dict[random.choice(leader.females)],
                           challenger, deathcounter, [])
         else:
-            print "It doesn't look like he had any females."
+            utilities.consolator("It doesn't look like he had any females.")
 
         if random.choice(["dead", "alive"]) == "dead":
             new_generation.mark_agent_as_dead(leader, new_generation, deathcounter, avail_females, eligible_males,
@@ -138,7 +137,7 @@ def challenge(this_generation, new_generation, challenger, leader_index, deathco
 
 
 def follow(this_generation, new_generation, leader_index, newfollower, lea_for_fol):
-    print str(newfollower.index) + " is about to follow " + str(leader_index)
+    utilities.consolator( str(newfollower.index) + " is about to follow " + str(leader_index))
     follower = new_generation.agent_dict[newfollower.index]
     leadermale = new_generation.agent_dict[leader_index]
 
@@ -153,7 +152,7 @@ def follow(this_generation, new_generation, leader_index, newfollower, lea_for_f
     leadermale.setMaleFol(leadermale.getMaleFol() + [follower.index])
     if len(leadermale.getMaleFol()) >= 2:
         lea_for_fol.remove(leadermale.index)
-    print str(newfollower.index) + " is following " + str(leadermale)
+    utilities.consolator( str(newfollower.index) + " is following " + str(leadermale))
 
 
 
@@ -172,21 +171,55 @@ def inherit_female(new_generation, omufemales, OMUfol, deadleader, random_module
                 # choice randomly picks an item from the list
 
                 if random_module.roll(0.9):
-                    print "Inheritance"
+                    utilities.consolator( "Inheritance")
                     add_female_to_OMU(new_generation, this_female, this_male, deathcounter)
                     try:
                         deadleader.females.remove(this_female.index)
                     except ValueError:
                         pass
                     eligible_males.remove(this_male.index)
-                    print str(this_male.index) + " removed from eligible males"
+                    utilities.consolator( str(this_male.index) + " removed from eligible males")
                     # remove inherited females from deadleader.females
         else:
             for agent_index in OMUfol:
                 this_male = new_generation.agent_dict[agent_index]
                 this_male.maleState = MaleState.sol
 
+def recognition(new_generation, this_female, this_male, reps):
+    """
+    This function simulates realistic familiarity recognition for baboon females.
+    Females being mother/daughter/sister of available female double chance of that female being acquired.
 
+    Recognition of kin is boolean, meaning have more than one relative in the OMU does not further increase probability
+    of being acquired.
+
+    Parameters
+    ----------
+    new_generation
+    this_female
+    this_male
+    reps
+
+    Returns
+    -------
+
+    """
+    recognized = False
+    females = this_male.females
+    if this_female.parents[0] in females:
+        recognized = True
+        #  this_female is the daughter of someone in that OMU
+    else:
+        for female in females:
+            isshekin = new_generation[female]
+            if this_female.index in isshekin.parents:
+                recognized = True
+                #  this_female is the mother of someone in that OMU
+            elif this_female.parents[0] in isshekin.parents or this_female.parents[1] in isshekin.parents:
+                recognized = True
+                # this_female is the sibling of someone in that OMU
+    if recognized:
+        reps = reps * 2
 
 def opportun_takeover(new_generation, avail_females, eligible_males, deathcounter, population):
     """
@@ -223,17 +256,21 @@ def opportun_takeover(new_generation, avail_females, eligible_males, deathcounte
                     #  certain chance of success
                     if not this_male.getMaleFol():
                         #  if male doesn't have followers, half success
-                        for i in range(0, 1):
+                        reps = 2
+                        if control_experiment.ControlExperiment.recognition:
+                            recognition(new_generation, this_female, this_male, reps)
+                        for i in range(0, reps):
                             lottery += [this_male.index]
                     else:
                         #  male must have followers
-                        for i in range(0, 4):
+                        reps = 5
+                        if simulation.recognition:
+                            recognition(new_generation, this_female, this_male, reps)
+                        for i in range(0, reps):
                             lottery += [this_male.index]
-
-
                 else:
                     #  higher chance of success
-                    for i in range(0, 4):
+                    for i in range(0, 5):
                         lottery += [this_male.index]
 
             else:
@@ -241,18 +278,25 @@ def opportun_takeover(new_generation, avail_females, eligible_males, deathcounte
                 if this_male.maleState == MaleState.lea:
                     if this_male.bandID == this_female.bandID:
                         if this_male.age > 14:
+                            reps = 1
                             #  male must be older, but has equal success
-                            for i in range(0, 1):
+                            if simulation.recognition:
+                                recognition(new_generation, this_female, this_male, reps)
+                            for i in range(0, reps):
                                 lottery += [this_male.index]
                     else:
                         if this_male.age > 14:
+                            reps = 1
+                            if simulation.recognition:
+                                recognition(new_generation, this_female, this_male, reps)
                             #  male must be older, but has equal success
-                            lottery += [this_male.index]
+                            for i in range(0, reps):
+                                lottery += [this_male.index]
 
         chosen_male = random.choice(lottery)
         #  lottery draw
         the_male = new_generation[chosen_male]
-        print "Opportunistic"
+        utilities.consolator( "Opportunistic")
         add_female_to_OMU(new_generation, this_female, the_male, deathcounter, population)
     #  so eligible_males is not emptied here, which is GOOD b/c then we can recall the func
                 #  without repopulating this_generation_eligible_males
@@ -274,8 +318,12 @@ def add_female_to_OMU(new_generation, female, male, deathcounter, population = N
             if random_module.roll(0.6):
                 her_generation.mark_agent_as_dead(
                     child, new_generation, deathcounter, None, None, random_module)
-            print "child " + str(child.index) + " now follows " + str(male.index)
-            child.setOMUID(male.index)
+            else:
+                utilities.consolator( "child " + str(child.index) + " now follows " + str(male.index))
+                child.setOMUID(male.index)
+                if child.bandID != male.bandID:
+                    population.move_agent_to_group(child, male.bandID)
+
 
     try:
         his_generation.agent_dict[male.getOMUID()].getMaleFol().remove(male.index)
@@ -284,11 +332,11 @@ def add_female_to_OMU(new_generation, female, male, deathcounter, population = N
         pass
     try:
         her_generation.agent_dict[female.getOMUID()].females.remove(female.index)
-        print " removed " + str(female.index) + " from OMU " + str(female.getOMUID())
+        utilities.consolator( " removed " + str(female.index) + " from OMU " + str(female.getOMUID()))
     except (ValueError, KeyError):
         pass
 
-    print str(male.getOMUID()) + " is now a leader! Hooray!"
+    utilities.consolator( str(male.getOMUID()) + " is now a leader! Hooray!")
     male.setOMUID(male.index)
     male.maleState = MaleState.lea
     male.females.append(female.index)
@@ -299,5 +347,5 @@ def add_female_to_OMU(new_generation, female, male, deathcounter, population = N
         population.move_agent_to_group(female, male.bandID)
     female.dispersed = True
 
-    print str(female.index) + "was added to " + str(male.index) + "'s OMU"
+    utilities.consolator( str(female.index) + "was added to " + str(male.index) + "'s OMU")
     """  IF SHE'S FROM ANOTHER GROUP SHE NEEDS TO BE ADDED TO HER NEW MALE'S GROUP"""

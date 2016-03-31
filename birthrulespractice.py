@@ -23,7 +23,7 @@ if __name__ == "__main__":
         			Female = pregnant
         		else Female = cycling
         	if Female == pregnant:
-        		#print the birth to excel
+        		#utilities.consolator( the birth to excel
         		Female = motherzero
         	if Female == motherzero:
         		# get a 1/5 chance
@@ -36,7 +36,7 @@ if __name__ == "__main__":
         	if Female == mothersix: 
         		Female = cycling
         	#if infant was 6 months old at START of last turn
-        	print to excel value of Female
+        	utilities.consolator( to excel value of Female
 
 
 
