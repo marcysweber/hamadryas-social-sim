@@ -45,7 +45,8 @@ class Simulation:
     NUMBER_OF_SEED_GROUPS = 10
 
     def __init__(self, output_xls_name="simulation_output_data.xls",
-                 dot_directory="dot/", json_directory="json/"):
+                 dot_directory="dot/", json_directory="json/",
+                 recognition=True):
         """
         constructor
 
@@ -57,6 +58,7 @@ class Simulation:
         self.output_xls_name = output_xls_name
         self.dot_directory = dot_directory
         self.json_directory = json_directory
+        self.recognition = recognition
 
         #relatedness
         self.parentage = {}
@@ -169,7 +171,8 @@ class Simulation:
                                             avail_females=avail_females,
                                             eligible_males=eligible_males,
                                             deathcounter=death_counter,
-                                            population=next_generation_population)
+                                            population=next_generation_population,
+                                            recognition_bool=self.recognition)
 
             avail_females = []
             utilities.consolator( "Opp takeovers 1 done.")
@@ -277,7 +280,8 @@ class Simulation:
             if avail_females:
                 dispersal.opportun_takeover(new_generation=new_generation_population_dict,
                                             avail_females=avail_females, eligible_males=eligible_males,
-                                            deathcounter=death_counter, population=next_generation_population)
+                                            deathcounter=death_counter, population=next_generation_population,
+                                            recognition_bool=self.recognition)
 
             avail_females = []
             utilities.consolator( "Second op takeovers done.")
@@ -351,14 +355,18 @@ class Simulation:
 
         #  here add OMUID to every living female
         female_OMU_dict = {}
-        for group in this_generation_population:
-            for agent in group.agent_dict:
+        for group in this_generation_population.groups:
+            for indiv in group.agent_dict:
+                agent = group.agent_dict[indiv]
                 if agent.sex == "f" and agent.age >= 5:
-                    female_OMU_dict[agent.index] = agent.OMUID
+                    female_OMU_dict[agent.index] = agent.getOMUID()
 
         #  a function for calculating relatedness
-        relatedness.main(self.recognition, female_OMU_dict, self.parentage)
-
+        related_dict = relatedness.main(self.recognition, female_OMU_dict, self.parentage)
+        self.withinmean = related_dict["withinmean"]
+        self.withinsd = related_dict["withinsd"]
+        self.acrossmean = related_dict["acrossmean"]
+        self.acrosssd = related_dict["acrosssd"]
 
         self.save_data(population_record_list,
                        male_population_record_list,

@@ -13,7 +13,6 @@ def main(recognition, OMU_dict, parentage_dict):
 
     female_dyads = dyad_generator(OMU_dict)
     #  generate all unique female dyads in OMU_dict
-    print female_dyads
 
     for dyad in female_dyads:
         fem1OMU = OMU_dict[dyad[0]]
@@ -34,11 +33,13 @@ def main(recognition, OMU_dict, parentage_dict):
     print "Mean Within: " + str(mean_within)
     print "Mean Across: " + str(mean_across)
 
-
-    simulation.withinmean = mean_within
-    simulation.withinsd = sd_within
-    simulation.acrossmean = mean_across
-    simulation.acrosssd = sd_across
+    output = {
+        "withinmean": mean_within,
+        "withinsd": sd_within,
+        "acrossmean": mean_across,
+        "acrosssd": sd_across
+    }
+    return output
 
 def dyad_generator(OMU_dict):
     dyads = []

@@ -15,9 +15,9 @@ def main():
 
 class ControlExperiment:
     OUTPUT_XLS_NAME = "control_control_output.xls"
-    recognition = False
+    recognition = True
 
-    def __init__(self, number_of_simulations = 10):
+    def __init__(self, number_of_simulations = 1):
         self.NUMBER_OF_SIMULATIONS = number_of_simulations
 
     def run(self):

@@ -17,6 +17,7 @@ import loader
 from agent import MaleState, CompAbility
 from random_module import RandomModule
 import utilities
+import relatedness
 
 class Competitive:
     competitive_ability = {}
@@ -164,14 +165,14 @@ def inherit_female(new_generation, omufemales, OMUfol, deadleader, random_module
 
     # loop over the males, give random female
     if OMUfol:
-        if omufemales:
+        if omufemales != None and len(omufemales) != 0:
             for agent_index in OMUfol:
                 this_male = new_generation.agent_dict[agent_index]
                 this_female = new_generation.agent_dict[random.choice(omufemales)]
                 # choice randomly picks an item from the list
 
                 if random_module.roll(0.9):
-                    utilities.consolator( "Inheritance")
+                    utilities.consolator("Inheritance")
                     add_female_to_OMU(new_generation, this_female, this_male, deathcounter)
                     try:
                         deadleader.females.remove(this_female.index)
@@ -205,23 +206,25 @@ def recognition(new_generation, this_female, this_male, reps):
 
     """
     recognized = False
-    females = this_male.females
-    if this_female.parents[0] in females:
-        recognized = True
-        #  this_female is the daughter of someone in that OMU
-    else:
-        for female in females:
-            isshekin = new_generation[female]
-            if this_female.index in isshekin.parents:
-                recognized = True
-                #  this_female is the mother of someone in that OMU
-            elif this_female.parents[0] in isshekin.parents or this_female.parents[1] in isshekin.parents:
-                recognized = True
-                # this_female is the sibling of someone in that OMU
-    if recognized:
-        reps = reps * 2
+    if this_female.parents:
+        females = this_male.females
+        if this_female.parents[0] in females:
+            recognized = True
+            #  this_female is the daughter of someone in that OMU
+        else:
+            for female in females:
+                isshekin = new_generation[female]
+                if isshekin.parents:
+                    if this_female.index in isshekin.parents:
+                        recognized = True
+                        #  this_female is the mother of someone in that OMU
+                    elif this_female.parents[0] in isshekin.parents or this_female.parents[1] in isshekin.parents:
+                        recognized = True
+                        # this_female is the sibling of someone in that OMU
+        if recognized:
+            reps = reps * 2
 
-def opportun_takeover(new_generation, avail_females, eligible_males, deathcounter, population):
+def opportun_takeover(new_generation, avail_females, eligible_males, deathcounter, population, recognition_bool):
     """
     goes thru the females in avail_females and distributes them to
     "eligible" males
@@ -257,14 +260,14 @@ def opportun_takeover(new_generation, avail_females, eligible_males, deathcounte
                     if not this_male.getMaleFol():
                         #  if male doesn't have followers, half success
                         reps = 2
-                        if control_experiment.ControlExperiment.recognition:
+                        if recognition_bool:
                             recognition(new_generation, this_female, this_male, reps)
                         for i in range(0, reps):
                             lottery += [this_male.index]
                     else:
                         #  male must have followers
                         reps = 5
-                        if simulation.recognition:
+                        if recognition_bool:
                             recognition(new_generation, this_female, this_male, reps)
                         for i in range(0, reps):
                             lottery += [this_male.index]
@@ -280,14 +283,14 @@ def opportun_takeover(new_generation, avail_females, eligible_males, deathcounte
                         if this_male.age > 14:
                             reps = 1
                             #  male must be older, but has equal success
-                            if simulation.recognition:
+                            if recognition_bool:
                                 recognition(new_generation, this_female, this_male, reps)
                             for i in range(0, reps):
                                 lottery += [this_male.index]
                     else:
                         if this_male.age > 14:
                             reps = 1
-                            if simulation.recognition:
+                            if recognition_bool:
                                 recognition(new_generation, this_female, this_male, reps)
                             #  male must be older, but has equal success
                             for i in range(0, reps):

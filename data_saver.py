@@ -10,9 +10,9 @@ Saves analytical data to disk, using xlwt
 from xlwt import Workbook
 from tempfile import TemporaryFile
 import constants
+import pickle
 
-
-def save_relatedness_data(withinmean, withinsd, acrossmean, acrosssd, book, number_simulations = 1):
+def save_relatedness_data(withinmean, withinsd, acrossmean, acrosssd, relatednessfilename, number_simulations = 1):
     """
     THIS FUNCTION WORKS AS IT WAS IMPLEMENTED IN RELATEDNESS. pROBABLY NEEDS TO BE MODIFIED FOR
     MULTIPLE REPLICATES AND CALLED APPROPRIATELY IN SIMULATION.PY
@@ -32,6 +32,18 @@ def save_relatedness_data(withinmean, withinsd, acrossmean, acrosssd, book, numb
     -------
 
     """
+
+    # data = {
+    #     'withinMean': withinmean,
+    #     'withinsd': withinsd,
+    #     'acrossmean': acrossmean,
+    #     'acrosssd': acrosssd
+    # }
+    #
+    # pickle.dump(data, "data_to_be_excelled.pickle")
+
+    book = Workbook()
+
     data_sheet = book.add_sheet('relatedness')
 
     data_sheet.write(0, 1, 'Mean Relatedness Within OMU')
@@ -45,6 +57,8 @@ def save_relatedness_data(withinmean, withinsd, acrossmean, acrosssd, book, numb
         data_sheet.write(i + 1, 2, withinsd[i])
         data_sheet.write(i + 1, 3, acrossmean[i])
         data_sheet.write(i + 1, 4, acrosssd[i])
+
+    book.save(relatednessfilename)
 
 def save_age_data(data_list, book):
     """
