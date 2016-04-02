@@ -184,5 +184,5 @@ class ControlSimulation(Simulation):
             output_list[-1]
 
     def per_generation_print_out(self, generation_index):
-        print(str(self.simulation_index) + "of" + str(self.total_simulations) +
+        utilities.consolator(str(self.simulation_index) + "of" + str(self.total_simulations) +
               " Half-year:  " + str(generation_index))

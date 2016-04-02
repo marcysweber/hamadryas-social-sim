@@ -66,6 +66,10 @@ class Simulation:
         self.withinsd = ""
         self.acrossmean = ""
         self.acrosssd = ""
+        self.totalrelmean = ""
+        self.totalrelsd = ""
+        self.acrossOMUwithinbandmean = ""
+        self.acrossOMUwithinbandsd = ""
 
     def run_simulation(self, save_to_dot=True, save_to_json=True):
         # import Seed and lifetable data
@@ -359,7 +363,8 @@ class Simulation:
             for indiv in group.agent_dict:
                 agent = group.agent_dict[indiv]
                 if agent.sex == "f" and agent.age >= 5:
-                    female_OMU_dict[agent.index] = agent.getOMUID()
+                    female_OMU_dict[agent.index] = [agent.getOMUID(), agent.bandID]
+        #  so female_OMU_dict is now {agentindex : [OMU, band]}
 
         #  a function for calculating relatedness
         related_dict = relatedness.main(self.recognition, female_OMU_dict, self.parentage)
@@ -367,6 +372,10 @@ class Simulation:
         self.withinsd = related_dict["withinsd"]
         self.acrossmean = related_dict["acrossmean"]
         self.acrosssd = related_dict["acrosssd"]
+        self.totalrelmean = related_dict["totalrelmean"]
+        self.totalrelsd = related_dict["totalrelsd"]
+        self.acrossOMUwithinbandmean = related_dict["acrossOMUwithinbandmean"]
+        self.acrossOMUwithinbandsd = related_dict["acrossOMUwithinbandsd"]
 
         self.save_data(population_record_list,
                        male_population_record_list,

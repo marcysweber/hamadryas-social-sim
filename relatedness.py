@@ -7,20 +7,28 @@ def main(recognition, OMU_dict, parentage_dict):
     withinOMU = []
     mean_within = 0.0
     sd_within = 0.0
+
     acrossOMU = []
     mean_across = 0.0
     sd_across = 0.0
+
+    acrossOMUwithinband = []
 
     female_dyads = dyad_generator(OMU_dict)
     #  generate all unique female dyads in OMU_dict
 
     for dyad in female_dyads:
-        fem1OMU = OMU_dict[dyad[0]]
-        fem2OMU = OMU_dict[dyad[1]]
+        fem1OMU = OMU_dict[dyad[0]][0]
+        fem2OMU = OMU_dict[dyad[1]][0]
+        fem1band = OMU_dict[dyad[0]][1]
+        fema2band = OMU_dict[dyad[1]][1]
         if fem1OMU == fem2OMU:
             withinOMU += [calc(dyad, parentage_dict)]
         else:
             acrossOMU += [calc(dyad, parentage_dict)]
+
+        if fem1OMU != fem2OMU and fem1band == fema2band:
+            acrossOMUwithinband += [calc(dyad, parentage_dict)]
 
     mean_within = sum(withinOMU)/len(withinOMU)
     var_within = sum([(i - mean_within)**2.0 for i in withinOMU])
@@ -30,6 +38,16 @@ def main(recognition, OMU_dict, parentage_dict):
     var_across = sum([(i - mean_across)**2.0 for i in acrossOMU])
     sd_across = math.sqrt(var_across / len(acrossOMU))
 
+    totalreldyads = withinOMU + acrossOMU
+    total_rel_mean = sum(totalreldyads) / len(totalreldyads)
+    var_total = sum([(i - total_rel_mean)**2.0 for i in totalreldyads])
+    total_rel_sd = math.sqrt(var_total / len(totalreldyads))
+
+    mean_acrossOMUwithinband = sum(acrossOMUwithinband) / len(acrossOMUwithinband)
+    var_acrossOMUwithinband = sum([(i - mean_acrossOMUwithinband)**2.0 for i in acrossOMUwithinband])
+    sd_acrossOMUwithinband = math.sqrt(var_acrossOMUwithinband / len(acrossOMUwithinband))
+
+
     print "Mean Within: " + str(mean_within)
     print "Mean Across: " + str(mean_across)
 
@@ -37,7 +55,11 @@ def main(recognition, OMU_dict, parentage_dict):
         "withinmean": mean_within,
         "withinsd": sd_within,
         "acrossmean": mean_across,
-        "acrosssd": sd_across
+        "acrosssd": sd_across,
+        "totalrelmean" : total_rel_mean,
+        "totalrelsd" : total_rel_sd,
+        "acrossOMUwithinbandmean" : mean_acrossOMUwithinband,
+        "acrossOMUwithinbandsd" : sd_acrossOMUwithinband
     }
     return output
 

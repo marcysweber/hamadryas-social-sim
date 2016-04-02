@@ -12,7 +12,9 @@ from tempfile import TemporaryFile
 import constants
 import pickle
 
-def save_relatedness_data(withinmean, withinsd, acrossmean, acrosssd, relatednessfilename, number_simulations = 1):
+def save_relatedness_data(withinmean, withinsd, acrossmean, acrosssd, totalmean, totalsd,
+                          acrosswithinmean, acrosswithinsd,
+                          relatednessfilename, number_simulations = 1):
     """
     THIS FUNCTION WORKS AS IT WAS IMPLEMENTED IN RELATEDNESS. pROBABLY NEEDS TO BE MODIFIED FOR
     MULTIPLE REPLICATES AND CALLED APPROPRIATELY IN SIMULATION.PY
@@ -50,6 +52,10 @@ def save_relatedness_data(withinmean, withinsd, acrossmean, acrosssd, relatednes
     data_sheet.write(0, 2, 'SD Relatedness Within OMU')
     data_sheet.write(0, 3, 'Mean Relatedness Across OMU')
     data_sheet.write(0, 4, 'SD Relatedness Across OMU')
+    data_sheet.write(0, 5, 'Mean Relatedness all dyads')
+    data_sheet.write(0, 6, 'SD Relatedness all dyads')
+    data_sheet.write(0, 7, 'Mean Relatedness Across OMU Within Band')
+    data_sheet.write(0, 8, 'SD Relatedness Across OMU Within Band')
 
     for i in range(0, number_simulations):
         data_sheet.write(i + 1, 0, i)
@@ -57,6 +63,10 @@ def save_relatedness_data(withinmean, withinsd, acrossmean, acrosssd, relatednes
         data_sheet.write(i + 1, 2, withinsd[i])
         data_sheet.write(i + 1, 3, acrossmean[i])
         data_sheet.write(i + 1, 4, acrosssd[i])
+        data_sheet.write(i + 1, 5, totalmean[i])
+        data_sheet.write(i + 1, 6, totalsd[i])
+        data_sheet.write(i + 1, 7, acrosswithinmean[i])
+        data_sheet.write(i + 1, 8, acrosswithinsd[i])
 
     book.save(relatednessfilename)
 

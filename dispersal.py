@@ -259,29 +259,29 @@ def opportun_takeover(new_generation, avail_females, eligible_males, deathcounte
                     #  certain chance of success
                     if not this_male.getMaleFol():
                         #  if male doesn't have followers, half success
-                        reps = 2
+                        reps = 4
                         if recognition_bool:
                             recognition(new_generation, this_female, this_male, reps)
                         for i in range(0, reps):
                             lottery += [this_male.index]
                     else:
                         #  male must have followers
-                        reps = 5
+                        reps = 8
                         if recognition_bool:
                             recognition(new_generation, this_female, this_male, reps)
                         for i in range(0, reps):
                             lottery += [this_male.index]
                 else:
                     #  higher chance of success
-                    for i in range(0, 5):
+                    for i in range(0, 8):
                         lottery += [this_male.index]
 
             else:
-                #  in same band but different clan
                 if this_male.maleState == MaleState.lea:
+                    #  in same band but different clan
                     if this_male.bandID == this_female.bandID:
                         if this_male.age > 14:
-                            reps = 1
+                            reps = 2
                             #  male must be older, but has equal success
                             if recognition_bool:
                                 recognition(new_generation, this_female, this_male, reps)
@@ -295,9 +295,12 @@ def opportun_takeover(new_generation, avail_females, eligible_males, deathcounte
                             #  male must be older, but has equal success
                             for i in range(0, reps):
                                 lottery += [this_male.index]
-
-        chosen_male = random.choice(lottery)
-        #  lottery draw
+        if lottery != []:
+            chosen_male = random.choice(lottery)
+            #  lottery draw
+        else:
+            #  if for some reason the lottery isn't working
+            chosen_male = random.choice(eligible_males)
         the_male = new_generation[chosen_male]
         utilities.consolator( "Opportunistic")
         add_female_to_OMU(new_generation, this_female, the_male, deathcounter, population)
