@@ -5,7 +5,7 @@ import constants
 import math
 import gc
 import utilities
-
+import traceback
 
 def main():
     # disable gc for all experiment
@@ -15,9 +15,9 @@ def main():
 
 class ControlExperiment:
     OUTPUT_XLS_NAME = "control_control_output.xls"
-    recognition = True
+    recognition = False
 
-    def __init__(self, number_of_simulations = 1):
+    def __init__(self, number_of_simulations = 100):
         self.NUMBER_OF_SIMULATIONS = number_of_simulations
 
     def run(self):
@@ -129,6 +129,10 @@ class ControlExperiment:
                 print ('End of simulation #' + str(i + 1))
             except Exception as e:
                 print "An exception occurred in simulation " + str(i + 1) + " " + str(format(e))
+                #traceback.print_exc()
+            finally:
+                del(simulation)
+                gc.collect()
 
     def save_output_data(self, total_population_record_list,
                          total_age_record_list,

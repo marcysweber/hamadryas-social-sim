@@ -69,6 +69,7 @@ def save_relatedness_data(withinmean, withinsd, acrossmean, acrosssd, totalmean,
         data_sheet.write(i + 1, 8, acrosswithinsd[i])
 
     book.save(relatednessfilename)
+    del(book)
 
 def save_age_data(data_list, book):
     """

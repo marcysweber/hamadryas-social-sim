@@ -541,10 +541,3 @@ class AgentGroup():
 
         utilities.consolator( "group passes checks")
 
-    def __del__(self):
-        del self.agent_dict
-        self.female_set.clear()
-        self.male_set.clear()
-        self.infants_set.clear()
-        self.in_relationships_set.clear()
-        self.whole_set.clear()

@@ -41,12 +41,12 @@ class Simulation:
     output_xls_name = ""
     dot_directory = ""
     json_directory = ""
-    NUMBER_OF_GENERATIONS = 100
+    NUMBER_OF_GENERATIONS = 200
     NUMBER_OF_SEED_GROUPS = 10
 
     def __init__(self, output_xls_name="simulation_output_data.xls",
                  dot_directory="dot/", json_directory="json/",
-                 recognition=True):
+                 recognition=False):
         """
         constructor
 
