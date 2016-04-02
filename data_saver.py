@@ -57,7 +57,7 @@ def save_relatedness_data(withinmean, withinsd, acrossmean, acrosssd, totalmean,
     data_sheet.write(0, 7, 'Mean Relatedness Across OMU Within Band')
     data_sheet.write(0, 8, 'SD Relatedness Across OMU Within Band')
 
-    for i in range(0, number_simulations):
+    for i in range(0, len(withinmean)):
         data_sheet.write(i + 1, 0, i)
         data_sheet.write(i + 1, 1, withinmean[i])
         data_sheet.write(i + 1, 2, withinsd[i])

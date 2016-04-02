@@ -165,22 +165,23 @@ def inherit_female(new_generation, omufemales, OMUfol, deadleader, random_module
 
     # loop over the males, give random female
     if OMUfol:
-        if omufemales != None and len(omufemales) != 0:
+        if omufemales:
             for agent_index in OMUfol:
-                this_male = new_generation.agent_dict[agent_index]
-                this_female = new_generation.agent_dict[random.choice(omufemales)]
-                # choice randomly picks an item from the list
+                if omufemales:
+                    this_male = new_generation.agent_dict[agent_index]
+                    this_female = new_generation.agent_dict[random.choice(omufemales)]
+                    # choice randomly picks an item from the list
 
-                if random_module.roll(0.9):
-                    utilities.consolator("Inheritance")
-                    add_female_to_OMU(new_generation, this_female, this_male, deathcounter)
-                    try:
-                        deadleader.females.remove(this_female.index)
-                    except ValueError:
-                        pass
-                    eligible_males.remove(this_male.index)
-                    utilities.consolator( str(this_male.index) + " removed from eligible males")
-                    # remove inherited females from deadleader.females
+                    if random_module.roll(0.9):
+                        utilities.consolator("Inheritance")
+                        add_female_to_OMU(new_generation, this_female, this_male, deathcounter)
+                        try:
+                            deadleader.females.remove(this_female.index)
+                        except ValueError:
+                            pass
+                        eligible_males.remove(this_male.index)
+                        utilities.consolator( str(this_male.index) + " removed from eligible males")
+                        # remove inherited females from deadleader.females
         else:
             for agent_index in OMUfol:
                 this_male = new_generation.agent_dict[agent_index]
@@ -295,7 +296,7 @@ def opportun_takeover(new_generation, avail_females, eligible_males, deathcounte
                             #  male must be older, but has equal success
                             for i in range(0, reps):
                                 lottery += [this_male.index]
-        if lottery != []:
+        if lottery:
             chosen_male = random.choice(lottery)
             #  lottery draw
         else:
@@ -317,7 +318,7 @@ def add_female_to_OMU(new_generation, female, male, deathcounter, population = N
         his_generation = new_generation
 
     random_module = RandomModule()
-    if len(female.children) != 0: # if the children set is not empty
+    if female.children: # if the children set is not empty
         for child in her_generation.agent_dict[female.children]:
             assert child.age < 5
             # INFANTICIDE, 60%

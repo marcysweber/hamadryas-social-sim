@@ -129,7 +129,7 @@ class ControlExperiment:
                 print ('End of simulation #' + str(i + 1))
             except Exception as e:
                 print "An exception occurred in simulation " + str(i + 1) + " " + str(format(e))
-                #traceback.print_exc()
+                traceback.print_exc()
             finally:
                 del(simulation)
                 gc.collect()
