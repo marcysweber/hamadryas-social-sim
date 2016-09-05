@@ -1,5 +1,5 @@
 
 def consolator(print_out):
-    printing = False
+    printing = True
     if printing:
         print (print_out)

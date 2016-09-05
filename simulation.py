@@ -19,13 +19,14 @@ import constants
 import data_saver
 import dispersal
 import loader
+import relatedness
 import seed
+import utilities
 from agent import FemaleState, MaleState
 from counter import Counter
 from population import Population
 from random_module import RandomModule
-import utilities
-import relatedness
+
 
 def main():
     simulation = Simulation()
@@ -46,7 +47,7 @@ class Simulation:
 
     def __init__(self, output_xls_name="simulation_output_data.xls",
                  dot_directory="dot/", json_directory="json/",
-                 recognition=False):
+                 recognition=True):
         """
         constructor
 
@@ -153,13 +154,18 @@ class Simulation:
             for x in range(0, len(this_generation_population.groups)):
                 for agent_index in this_generation_population.groups[x].whole_set:
                     this_agent = this_generation_population.groups[x].agent_dict[agent_index]
-                    new_agent = next_generation_population.groups[x].agent_dict[agent_index]
 
-                    if self.check_for_death(lifetable=lifetable, this_agent=this_agent, new_agent=new_agent,
-                                            new_generation=next_generation_population.groups[x],
-                                         random_module=random_module, counter=death_counter, avail_females=avail_females,
-                                         eligible_males=eligible_males, population_dict=new_generation_population_dict):
-                        new_generation_population_dict[agent_index] = new_agent
+                    if agent_index in next_generation_population.groups[x].agent_dict:
+                        new_agent = next_generation_population.groups[x].agent_dict[agent_index]
+
+                        if self.check_for_death(lifetable=lifetable, this_agent=this_agent, new_agent=new_agent,
+                                                new_generation=next_generation_population.groups[x],
+                                                random_module=random_module, counter=death_counter,
+                                                avail_females=avail_females,
+                                                eligible_males=eligible_males,
+                                                population_dict=new_generation_population_dict,
+                                                population=next_generation_population):
+                            new_generation_population_dict[agent_index] = new_agent
 
             self.check_followers(new_generation_population_dict)
 
@@ -171,7 +177,7 @@ class Simulation:
 
             # disperse females whose male died naturally this year
             if avail_females:
-                dispersal.opportun_takeover(new_generation=new_generation_population_dict,
+                dispersal.opportun_takeover(new_generation_population_dict=new_generation_population_dict,
                                             avail_females=avail_females,
                                             eligible_males=eligible_males,
                                             deathcounter=death_counter,
@@ -218,14 +224,15 @@ class Simulation:
                         new_agent = \
                             new_generation.agent_dict[agent_index]
                         #  increment age
-                        new_generation.promote_agent(new_agent, self)
+                        new_generation.promote_agent(new_agent, self, new_generation_population_dict)
 
 
                         if this_agent.sex == "m":
                             self.male_choices(this_generation, new_generation, this_agent,
-                                             new_agent, random_module, this_generation_lea_for_fol,
-                                             this_generation_leaders, death_counter, avail_females, eligible_males,
-                                              population_dict=new_generation_population_dict)
+                                              new_agent, random_module, this_generation_lea_for_fol,
+                                              this_generation_leaders, death_counter, avail_females, eligible_males,
+                                              population_dict=new_generation_population_dict,
+                                              population=next_generation_population)
 
                             for female in this_agent.females:
                                 female
@@ -282,7 +289,7 @@ class Simulation:
                 )
             utilities.consolator( "Main loop done.")
             if avail_females:
-                dispersal.opportun_takeover(new_generation=new_generation_population_dict,
+                dispersal.opportun_takeover(new_generation_population_dict=new_generation_population_dict,
                                             avail_females=avail_females, eligible_males=eligible_males,
                                             deathcounter=death_counter, population=next_generation_population,
                                             recognition_bool=self.recognition)
@@ -459,20 +466,22 @@ class Simulation:
                 assert not new_agent.getMaleFol()
 
     def male_choices(self, this_generation, new_generation, this_agent,
-                    new_agent, randommodule, lea_for_fol, leaders,
-                    deathcounter, avail_females, eligible_males, population_dict):
+                     new_agent, randommodule, lea_for_fol, leaders,
+                     deathcounter, avail_females, eligible_males, population_dict, population):
 
         #  FOLLOWERS CHOOSE FIRST
         if new_agent.maleState == MaleState.fol:
-            dispersal.follower_choices(new_generation, this_generation, new_agent, deathcounter)
+            dispersal.follower_choices(new_generation, this_generation, new_agent, deathcounter, population)
 
         if new_agent.maleState == MaleState.sol:
             dispersal.solitary_choices(new_generation, this_generation, new_agent,
-                                       lea_for_fol, leaders, deathcounter, avail_females, eligible_males, randommodule, population_dict=population_dict)
+                                       lea_for_fol, leaders, deathcounter, avail_females,
+                                       eligible_males, randommodule, population_dict=population_dict,
+                                       population=population)
 
     def check_for_death(self, lifetable, this_agent,
                         new_agent, new_generation, random_module, counter, avail_females, eligible_males,
-                        leaders=[],lea_for_fol = [], population_dict={}):
+                        population, leaders=[], lea_for_fol=[], population_dict={}):
         """
         checks if an agent should die by getting the probability
         from the lifetable, then performing a dieroll for that
@@ -487,9 +496,9 @@ class Simulation:
         chance_of_death = lifetable.chance_of_death(
             this_agent.age, this_agent.sex)
         if random_module.roll(chance_of_death):
-            new_generation.mark_agent_as_dead(new_agent, new_generation, counter, avail_females, eligible_males,
+            new_generation.mark_agent_as_dead(new_agent, counter, avail_females, eligible_males,
                                               random_module=random_module, leaders=leaders, lea_for_fol=lea_for_fol,
-                                              population_dict=population_dict)
+                                              population=population, population_dict=population_dict)
             #  utilities.consolator(("dead")
             return False
 

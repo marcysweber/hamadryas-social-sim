@@ -13,11 +13,11 @@ of this module
 """
 
 import xlrd
-import constants
-from common import read_CSV
+
 from agent import AgentClass, FemaleState, MaleState
 from group import AgentGroup
 from population import Population
+
 
 def load_group(parent_population):
     """
@@ -134,11 +134,11 @@ class SeedGenerator:
                 femaleState = FemaleState.cycling
 
             this_agent = AgentClass(age = age_in_years, sex = sex,
-                femaleState = femaleState, maleState= maleState, females = females,
+                                    femaleState=femaleState, maleState=maleState, females=females,
                                     malefol=fols, last_birth= 0,
                                     index = agent_index, clanID = clan_index,
                                     bandID = None, OMUID = omu_index, parents=None,
-                                    children=None, compability=None)
+                                    offspring=None, compability=None)
 
 
             #add agent to group

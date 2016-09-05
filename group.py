@@ -17,9 +17,8 @@ import random
 
 import constants
 import dispersal
-from agent import AgentClass, FemaleState, MaleState, CompAbility
 import utilities
-import simulation
+from agent import AgentClass, FemaleState, MaleState, CompAbility
 
 
 class AgentGroup():
@@ -97,7 +96,6 @@ class AgentGroup():
         self.in_relationships_set = set()
         self.whole_set = set()
         self.agent_dict = {}
-        aggressive_chain_head = None
 
     def update_indices(self, top_index):
         """
@@ -123,8 +121,6 @@ class AgentGroup():
                 new_top_index = agent.index
 
             list_of_agents_to_add.append(agent)
-
-        # self.aggressive_chain_head += top_index
 
         # clear the group and re-add agents
         self.clear()
@@ -182,8 +178,8 @@ class AgentGroup():
 
         # generate a new infant
         PROBABILITY_OF_MALE = 0.5
-        child_sex = "f"
-        child_ability = None
+        inf_sex = "f"
+        inf_ability = None
 
         if (random_module.roll(PROBABILITY_OF_MALE)):
             child_sex = "m"
@@ -194,28 +190,27 @@ class AgentGroup():
         bandID = mother.bandID
         OMUID = mother.getOMUID()
         assert isinstance(OMUID, object)
-        child_agent = AgentClass(
-                age=0, sex=child_sex, femaleState=None, maleState=None,
+        inf_agent = AgentClass(
+                age=0, sex=inf_sex, femaleState=None, maleState=None,
                 parents=[mother.index, OMUID], index=agent_index,
-                clanID=clanID, bandID=bandID, OMUID=OMUID, compability=child_ability)
+                clanID=clanID, bandID=bandID, OMUID=OMUID, compability=inf_ability)
 
-        # if agent is young and mbale, it has to be
-        # marked as 'about to migrate'
-        # if child_sex == "m":
-        #	child_agent.young_migration = False
+        mother.offspring += [inf_agent.index]
 
         # if agent in female, they have to be marked underage so
         # that they eventually start cycling
-        if child_sex == "f":
-            child_agent.femaleState = FemaleState.underage
+        if inf_sex == "f":
+            inf_agent.femaleState = FemaleState.juvenile
 
         # add the new infant to the group
-        group.add_agent(child_agent)
-        utilities.consolator( str(child_agent.index) + " was born to " + str(child_agent.getOMUID()) + "'s OMU!")
+        group.add_agent(inf_agent)
+        utilities.consolator(str(inf_agent.index) + " was born to " + str(inf_agent.getOMUID()) + "'s OMU!")
 
-    def mark_agent_as_dead(self, agent, new_generation, counter,
+    def mark_agent_as_dead(self, agent, counter,
                            avail_females, eligible_males,
-                           leaders, lea_for_fol, random_module, population_dict=None):
+                           leaders, lea_for_fol, random_module,
+                           population,
+                           population_dict=None):
         """
         marks an agent as having died. Since the self.all_agents
         set contains all living agents, by removing the agent
@@ -225,27 +220,20 @@ class AgentGroup():
         ----------
         agent: agent to mark as dead
         """
-        utilities.consolator( (str(agent.index) + " died!"))
+        utilities.consolator((str(agent.index) + " died!"))
         counter.increment()
-        try:
-            new_generation.agent_dict.pop(agent.index)
-        except KeyError:
-            pass
-        try:
+        if agent.index in self.agent_dict:
+            self.agent_dict.pop(agent.index)
+        if population_dict != None and agent.index in population_dict:
             population_dict.pop(agent.index)
-        except (AttributeError, KeyError):
-            pass
-        try:
-            new_generation.remove_agent(agent)
-        except ValueError:
-            pass
+        self.remove_agent(agent)
 
         # if this dead agent had explicit parents, and they are 1 y old or less,
         # mother (parents[0]) resumes cycles
         if agent.parents:
             if agent.age <= 1:
                 try:
-                    new_generation.agent_dict[agent.parents[0]].femaleState = \
+                    self.agent_dict[agent.parents[0]].femaleState = \
                         FemaleState.cycling
                 except KeyError:
                     pass
@@ -254,19 +242,19 @@ class AgentGroup():
             utilities.consolator((str(agent.index) + "'s malestate is " + str(agent.maleState)))
             try:
                 eligible_males.remove(agent.index)
-                utilities.consolator( "removed " + str(agent.index) + " from eligible_males")
+                utilities.consolator("removed " + str(agent.index) + " from eligible_males")
             except ValueError:
                 pass
             if leaders:
                 try:
                     leaders.remove(agent.index)
-                    utilities.consolator( "removed " + str(agent.index) + " from leaders")
+                    utilities.consolator("removed " + str(agent.index) + " from leaders")
                 except ValueError:
                     pass
 
             try:
                 lea_for_fol.remove(agent.index)
-                utilities.consolator( "removed " + str(agent.index) + " from lea_for_fol")
+                utilities.consolator("removed " + str(agent.index) + " from lea_for_fol")
 
             except ValueError:
                 pass
@@ -282,13 +270,13 @@ class AgentGroup():
                 #  b/c they were effectively solitary this turn
                 malefol = agent.getMaleFol()
                 for i in range(0, len(malefol)):
-                    new_generation.agent_dict[malefol[i]].maleState = MaleState.sol
+                    self.agent_dict[malefol[i]].maleState = MaleState.sol
                 agent.setMaleFol(malefol)
 
                 eligible_males += agent.getMaleFol()
                 utilities.consolator(("added " + str(agent.getMaleFol()) + " to elig males"))
-                dispersal.inherit_female(new_generation, agent.females,
-                                         agent.getMaleFol(), agent, random_module, counter, eligible_males)
+                dispersal.inherit_female(self, agent.females,
+                                         agent.getMaleFol(), agent, random_module, counter, eligible_males, population)
                 avail_females += agent.females
                 utilities.consolator(("added " + str(agent.females) + " to avail females"))
 
@@ -296,32 +284,39 @@ class AgentGroup():
 
             elif agent.maleState == MaleState.fol:
                 try:
-                    new_generation.agent_dict[agent.getOMUID()].getMaleFol().remove(agent.index)
+                    self.agent_dict[agent.getOMUID()].getMaleFol().remove(agent.index)
                     utilities.consolator((str(agent.index) + " removed from " + str(agent.getOMUID()) + "'s OMU"))
                 except (KeyError, ValueError):
                     pass
 
         # quickly remove dead female from available females and as leader's female
         elif agent.sex == "f":
-            if agent.index not in avail_females and agent.dispersed:
-                #  if her male's not dead AND she's not still in her dad's OMU, try to remove her from his list
-                try:
-                    new_generation.agent_dict[agent.getOMUID()].females.remove(agent.index)
-                    utilities.consolator(("removed female " + str(agent.index) + " from females list of " + str(agent.getOMUID())))
-                except ValueError:
-                    pass
-            if agent.index in avail_females:
-                avail_females.remove(agent.index)
-                utilities.consolator(("removed " + str(agent.index) + " from avail fems"))
+            if avail_females:
+                # there are avail_females
+                if agent.index in avail_females:
+                    # if this female is in avail_females, remove her
+                    avail_females.remove(agent.index)
+                    utilities.consolator(("removed " + str(agent.index) + " from avail fems"))
+                elif agent.dispersed:
+                    #  if her male's not dead AND she's not still in her dad's OMU,
+                    #  try to remove her from her leader's list
+                    try:
+                        self.agent_dict[agent.getOMUID()].females.remove(agent.index)
+                        utilities.consolator(("removed female " + str(agent.index) + " from females list of " + str(
+                                agent.getOMUID())))
+                    except ValueError:
+                        pass
+
             try:
-                new_generation.underage_females_for_takeover.remove(agent.index)
+                #  attempt to remove dead female from juvenile list in case she was there too
+                self.underage_females_for_takeover.remove(agent.index)
                 utilities.consolator(("removed " + str(agent.index) + " from underage fems"))
             except ValueError:
                 pass
 
         try:
             if agent.sex == 'm':
-                new_generation.male_set.remove(agent.index)
+                self.male_set.remove(agent.index)
             else:
                 self.female_set.remove(agent.index)
         except KeyError:
@@ -345,57 +340,17 @@ class AgentGroup():
         except KeyError:
             pass
 
-        """
-        #if agent is a parent and if the child is
-        #still underage, kill the child as well
-        for child in agent.children:
-            if (child in self.underage_set):
-                self.mark_agent_as_dead(
-                    self.agent_dict[child])
-        """
+        # if agent is a parent and if the child is
+        # still immature, kill the child as well
+        for offspring in agent.offspring:
+            self.mark_agent_as_dead(
+                    self.agent_dict[offspring], counter, avail_females,
+                    eligible_males, leaders, lea_for_fol, random_module, population,
+                    population_dict)
+
         return marked
 
-    def mark_as_parent(self, agent, child_or_children):
-        """
-        marks an agent as being a parent
-        by marking as being in a relationship and
-        adding the child's index to the parent's list
-        of childrens
-
-        parameters
-        ----------
-        agent: agent to mark as being a parent
-        child_or_children: agent to mark as child,
-         or list of indices representing children
-
-        self.mark_as_in_relationship(agent.index)
-
-        #make sure the child or children don't already
-        #have a parent
-        #duck typing!
-        try:
-            agent.chidren = agent.children.union(
-                child_or_children)
-
-        except TypeError:
-            agent.children.add(child_or_children.index)
-
-        agent.children.add(child_or_children.index)
-        child_or_children.parents.add(agent.index)
-        """
-
-    def mark_as_in_relationship(self, agent):
-        """
-        marks an agent as being in a relationship,
-        by moving it to the in_relationships_set
-
-        parameters
-        ----------
-        agent: agent to mark as being in a relationship
-        """
-        self.in_relationships_set.add(agent)
-
-    def promote_agent(self, agent, simulation):
+    def promote_agent(self, agent, simulation, next_generation_pop):
         """
         makes an agent older, and if need be, removes them from the
         underage_set
@@ -408,12 +363,7 @@ class AgentGroup():
             self.infants_set.add(agent.index)
 
         elif agent.age == (self.MALE_MINIMUM_AGE) and agent.sex == "m":
-            """
-            because males are dispersed from group to group,
-            it is possible for a male on the cusp of
-            adulthood to be moved from 1 group to another.
-            Therefore, don't panic if key not found
-            """
+
             try:
                 self.infants_set.remove(agent.index)
             except KeyError:
@@ -425,6 +375,7 @@ class AgentGroup():
             agent.females = []
             if agent.parents:
                 simulation.parentage[agent.index] = agent.parents
+                next_generation_pop[agent.parents[0]].offpsring.remove(agent.index)
 
         elif agent.age == 6 and agent.sex == "m":
             agent.maleState = MaleState.sol
@@ -437,9 +388,11 @@ class AgentGroup():
                 pass
             self.female_set.add(agent.index)
             self.underage_females_for_takeover.append(agent.index)
-            agent.femaleState = FemaleState.underage
+            agent.femaleState = FemaleState.juvenile
             if agent.parents:
                 simulation.parentage[agent.index] = agent.parents
+                next_generation_pop[agent.parents[0]].offpsring.remove(agent.index)
+
 
 
         elif agent.age == (self.FEMALE_MATUR_AGE) and agent.sex == "f":
@@ -534,10 +487,9 @@ class AgentGroup():
                         follower = self.agent_dict[follower_index]
                         assert follower.maleState == MaleState.fol
                         assert follower.getOMUID() == agent_index
-                elif agent.maleState == MaleState.sol or\
-                    agent.maleState == MaleState.fol:
+                elif agent.maleState == MaleState.sol or \
+                                agent.maleState == MaleState.fol:
                     assert not agent.females
                     assert not agent.getMaleFol()
 
-        utilities.consolator( "group passes checks")
-
+        utilities.consolator("group passes checks")

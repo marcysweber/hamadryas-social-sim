@@ -4,7 +4,7 @@ import utilities
 
 
 class FemaleState:
-    underage, cycling, pregnant, nursing0, nursing1 = range(5)
+    juvenile, cycling, pregnant, nursing0, nursing1 = range(5)
 
 class MaleState:
     juvsol, sol, fol, lea = range(4)
@@ -30,7 +30,7 @@ class AgentClass:
     compability = None
 
     parents = []
-    children = set()
+    offspring = []
 
     index = 0
     clanID = ""
@@ -41,8 +41,8 @@ class AgentClass:
 
 
     def __init__(self, age, sex, femaleState, maleState,
-        index, clanID, bandID, parents, OMUID, compability, females = [],
-                 malefol = [], children = set(), last_birth = 0, lottery = [], dispersed = False
+                 index, clanID, bandID, parents, OMUID, compability, females=[],
+                 malefol=[], offspring=[], last_birth=0, lottery=[], dispersed=False
                  ):
         """
         constructor
@@ -65,10 +65,9 @@ class AgentClass:
 
         self.age = float(age)
         self.sex = sex
-        #self.is_alpha = is_alpha
         self.parents = parents
         self.index = index
-        self.children = children
+        self.offspring = offspring
         self.clanID = clanID
         self.bandID = bandID
         self.femaleState = femaleState
@@ -81,14 +80,9 @@ class AgentClass:
         self.compability = compability
         self.dispersed = dispersed
 
-        #make sure sisters, aggressive, friends are empty lists not
-        #null references
+        if self.offspring == None:
+            self.offspring = []
 
-        if self.children == None:
-            self.children = set()
-
-        #make sure that children is a set
-        #assert(type(self.children) is set)
 
     def setOMUID(self, OMUID):
         utilities.consolator( str(self.index) + "'s OMU ID is now " + str(OMUID))
@@ -160,7 +154,7 @@ class AgentClass:
 
         outputstring += self.get_selfstring() + ";\n"
 
-        for child_index in self.children:
+        for child_index in self.offspring:
             if (child_index in parent_group.whole_set):
                 outputstring += str(self.index) + " -> " +\
                  str(child_index) + "[color=red];\n"
@@ -185,7 +179,7 @@ class AgentClass:
         """
         output = []
 
-        for child_index in self.children:
+        for child_index in self.offspring:
             output_dict = {"source":self.index,
             "target":child_index, "type":"parent-child"}
             output.append(output_dict)
