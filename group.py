@@ -210,6 +210,7 @@ class AgentGroup():
                            avail_females, eligible_males,
                            leaders, lea_for_fol, random_module,
                            population,
+                           cause_of_death,
                            population_dict=None):
         """
         marks an agent as having died. Since the self.all_agents
@@ -220,7 +221,7 @@ class AgentGroup():
         ----------
         agent: agent to mark as dead
         """
-        utilities.consolator((str(agent.index) + " died!"))
+        utilities.consolator((str(agent.index) + " died because " + cause_of_death + " !"))
         counter.increment()
         if agent.index in self.agent_dict:
             self.agent_dict.pop(agent.index)
@@ -231,12 +232,14 @@ class AgentGroup():
         # if this dead agent had explicit parents, and they are 1 y old or less,
         # mother (parents[0]) resumes cycles
         if agent.parents:
-            if agent.age <= 1:
-                try:
-                    self.agent_dict[agent.parents[0]].femaleState = \
-                        FemaleState.cycling
-                except KeyError:
-                    pass
+            for parent in agent.parents:
+                if parent in self.agent_dict and self.agent_dict[parent].sex == "f":
+                    if agent.age <= 1:
+                        self.agent_dict[parent].femaleState = FemaleState.cycling
+                    if agent.index in self.agent_dict[parent].offspring:
+                        self.agent_dict[parent].offspring.remove(agent.index)
+                        utilities.consolator(
+                            "removing " + str(agent.index) + " from offspring of parent " + str(parent))
 
         if agent.sex == "m":
             utilities.consolator((str(agent.index) + "'s malestate is " + str(agent.maleState)))
@@ -273,11 +276,13 @@ class AgentGroup():
                     self.agent_dict[malefol[i]].maleState = MaleState.sol
                 agent.setMaleFol(malefol)
 
+                agent.females = filter(lambda female: female in population_dict, agent.females)
+
                 eligible_males += agent.getMaleFol()
                 utilities.consolator(("added " + str(agent.getMaleFol()) + " to elig males"))
                 dispersal.inherit_female(self, agent.females,
                                          agent.getMaleFol(), agent, random_module, counter, eligible_males, population)
-                avail_females += agent.females
+                avail_females = avail_females.union(set(agent.females))
                 utilities.consolator(("added " + str(agent.females) + " to avail females"))
 
 
@@ -346,6 +351,7 @@ class AgentGroup():
             self.mark_agent_as_dead(
                     self.agent_dict[offspring], counter, avail_females,
                     eligible_males, leaders, lea_for_fol, random_module, population,
+                    "its mother, " + str(agent.index) + " died",
                     population_dict)
 
         return marked
@@ -391,9 +397,11 @@ class AgentGroup():
             agent.femaleState = FemaleState.juvenile
             if agent.parents:
                 simulation.parentage[agent.index] = agent.parents
-                next_generation_pop[agent.parents[0]].offpsring.remove(agent.index)
-
-
+                if agent.parents[0] in next_generation_pop:
+                    mother_of_agent = next_generation_pop[agent.parents[0]]
+                    utilities.consolator(
+                        "removing " + str(agent.index) + " from offspring of mother, " + str(mother_of_agent.index))
+                    setattr(mother_of_agent, "offspring", [])
 
         elif agent.age == (self.FEMALE_MATUR_AGE) and agent.sex == "f":
             agent.femaleState = FemaleState.cycling

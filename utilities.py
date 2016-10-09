@@ -1,4 +1,3 @@
-
 def consolator(print_out):
     printing = True
     if printing:

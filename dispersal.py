@@ -124,9 +124,11 @@ def challenge(this_generation, new_generation, challenger, leader_index, deathco
         if random.choice(["dead", "alive"]) == "dead":
             new_generation.mark_agent_as_dead(challenger, deathcounter, avail_females, eligible_males,
                                               leaders, lea_for_fol, random_module, population,
+                                              cause_of_death="he was challenged and lost",
                                               population_dict=population_dict)
     else:
         #  challenger wins
+        removeDeadFemales(leader, new_generation)
         utilities.consolator(str(challenger.index) + " won.")
         if leader.females:
             add_female_to_OMU(new_generation.agent_dict[random.choice(leader.females)],
@@ -138,8 +140,16 @@ def challenge(this_generation, new_generation, challenger, leader_index, deathco
             new_generation.mark_agent_as_dead(leader, deathcounter, avail_females, eligible_males,
                                               leaders=leaders, lea_for_fol=lea_for_fol, random_module=random_module,
                                               population=population,
+                                              cause_of_death="male attack",
                                               population_dict=population_dict)
 
+
+def removeDeadFemales(leader, new_generation):
+    live_females = filter(lambda female: female in new_generation.agent_dict, leader.females)
+    if len(live_females) != len(leader.females):
+        removed_females = set(leader.females) - set(live_females)
+        utilities.consolator("removing " + str(removed_females) + " from leader " + str(leader.index))
+        leader.females = live_females
 
 def follow(this_generation, new_generation, leader_index, newfollower, lea_for_fol):
     utilities.consolator( str(newfollower.index) + " is about to follow " + str(leader_index))
@@ -333,7 +343,8 @@ def add_female_to_OMU(female, male, deathcounter, population):
             if random_module.roll(0.6):
                 her_generation.mark_agent_as_dead(
                         agent=offspring, counter=deathcounter, avail_females=None, eligible_males=None, leaders=None,
-                        lea_for_fol=None, random_module=random_module, population=population)
+                        lea_for_fol=None, random_module=random_module, cause_of_death="infanticide",
+                        population=population)
             else:
                 utilities.consolator("offspring " + str(offspring.index) + " now follows " + str(male.index))
                 offspring.setOMUID(male.index)

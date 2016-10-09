@@ -1,4 +1,3 @@
-
 import constants
 import utilities
 
@@ -6,40 +5,21 @@ import utilities
 class FemaleState:
     juvenile, cycling, pregnant, nursing0, nursing1 = range(5)
 
+
 class MaleState:
     juvsol, sol, fol, lea = range(4)
 
+
 class CompAbility:
     type1, type2, type3, type4 = range(4)
+
 
 class AgentClass:
     """
     defines an agent (in this case, a baboon) in the Simulation
     """
-    #these values are defined in class seedgenerator.
-    age = 0
-    sex = ""
 
-    femaleState = None
-    last_birth = 0
-
-    maleState = None
-    females = []
-    malefols = []
-    lottery = []
-    compability = None
-
-    parents = []
-    offspring = []
-
-    index = 0
-    clanID = ""
-    bandID = ""
-    OMU = ""
-
-    dispersed = False
-
-
+    # these values are defined in class seedgenerator.
     def __init__(self, age, sex, femaleState, maleState,
                  index, clanID, bandID, parents, OMUID, compability, females=[],
                  malefol=[], offspring=[], last_birth=0, lottery=[], dispersed=False
@@ -59,9 +39,12 @@ class AgentClass:
         index - the index of this agent
         children - list of indices of this agent's children
         """
-        #make sure age class and sex are valid
+        # make sure age class and sex are valid
         sex = sex.lower()
         assert (constants.SEX_DICT.has_key(sex))
+
+        if offspring is None:
+            offspring = []
 
         self.age = float(age)
         self.sex = sex
@@ -80,19 +63,15 @@ class AgentClass:
         self.compability = compability
         self.dispersed = dispersed
 
-        if self.offspring == None:
-            self.offspring = []
-
-
     def setOMUID(self, OMUID):
-        utilities.consolator( str(self.index) + "'s OMU ID is now " + str(OMUID))
+        utilities.consolator(str(self.index) + "'s OMU ID is now " + str(OMUID))
         self.OMU = OMUID
 
     def getOMUID(self):
         return self.OMU
 
     def setMaleFol(self, malefol):
-        utilities.consolator( str(self.index) + "'s malefols are now " + str(malefol))
+        utilities.consolator(str(self.index) + "'s malefols are now " + str(malefol))
         self.malefols = malefol
 
     def getMaleFol(self):
@@ -141,7 +120,7 @@ class AgentClass:
         if self.getOMUID() != "":
             self.setOMUID(self.getOMUID() + top_index)
 
-        #this is correct
+            # this is correct
 
     def move_agent_to_group(self, destination):
         self.bandID = destination
@@ -156,9 +135,8 @@ class AgentClass:
 
         for child_index in self.offspring:
             if (child_index in parent_group.whole_set):
-                outputstring += str(self.index) + " -> " +\
-                 str(child_index) + "[color=red];\n"
-
+                outputstring += str(self.index) + " -> " + \
+                                str(child_index) + "[color=red];\n"
 
         return outputstring
 
@@ -167,8 +145,8 @@ class AgentClass:
         returns the name of this object in JSON. This
         is used for visualizing populations in javascript
         """
-        name_dict = {"name":self.index,
-         "age":self.age, "sex":self.sex}
+        name_dict = {"name": self.index,
+                     "age": self.age, "sex": self.sex}
 
         return name_dict
 
@@ -180,8 +158,8 @@ class AgentClass:
         output = []
 
         for child_index in self.offspring:
-            output_dict = {"source":self.index,
-            "target":child_index, "type":"parent-child"}
+            output_dict = {"source": self.index,
+                           "target": child_index, "type": "parent-child"}
             output.append(output_dict)
 
         return output
@@ -190,22 +168,8 @@ class AgentClass:
         """
         returns human readable class description
         """
-        output_string = "age:" + str(self.age) +\
-            " sex:" + self.sex + " index: " +\
-            str(self.index)
+        output_string = "age:" + str(self.age) + \
+                        " sex:" + self.sex + " index: " + \
+                        str(self.index)
 
         return output_string
-
-
-
-
-
-
-
-
-
-
-
-
-
-

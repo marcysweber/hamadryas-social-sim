@@ -54,7 +54,8 @@ class ControlExperiment:
                       total_withinmean_list, total_withinsd_list,
                       total_acrossmean_list, total_acrosssd_list,
                       total_totalmean_list, total_totalsd_list,
-                      total_acrossOMUwithinbandmean_list, total_acrossOMUwithinbandsd_list)
+                      total_acrossOMUwithinbandmean_list,
+                      total_acrossOMUwithinbandsd_list)
 
         self.save_output_data(total_population_record_list,
                               total_age_record_list,

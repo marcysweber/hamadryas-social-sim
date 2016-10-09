@@ -136,7 +136,7 @@ class Simulation:
             this_generation_group_composition_list = []
 
             # both of these refer to the whole population for one year, which is what we want
-            avail_females = []
+            avail_females = set()
             eligible_males = []
             new_generation_population_dict = {}
 
@@ -151,6 +151,7 @@ class Simulation:
                 copy.deepcopy(this_generation_population)
 
             #  FILL ELIGIBLE MALES FROM THE WHOLE POP, DEATH
+            dead_females = []
             for x in range(0, len(this_generation_population.groups)):
                 for agent_index in this_generation_population.groups[x].whole_set:
                     this_agent = this_generation_population.groups[x].agent_dict[agent_index]
@@ -158,6 +159,7 @@ class Simulation:
                     if agent_index in next_generation_population.groups[x].agent_dict:
                         new_agent = next_generation_population.groups[x].agent_dict[agent_index]
 
+                        #  check_for_death returns false if agent dies and true if they live
                         if self.check_for_death(lifetable=lifetable, this_agent=this_agent, new_agent=new_agent,
                                                 new_generation=next_generation_population.groups[x],
                                                 random_module=random_module, counter=death_counter,
@@ -166,6 +168,14 @@ class Simulation:
                                                 population_dict=new_generation_population_dict,
                                                 population=next_generation_population):
                             new_generation_population_dict[agent_index] = new_agent
+                        else:
+                            if new_agent.sex == "f":
+                                dead_females.append(new_agent.index)
+
+            for dead_female in dead_females:
+                if dead_female in avail_females:
+                    avail_females.remove(dead_female)
+                    utilities.consolator("removing " + str(new_agent.index) + " from avail_females because she died")
 
             self.check_followers(new_generation_population_dict)
 
@@ -184,7 +194,7 @@ class Simulation:
                                             population=next_generation_population,
                                             recognition_bool=self.recognition)
 
-            avail_females = []
+            avail_females = set()
             utilities.consolator( "Opp takeovers 1 done.")
 
             # run non-dispersal stuff for each sub_group.
@@ -233,9 +243,6 @@ class Simulation:
                                               this_generation_leaders, death_counter, avail_females, eligible_males,
                                               population_dict=new_generation_population_dict,
                                               population=next_generation_population)
-
-                            for female in this_agent.females:
-                                female
 
                         if this_agent.sex =="f":
                             # check for preg
@@ -498,7 +505,8 @@ class Simulation:
         if random_module.roll(chance_of_death):
             new_generation.mark_agent_as_dead(new_agent, counter, avail_females, eligible_males,
                                               random_module=random_module, leaders=leaders, lea_for_fol=lea_for_fol,
-                                              population=population, population_dict=population_dict)
+                                              population=population, cause_of_death="the lifetable said so",
+                                              population_dict=population_dict)
             #  utilities.consolator(("dead")
             return False
 
