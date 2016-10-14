@@ -1,4 +1,6 @@
-def consolator(print_out):
-    printing = True
-    if printing:
+printing = False
+
+
+def consolator(print_out, priority=False):
+    if printing or priority:
         print (print_out)

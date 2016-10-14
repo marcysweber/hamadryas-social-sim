@@ -347,6 +347,8 @@ class AgentGroup():
 
         # if agent is a parent and if the child is
         # still immature, kill the child as well
+        agent.offspring = filter(lambda offspring: offspring in self.agent_dict, agent.offspring)
+
         for offspring in agent.offspring:
             self.mark_agent_as_dead(
                     self.agent_dict[offspring], counter, avail_females,

@@ -1,9 +1,7 @@
-from simulation import Simulation
-from xlwt import Workbook
-import data_saver
-import constants
 import math
+
 import utilities
+from simulation import Simulation
 
 
 class ControlSimulation(Simulation):
@@ -185,4 +183,4 @@ class ControlSimulation(Simulation):
 
     def per_generation_print_out(self, generation_index):
         utilities.consolator(str(self.simulation_index) + "of" + str(self.total_simulations) +
-              " Half-year:  " + str(generation_index))
+                             " Half-year:  " + str(generation_index), True)
