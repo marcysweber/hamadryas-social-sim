@@ -115,38 +115,42 @@ def calc(dyad, parentage_dict):
         level = 1
         #  this is for the loop over second
         while match == False:
-            new_parents = []
-            for offspring in findmyparentstwo:
-                if offspring in parentage_dict:
-                    parents = parentage_dict[offspring]
-                    new_parents += parents
-                    parent_match = None
-                    for parent in parents:
-                        #  if the parent is in the ancestor dict of first
-                        if parent in firstancestors:
-                            #  then they are the match
-                            parent_match = parent
-                            if match == True:
-                                double_match = True
-                            else:
-                                #  and if this is the first match, match = True
-                                match = True
-                    if match == True and double_match == False:
-                        linkages = level + firstancestors[parent_match]
-                        # for exactly one ancestor match, every link is used
-                        return math.pow(0.5, linkages)
-                    elif match == True and double_match == True:
-                        linkages = level + firstancestors[parent_match] - 1
-                        #  if they have ancestors that were full sibs, subtract one edge
-                        return math.pow(0.5, linkages)
-            if new_parents:
-                findmyparentstwo = new_parents
-                level += 1
+            if second in firstancestors:
+                match = True
+                linkages = firstancestors[second]
+                return math.pow(0.5, linkages)
             else:
-                return 0.0
+                new_parents = []
+                for offspring in findmyparentstwo:
+                    if offspring in parentage_dict:
+                        parents = parentage_dict[offspring]
+                        new_parents += parents
+                        parent_match = None
+                        for parent in parents:
+                            #  if the parent is in the ancestor dict of first
+                            if parent in firstancestors:
+                                #  then they are the match
+                                parent_match = parent
+                                if match == True:
+                                    double_match = True
+                                else:
+                                    #  and if this is the first match, match = True
+                                    match = True
+                        if match == True and double_match == False:
+                            linkages = level + firstancestors[parent_match]
+                            # for exactly one ancestor match, every link is used
+                            return math.pow(0.5, linkages)
+                        elif match == True and double_match == True:
+                            linkages = level + firstancestors[parent_match] - 1
+                            #  if they have ancestors that were full sibs, subtract one edge
+                            return math.pow(0.5, linkages)
+                if new_parents:
+                    findmyparentstwo = new_parents
+                    level += 1
+                else:
+                    return 0.0
     else:
         return 0.0
-
 
 def save_relatedness_data(withinmean, withinsd, acrossmean, acrosssd, book, number_simulations = 1):
     data_sheet = book.add_sheet('relatedness')

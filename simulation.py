@@ -42,12 +42,11 @@ class Simulation:
     output_xls_name = ""
     dot_directory = ""
     json_directory = ""
-    NUMBER_OF_GENERATIONS = 200
     NUMBER_OF_SEED_GROUPS = 10
 
     def __init__(self, output_xls_name="simulation_output_data.xls",
                  dot_directory="dot/", json_directory="json/",
-                 recognition=True):
+                 recognition=False, number_of_generations=100):
         """
         constructor
 
@@ -71,6 +70,10 @@ class Simulation:
         self.totalrelsd = ""
         self.acrossOMUwithinbandmean = ""
         self.acrossOMUwithinbandsd = ""
+        self.number_of_generations = number_of_generations
+
+    def set_number_of_generations(self, number_of_generations):
+        self.number_of_generations = number_of_generations
 
     def run_simulation(self, save_to_dot=True, save_to_json=True):
         # import Seed and lifetable data
@@ -123,7 +126,7 @@ class Simulation:
         total_births = 0
         total_deaths = 0
 
-        for i in range(0, self.NUMBER_OF_GENERATIONS):
+        for i in range(0, self.number_of_generations):
             self.per_generation_print_out(i)
             # analytics
             this_age_record = []
@@ -314,7 +317,7 @@ class Simulation:
 
             self.conduct_changes_unique_to_experiment_at_gen(
                 this_generation_population, next_generation_population,
-                i, self.NUMBER_OF_GENERATIONS, table_data)
+                    i, self.number_of_generations, table_data)
 
             # set the old gen to the new one
             this_generation_population = next_generation_population
