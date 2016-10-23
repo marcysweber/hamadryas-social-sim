@@ -7,14 +7,10 @@ data_saver.py
 -------------
 Saves analytical data to disk, using xlwt
 """
-from xlwt import Workbook
-from tempfile import TemporaryFile
-import constants
-import pickle
 
-def save_relatedness_data(withinmean, withinsd, acrossmean, acrosssd, totalmean, totalsd,
-                          acrosswithinmean, acrosswithinsd,
-                          relatednessfilename, number_simulations = 1):
+
+def save_relatedness_data(book, withinmean, withinsd, acrossmean, acrosssd, totalmean, totalsd,
+                          acrosswithinmean, acrosswithinsd):
     """
     THIS FUNCTION WORKS AS IT WAS IMPLEMENTED IN RELATEDNESS. pROBABLY NEEDS TO BE MODIFIED FOR
     MULTIPLE REPLICATES AND CALLED APPROPRIATELY IN SIMULATION.PY
@@ -44,32 +40,27 @@ def save_relatedness_data(withinmean, withinsd, acrossmean, acrosssd, totalmean,
     #
     # pickle.dump(data, "data_to_be_excelled.pickle")
 
-    book = Workbook()
+    data_sheet = book.get_sheet(book.get_active_sheet())
 
-    data_sheet = book.add_sheet('relatedness')
-
-    data_sheet.write(0, 1, 'Mean Relatedness Within OMU')
-    data_sheet.write(0, 2, 'SD Relatedness Within OMU')
-    data_sheet.write(0, 3, 'Mean Relatedness Across OMU')
-    data_sheet.write(0, 4, 'SD Relatedness Across OMU')
-    data_sheet.write(0, 5, 'Mean Relatedness all dyads')
-    data_sheet.write(0, 6, 'SD Relatedness all dyads')
-    data_sheet.write(0, 7, 'Mean Relatedness Across OMU Within Band')
-    data_sheet.write(0, 8, 'SD Relatedness Across OMU Within Band')
+    data_sheet.write(0, 7, 'Mean Relatedness Within OMU')
+    data_sheet.write(0, 8, 'SD Relatedness Within OMU')
+    data_sheet.write(0, 9, 'Mean Relatedness Across OMU')
+    data_sheet.write(0, 10, 'SD Relatedness Across OMU')
+    data_sheet.write(0, 11, 'Mean Relatedness all dyads')
+    data_sheet.write(0, 12, 'SD Relatedness all dyads')
+    data_sheet.write(0, 13, 'Mean Relatedness Across OMU Within Band')
+    data_sheet.write(0, 14, 'SD Relatedness Across OMU Within Band')
 
     for i in range(0, len(withinmean)):
-        data_sheet.write(i + 1, 0, i)
-        data_sheet.write(i + 1, 1, withinmean[i])
-        data_sheet.write(i + 1, 2, withinsd[i])
-        data_sheet.write(i + 1, 3, acrossmean[i])
-        data_sheet.write(i + 1, 4, acrosssd[i])
-        data_sheet.write(i + 1, 5, totalmean[i])
-        data_sheet.write(i + 1, 6, totalsd[i])
-        data_sheet.write(i + 1, 7, acrosswithinmean[i])
-        data_sheet.write(i + 1, 8, acrosswithinsd[i])
+        data_sheet.write(i + 1, 7, withinmean[i])
+        data_sheet.write(i + 1, 8, withinsd[i])
+        data_sheet.write(i + 1, 9, acrossmean[i])
+        data_sheet.write(i + 1, 10, acrosssd[i])
+        data_sheet.write(i + 1, 11, totalmean[i])
+        data_sheet.write(i + 1, 12, totalsd[i])
+        data_sheet.write(i + 1, 13, acrosswithinmean[i])
+        data_sheet.write(i + 1, 14, acrosswithinsd[i])
 
-    book.save(relatednessfilename)
-    del(book)
 
 def save_age_data(data_list, book):
     """
