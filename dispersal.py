@@ -281,14 +281,14 @@ def opportun_takeover(new_generation_population_dict, avail_females, eligible_ma
                     #  certain chance of success
                     if not this_male.getMaleFol():
                         #  if male doesn't have followers, less success
-                        reps = 3
+                        reps = 12
                         if recognition_bool:
                             recognition(new_generation_population_dict, this_female, this_male, reps)
                         for i in range(0, reps):
                             lottery += [this_male.index]
                     else:
                         #  male must have followers
-                        reps = 4
+                        reps = 16
                         if recognition_bool:
                             recognition(new_generation_population_dict, this_female, this_male, reps)
                         for i in range(0, reps):
@@ -303,7 +303,7 @@ def opportun_takeover(new_generation_population_dict, avail_females, eligible_ma
                     #  in same band but different clan
                     if this_male.bandID == this_female.bandID:
                         # if this_male.age > 10:  changed and commented out 8/19
-                            reps = 2
+                        reps = 4
                             #  male must be older, but has equal success
                             if recognition_bool:
                                 recognition(new_generation_population_dict, this_female, this_male, reps)

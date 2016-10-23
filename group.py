@@ -221,7 +221,7 @@ class AgentGroup():
         ----------
         agent: agent to mark as dead
         """
-        utilities.consolator((str(agent.index) + " died because " + cause_of_death + " !"))
+        utilities.consolator((str(agent.index) + " died because " + cause_of_death + "!"))
         counter.increment()
         if agent.index in self.agent_dict:
             self.agent_dict.pop(agent.index)
