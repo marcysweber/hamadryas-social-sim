@@ -337,19 +337,21 @@ def add_female_to_OMU(female, male, deathcounter, population):
     random_module = RandomModule()
     if female.offspring:  # if the offspring list is not empty
         for each in female.offspring:
-            offspring = her_generation.agent_dict[each]
-            assert offspring.age < 5
-            # INFANTICIDE, 60%
-            if random_module.roll(0.6):
-                her_generation.mark_agent_as_dead(
-                        agent=offspring, counter=deathcounter, avail_females=None, eligible_males=None, leaders=None,
-                        lea_for_fol=None, random_module=random_module, cause_of_death="infanticide",
-                        population=population)
-            else:
-                utilities.consolator("offspring " + str(offspring.index) + " now follows " + str(male.index))
-                offspring.setOMUID(male.index)
-                if offspring.bandID != male.bandID:
-                    population.move_agent_to_group(offspring, male.bandID)
+            if each in her_generation.agent_dict:
+                offspring = her_generation.agent_dict[each]
+                assert offspring.age < 5
+                # INFANTICIDE, 60%
+                if random_module.roll(0.6):
+                    her_generation.mark_agent_as_dead(
+                            agent=offspring, counter=deathcounter, avail_females=None, eligible_males=None,
+                            leaders=None,
+                            lea_for_fol=None, random_module=random_module, cause_of_death="infanticide",
+                            population=population)
+                else:
+                    utilities.consolator("offspring " + str(offspring.index) + " now follows " + str(male.index))
+                    offspring.setOMUID(male.index)
+                    if offspring.bandID != male.bandID:
+                        population.move_agent_to_group(offspring, male.bandID)
 
 
     try:

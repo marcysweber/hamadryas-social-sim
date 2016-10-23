@@ -8,9 +8,7 @@
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/output/control_control_output.xls" afterPath="$PROJECT_DIR$/output/control_control_output.xls" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/control_experiment.py" afterPath="$PROJECT_DIR$/control_experiment.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/relatedness.py" afterPath="$PROJECT_DIR$/relatedness.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/relatedness_test.py" afterPath="$PROJECT_DIR$/relatedness_test.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/simulation.py" afterPath="$PROJECT_DIR$/simulation.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dispersal.py" afterPath="$PROJECT_DIR$/dispersal.py" />
     </list>
     <ignored path="hamadryas.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -34,8 +32,20 @@
       <file leaf-file-name="control_experiment.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/control_experiment.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.26541096">
-              <caret line="103" column="53" selection-start-line="103" selection-start-column="53" selection-end-line="103" selection-end-column="53" />
+            <state vertical-scroll-proportion="-0.24731183">
+              <caret line="81" column="37" selection-start-line="81" selection-start-column="37" selection-end-line="81" selection-end-column="37" />
+              <folding>
+                <element signature="e#0#9#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="data_saver.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/data_saver.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0">
+              <caret line="14" column="4" selection-start-line="14" selection-start-column="4" selection-end-line="14" selection-end-column="4" />
               <folding />
             </state>
           </provider>
@@ -86,8 +96,8 @@
       <file leaf-file-name="simulation.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/simulation.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-5.0555553">
-              <caret line="319" column="45" selection-start-line="319" selection-start-column="45" selection-end-line="319" selection-end-column="45" />
+            <state vertical-scroll-proportion="0.0">
+              <caret line="74" column="8" selection-start-line="74" selection-start-column="8" selection-end-line="74" selection-end-column="8" />
               <folding>
                 <element signature="e#92#103#0" expanded="true" />
               </folding>
@@ -99,7 +109,7 @@
         <entry file="file://$PROJECT_DIR$/dispersal.py">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="243" column="15" selection-start-line="243" selection-start-column="4" selection-end-line="243" selection-end-column="21" />
+              <caret line="339" column="49" selection-start-line="339" selection-start-column="49" selection-end-line="339" selection-end-column="49" />
               <folding />
             </state>
           </provider>
@@ -109,7 +119,7 @@
         <entry file="file://$PROJECT_DIR$/relatedness.py">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="148" column="30" selection-start-line="148" selection-start-column="30" selection-end-line="148" selection-end-column="30" />
+              <caret line="27" column="10" selection-start-line="27" selection-start-column="10" selection-end-line="27" selection-end-column="10" />
               <folding>
                 <element signature="e#0#11#0" expanded="true" />
               </folding>
@@ -169,15 +179,15 @@
         <option value="$PROJECT_DIR$/loader.py" />
         <option value="$PROJECT_DIR$/seed.py" />
         <option value="$PROJECT_DIR$/data_saver.py" />
-        <option value="$PROJECT_DIR$/dispersal.py" />
         <option value="$PROJECT_DIR$/agent.py" />
         <option value="$PROJECT_DIR$/group.py" />
         <option value="$PROJECT_DIR$/utilities.py" />
         <option value="$PROJECT_DIR$/relatedness_test.py" />
         <option value="$PROJECT_DIR$/relatedness.py" />
         <option value="$PROJECT_DIR$/control_simulation.py" />
-        <option value="$PROJECT_DIR$/control_experiment.py" />
         <option value="$PROJECT_DIR$/simulation.py" />
+        <option value="$PROJECT_DIR$/dispersal.py" />
+        <option value="$PROJECT_DIR$/control_experiment.py" />
       </list>
     </option>
   </component>
@@ -231,6 +241,8 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scope" />
+      <pane id="Scratches" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -251,8 +263,6 @@
           </PATH>
         </subPane>
       </pane>
-      <pane id="Scratches" />
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -550,7 +560,13 @@
       <option name="project" value="LOCAL" />
       <updated>1476548401507</updated>
     </task>
-    <option name="localTasksCounter" value="16" />
+    <task id="LOCAL-00016" summary="running tests of length">
+      <created>1476975271272</created>
+      <option name="number" value="00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1476975271272</updated>
+    </task>
+    <option name="localTasksCounter" value="17" />
     <servers />
   </component>
   <component name="TestHistory">
@@ -598,23 +614,23 @@
     <frame x="-9" y="-9" width="1938" height="1048" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.20707871" sideWeight="0.8261618" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.20707871" sideWeight="0.8165869" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32995495" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33217993" sideWeight="0.50609434" order="8" side_tool="true" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.36936936" sideWeight="0.7448649" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4429066" sideWeight="0.8410175" order="11" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3404735" sideWeight="0.49390566" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.52364475" sideWeight="0.49390566" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32807216" sideWeight="0.49602544" order="10" side_tool="false" content_ui="tabs" />
-      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.14838368" sideWeight="0.17383821" order="2" side_tool="true" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.30439684" sideWeight="0.8479067" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.20707871" sideWeight="0.18341307" order="2" side_tool="true" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.2939189" sideWeight="0.8479067" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32919955" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3686584" sideWeight="0.7448649" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
     </layout>
     <layout-to-restore>
@@ -664,7 +680,8 @@
     <MESSAGE value="mostly debugged" />
     <MESSAGE value="last remaining debugging issue: error completion of run, i.e. turn 199, either compiling data or related issue" />
     <MESSAGE value="adding tests for relatedness" />
-    <option name="LAST_COMMIT_MESSAGE" value="adding tests for relatedness" />
+    <MESSAGE value="running tests of length" />
+    <option name="LAST_COMMIT_MESSAGE" value="running tests of length" />
     <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="true" />
     <option name="REFORMAT_BEFORE_PROJECT_COMMIT" value="true" />
     <option name="REARRANGE_BEFORE_PROJECT_COMMIT" value="true" />
@@ -699,7 +716,7 @@
           </properties>
         </breakpoint>
       </default-breakpoints>
-      <option name="time" value="179" />
+      <option name="time" value="186" />
     </breakpoint-manager>
     <watches-manager />
   </component>
@@ -782,7 +799,9 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="58" column="36" selection-start-line="58" selection-start-column="36" selection-end-line="58" selection-end-column="36" />
-          <folding />
+          <folding>
+            <element signature="e#0#9#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -944,13 +963,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/data_saver.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="8" column="3" selection-start-line="8" selection-start-column="3" selection-end-line="8" selection-end-column="3" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/loader.py">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
@@ -1009,23 +1021,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/relatedness.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="148" column="30" selection-start-line="148" selection-start-column="30" selection-end-line="148" selection-end-column="30" />
-          <folding>
-            <element signature="e#0#11#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/relatedness_test.py">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.45253164">
           <caret line="40" column="0" selection-start-line="40" selection-start-column="0" selection-end-line="40" selection-end-column="0" />
-          <folding>
-            <element signature="e#0#13#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1036,14 +1035,6 @@
           <folding>
             <element signature="e#295#306#0" expanded="true" />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/dispersal.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="243" column="15" selection-start-line="243" selection-start-column="4" selection-end-line="243" selection-end-column="21" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1062,6 +1053,34 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/relatedness.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="27" column="10" selection-start-line="27" selection-start-column="10" selection-end-line="27" selection-end-column="10" />
+          <folding>
+            <element signature="e#0#11#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/dispersal.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="339" column="49" selection-start-line="339" selection-start-column="49" selection-end-line="339" selection-end-column="49" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/simulation.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="74" column="8" selection-start-line="74" selection-start-column="8" selection-end-line="74" selection-end-column="8" />
+          <folding>
+            <element signature="e#92#103#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/control_simulation.py">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
@@ -1070,21 +1089,21 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/simulation.py">
+    <entry file="file://$PROJECT_DIR$/data_saver.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-5.0555553">
-          <caret line="319" column="45" selection-start-line="319" selection-start-column="45" selection-end-line="319" selection-end-column="45" />
-          <folding>
-            <element signature="e#92#103#0" expanded="true" />
-          </folding>
+        <state vertical-scroll-proportion="0.0">
+          <caret line="14" column="4" selection-start-line="14" selection-start-column="4" selection-end-line="14" selection-end-column="4" />
+          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/control_experiment.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.26541096">
-          <caret line="103" column="53" selection-start-line="103" selection-start-column="53" selection-end-line="103" selection-end-column="53" />
-          <folding />
+        <state vertical-scroll-proportion="-0.24731183">
+          <caret line="81" column="37" selection-start-line="81" selection-start-column="37" selection-end-line="81" selection-end-column="37" />
+          <folding>
+            <element signature="e#0#9#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
