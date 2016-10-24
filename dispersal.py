@@ -304,11 +304,11 @@ def opportun_takeover(new_generation_population_dict, avail_females, eligible_ma
                     if this_male.bandID == this_female.bandID:
                         # if this_male.age > 10:  changed and commented out 8/19
                         reps = 4
-                            #  male must be older, but has equal success
-                            if recognition_bool:
-                                recognition(new_generation_population_dict, this_female, this_male, reps)
-                            for i in range(0, reps):
-                                lottery += [this_male.index]
+                        #  male must be older, but has equal success
+                        if recognition_bool:
+                            recognition(new_generation_population_dict, this_female, this_male, reps)
+                        for i in range(0, reps):
+                            lottery += [this_male.index]
                     else:
                         # if this_male.age > 10: changed and commented out 8/19
                             reps = 1
@@ -343,9 +343,9 @@ def add_female_to_OMU(female, male, deathcounter, population):
                 # INFANTICIDE, 60%
                 if random_module.roll(0.6):
                     her_generation.mark_agent_as_dead(
-                            agent=offspring, counter=deathcounter, avail_females=None, eligible_males=None,
-                            leaders=None,
-                            lea_for_fol=None, random_module=random_module, cause_of_death="infanticide",
+                            agent=offspring, counter=deathcounter, avail_females=[], eligible_males=[],
+                            leaders=[],
+                            lea_for_fol=[], random_module=random_module, cause_of_death="infanticide",
                             population=population)
                 else:
                     utilities.consolator("offspring " + str(offspring.index) + " now follows " + str(male.index))

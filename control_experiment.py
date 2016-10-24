@@ -31,6 +31,8 @@ class ControlExperiment:
         total_population_breakdown_list = []
         total_population_relationships_list = []
         total_group_composition_list = []
+        total_real_birth_rate_list = []
+        total_real_death_rate_list = []
 
         #  these pertaining to relatedness
         total_withinmean_list = []
@@ -51,6 +53,8 @@ class ControlExperiment:
                       total_population_breakdown_list,
                       total_population_relationships_list,
                       total_group_composition_list,
+                      total_real_birth_rate_list,
+                      total_real_death_rate_list,
                       total_withinmean_list, total_withinsd_list,
                       total_acrossmean_list, total_acrosssd_list,
                       total_totalmean_list, total_totalsd_list,
@@ -76,6 +80,8 @@ class ControlExperiment:
                              total_population_breakdown_list,
                              total_population_relationships_list,
                              total_group_composition_list,
+                             total_real_birth_rate_list,
+                             total_real_death_rate_list,
                              total_withinmean_list,
                              total_withinsd_list,
                              total_acrossmean_list,
@@ -96,6 +102,8 @@ class ControlExperiment:
                  total_population_breakdown_list,
                  total_population_relationships_list,
                  total_group_composition_list,
+                 total_real_birth_rate_list,
+                 total_real_death_rate_list,
                  total_withinmean_list, total_withinsd_list,
                  total_acrossmean_list, total_acrosssd_list,
                  total_totalmean_list, total_totalsd_list,
@@ -123,6 +131,10 @@ class ControlExperiment:
                         simulation.last_gen_population_breakdown)
                 total_group_composition_list.append(
                         simulation.last_gen_composition)
+                total_real_birth_rate_list.append(
+                        simulation.real_birth_rate)
+                total_real_death_rate_list.append(
+                        simulation.real_death_rate)
 
                 #  relatedness
                 total_withinmean_list.append(simulation.withinmean)
@@ -149,6 +161,8 @@ class ControlExperiment:
                         total_population_breakdown_list,
                         total_population_relationships_list,
                         total_group_composition_list,
+                        total_real_birth_rate_list,
+                        total_real_death_rate_list,
                         total_withinmean_list,
                         total_withinsd_list,
                         total_acrossmean_list,
@@ -165,7 +179,9 @@ class ControlExperiment:
                                         total_age_sd_record_list,
                                         total_number_of_groups_list,
                                         total_females_per_males_list,
-                                        total_edges_per_agent_list)
+                                        total_edges_per_agent_list,
+                                        total_real_birth_rate_list,
+                                        total_real_death_rate_list)
 
         data_saver.save_relatedness_data(book,
                                          total_withinmean_list,

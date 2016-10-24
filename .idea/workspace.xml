@@ -4,11 +4,13 @@
     <bookmark url="file://$PROJECT_DIR$/agent.py" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="26d3b6da-75a2-4b80-be16-567964d85471" name="Default" comment="created a test to check when the populations become stable">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/output/control_control_output.xls" afterPath="$PROJECT_DIR$/output/control_control_output.xls" />
+    <list default="true" id="26d3b6da-75a2-4b80-be16-567964d85471" name="Default" comment="trying to figure out why population keeps increasing">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/control_experiment.py" afterPath="$PROJECT_DIR$/control_experiment.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/data_saver.py" afterPath="$PROJECT_DIR$/data_saver.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dispersal.py" afterPath="$PROJECT_DIR$/dispersal.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/group.py" afterPath="$PROJECT_DIR$/group.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/simulation.py" afterPath="$PROJECT_DIR$/simulation.py" />
     </list>
     <ignored path="hamadryas.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -29,11 +31,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="450">
-      <file leaf-file-name="control_experiment.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="control_experiment.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/control_experiment.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.38502672">
-              <caret line="19" column="0" selection-start-line="19" selection-start-column="0" selection-end-line="19" selection-end-column="0" />
+            <state vertical-scroll-proportion="-2.5">
+              <caret line="7" column="26" selection-start-line="7" selection-start-column="26" selection-end-line="7" selection-end-column="26" />
               <folding>
                 <element signature="e#0#9#0" expanded="true" />
               </folding>
@@ -41,11 +43,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Row.py" pinned="false" current-in-tab="false">
-        <entry file="file://C:/Python27/Lib/site-packages/xlwt/Row.py">
+      <file leaf-file-name="random_module.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/random_module.py">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="158" column="0" selection-start-line="158" selection-start-column="0" selection-end-line="158" selection-end-column="0" />
+              <caret line="36" column="0" selection-start-line="36" selection-start-column="0" selection-end-line="36" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -55,31 +57,7 @@
         <entry file="file://$PROJECT_DIR$/data_saver.py">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="65" column="34" selection-start-line="65" selection-start-column="34" selection-end-line="65" selection-end-column="34" />
-              <folding>
-                <element signature="e#136#161#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Workbook.py" pinned="false" current-in-tab="false">
-        <entry file="file://C:/Python27/Lib/site-packages/xlwt/Workbook.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="352" column="8" selection-start-line="352" selection-start-column="8" selection-end-line="352" selection-end-column="8" />
-              <folding>
-                <element signature="e#668#686#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="control_simulation.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/control_simulation.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="6" column="28" selection-start-line="6" selection-start-column="28" selection-end-line="6" selection-end-column="28" />
+              <caret line="173" column="0" selection-start-line="172" selection-start-column="0" selection-end-line="173" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -88,8 +66,8 @@
       <file leaf-file-name="group.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/group.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="204" column="41" selection-start-line="204" selection-start-column="41" selection-end-line="204" selection-end-column="41" />
+            <state vertical-scroll-proportion="-4.0555553">
+              <caret line="383" column="72" selection-start-line="383" selection-start-column="72" selection-end-line="383" selection-end-column="72" />
               <folding>
                 <element signature="e#295#306#0" expanded="true" />
               </folding>
@@ -97,12 +75,44 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="constants.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/constants.py">
+      <file leaf-file-name="__init__.py" pinned="false" current-in-tab="false">
+        <entry file="file://C:/Python27/Lib/encodings/__init__.py">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="53" column="42" selection-start-line="53" selection-start-column="42" selection-end-line="54" selection-end-column="0" />
+              <caret line="144" column="0" selection-start-line="144" selection-start-column="0" selection-end-line="144" selection-end-column="0" />
               <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="__builtin__.py" pinned="false" current-in-tab="false">
+        <entry file="file://$USER_HOME$/.PyCharm50/system/python_stubs/-762174762/__builtin__.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0">
+              <caret line="230" column="4" selection-start-line="230" selection-start-column="4" selection-end-line="230" selection-end-column="4" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="utilities.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/utilities.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0">
+              <caret line="0" column="16" selection-start-line="0" selection-start-column="16" selection-end-line="0" selection-end-column="16" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="dispersal.py" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/dispersal.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.3327616">
+              <caret line="341" column="0" selection-start-line="341" selection-start-column="0" selection-end-line="341" selection-end-column="0" />
+              <folding>
+                <element signature="e#241#254#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -110,8 +120,8 @@
       <file leaf-file-name="simulation.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/simulation.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="642" column="32" selection-start-line="642" selection-start-column="32" selection-end-line="642" selection-end-column="32" />
+            <state vertical-scroll-proportion="-2.0555556">
+              <caret line="186" column="0" selection-start-line="186" selection-start-column="0" selection-end-line="186" selection-end-column="0" />
               <folding>
                 <element signature="e#92#103#0" expanded="true" />
               </folding>
@@ -119,24 +129,12 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="dispersal.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/dispersal.py">
+      <file leaf-file-name="agent.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/agent.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="339" column="49" selection-start-line="339" selection-start-column="49" selection-end-line="339" selection-end-column="49" />
+            <state vertical-scroll-proportion="-5.0555553">
+              <caret line="58" column="13" selection-start-line="58" selection-start-column="13" selection-end-line="58" selection-end-column="13" />
               <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="relatedness.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/relatedness.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="27" column="10" selection-start-line="27" selection-start-column="10" selection-end-line="27" selection-end-column="10" />
-              <folding>
-                <element signature="e#0#11#0" expanded="true" />
-              </folding>
             </state>
           </provider>
         </entry>
@@ -182,15 +180,15 @@
         <option value="$PROJECT_DIR$/generatesubadultages.py" />
         <option value="$PROJECT_DIR$/loader.py" />
         <option value="$PROJECT_DIR$/seed.py" />
-        <option value="$PROJECT_DIR$/agent.py" />
-        <option value="$PROJECT_DIR$/group.py" />
-        <option value="$PROJECT_DIR$/utilities.py" />
         <option value="$PROJECT_DIR$/relatedness_test.py" />
         <option value="$PROJECT_DIR$/relatedness.py" />
         <option value="$PROJECT_DIR$/control_simulation.py" />
-        <option value="$PROJECT_DIR$/simulation.py" />
-        <option value="$PROJECT_DIR$/dispersal.py" />
         <option value="$PROJECT_DIR$/data_saver.py" />
+        <option value="$PROJECT_DIR$/utilities.py" />
+        <option value="$PROJECT_DIR$/agent.py" />
+        <option value="$PROJECT_DIR$/dispersal.py" />
+        <option value="$PROJECT_DIR$/group.py" />
+        <option value="$PROJECT_DIR$/simulation.py" />
         <option value="$PROJECT_DIR$/control_experiment.py" />
       </list>
     </option>
@@ -576,7 +574,19 @@
       <option name="project" value="LOCAL" />
       <updated>1477233214594</updated>
     </task>
-    <option name="localTasksCounter" value="18" />
+    <task id="LOCAL-00018" summary="created a test to check when the populations become stable">
+      <created>1477244079723</created>
+      <option name="number" value="00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1477244079723</updated>
+    </task>
+    <task id="LOCAL-00019" summary="trying to figure out why population keeps increasing">
+      <created>1477249502310</created>
+      <option name="number" value="00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1477249502310</updated>
+    </task>
+    <option name="localTasksCounter" value="20" />
     <servers />
   </component>
   <component name="TestHistory">
@@ -624,18 +634,18 @@
     <frame x="-9" y="-9" width="1938" height="1048" extended-state="6" />
     <editor active="false" />
     <layout>
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.20707871" sideWeight="0.8165869" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.12731114" sideWeight="0.8165869" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32919955" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32919955" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33217993" sideWeight="0.50609434" order="8" side_tool="true" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3686584" sideWeight="0.7448649" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.19954905" sideWeight="0.7448649" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4429066" sideWeight="0.8410175" order="11" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3404735" sideWeight="0.49390566" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.52364475" sideWeight="0.49390566" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.24986793" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32807216" sideWeight="0.49602544" order="10" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.20707871" sideWeight="0.18341307" order="2" side_tool="true" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.2897407" sideWeight="0.8479067" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.30552423" sideWeight="0.8479067" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
@@ -692,7 +702,8 @@
     <MESSAGE value="adding tests for relatedness" />
     <MESSAGE value="running tests of length" />
     <MESSAGE value="created a test to check when the populations become stable" />
-    <option name="LAST_COMMIT_MESSAGE" value="created a test to check when the populations become stable" />
+    <MESSAGE value="trying to figure out why population keeps increasing" />
+    <option name="LAST_COMMIT_MESSAGE" value="trying to figure out why population keeps increasing" />
     <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="true" />
     <option name="REFORMAT_BEFORE_PROJECT_COMMIT" value="true" />
     <option name="REARRANGE_BEFORE_PROJECT_COMMIT" value="true" />
@@ -712,6 +723,26 @@
           </properties>
           <option name="timeStamp" value="99" />
         </breakpoint>
+        <breakpoint type="python-exception">
+          <properties notifyOnlyOnFirst="true" notifyOnTerminate="true" exception="AttributeError">
+            <option name="notifyOnTerminate" value="true" />
+            <option name="notifyOnlyOnFirst" value="true" />
+          </properties>
+          <option name="timeStamp" value="196" />
+        </breakpoint>
+        <breakpoint type="python-exception">
+          <properties notifyOnlyOnFirst="true" notifyOnTerminate="true" exception="ValueError">
+            <option name="notifyOnTerminate" value="true" />
+            <option name="notifyOnlyOnFirst" value="true" />
+          </properties>
+          <option name="timeStamp" value="201" />
+        </breakpoint>
+        <breakpoint enabled="true" type="python-exception">
+          <properties notifyOnTerminate="true" exception="AssertionError">
+            <option name="notifyOnTerminate" value="true" />
+          </properties>
+          <option name="timeStamp" value="202" />
+        </breakpoint>
       </breakpoints>
       <breakpoints-dialog>
         <breakpoints-dialog>
@@ -727,32 +758,11 @@
           </properties>
         </breakpoint>
       </default-breakpoints>
-      <option name="time" value="186" />
+      <option name="time" value="203" />
     </breakpoint-manager>
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$APPLICATION_HOME_DIR$/helpers/pydev/pydevd.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="1797" column="0" selection-start-line="1797" selection-start-column="0" selection-end-line="1797" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/population.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="44" column="43" selection-start-line="44" selection-start-column="43" selection-end-line="44" selection-end-column="43" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/group.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="20" column="19" selection-start-line="20" selection-start-column="17" selection-end-line="20" selection-end-column="19" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/random_module.py">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
@@ -869,13 +879,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/lifetable.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="16" column="29" selection-start-line="16" selection-start-column="29" selection-end-line="16" selection-end-column="29" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/birthrulesapp.py">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
@@ -925,13 +928,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/random_module.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="36" column="0" selection-start-line="36" selection-start-column="0" selection-end-line="36" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/generateadultages.py">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.030120483">
@@ -953,30 +949,9 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://C:/Python27/Lib/site-packages/xlwt/Worksheet.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="181" column="0" selection-start-line="181" selection-start-column="0" selection-end-line="181" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/loader.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="21" column="16" selection-start-line="21" selection-start-column="16" selection-end-line="21" selection-end-column="16" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://C:/Python27/Lib/copy.py">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="4.099307">
-          <caret line="144" column="0" selection-start-line="144" selection-start-column="0" selection-end-line="144" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://C:/Python27/Lib/encodings/__init__.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
           <caret line="144" column="0" selection-start-line="144" selection-start-column="0" selection-end-line="144" selection-end-column="0" />
         </state>
       </provider>
@@ -995,13 +970,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/utilities.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.10538641">
-          <caret line="5" column="25" selection-start-line="5" selection-start-column="25" selection-end-line="5" selection-end-column="25" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/seed.py">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
@@ -1010,28 +978,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/agent.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="51" column="0" selection-start-line="51" selection-start-column="0" selection-end-line="51" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/relatedness_test.py">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.45253164">
           <caret line="40" column="0" selection-start-line="40" selection-start-column="0" selection-end-line="40" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/group.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="204" column="41" selection-start-line="204" selection-start-column="41" selection-end-line="204" selection-end-column="41" />
-          <folding>
-            <element signature="e#295#306#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1047,24 +997,8 @@
         <state vertical-scroll-proportion="0.0">
           <caret line="27" column="10" selection-start-line="27" selection-start-column="10" selection-end-line="27" selection-end-column="10" />
           <folding>
-            <element signature="e#0#11#0" expanded="true" />
+            <element signature="e#0#11#0" expanded="false" />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/dispersal.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="339" column="49" selection-start-line="339" selection-start-column="49" selection-end-line="339" selection-end-column="49" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/control_simulation.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="6" column="28" selection-start-line="6" selection-start-column="28" selection-end-line="6" selection-end-column="28" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1076,50 +1010,156 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/simulation.py">
+    <entry file="file://C:/Python27/Lib/site-packages/xlwt/Workbook.py">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
-          <caret line="642" column="32" selection-start-line="642" selection-start-column="32" selection-end-line="642" selection-end-column="32" />
+          <caret line="352" column="8" selection-start-line="352" selection-start-column="8" selection-end-line="352" selection-end-column="8" />
           <folding>
-            <element signature="e#92#103#0" expanded="true" />
+            <element signature="e#668#686#0" expanded="false" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://C:/Python27/Lib/site-packages/xlrd/xlsx.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="531" column="0" selection-start-line="531" selection-start-column="0" selection-end-line="531" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://C:/Python27/Lib/zipfile.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="639" column="0" selection-start-line="639" selection-start-column="0" selection-end-line="639" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://C:/Python27/Lib/site-packages/xlwt/Worksheet.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="1029" column="0" selection-start-line="1029" selection-start-column="0" selection-end-line="1029" selection-end-column="0" />
+          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://C:/Python27/Lib/site-packages/xlwt/Row.py">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
-          <caret line="158" column="0" selection-start-line="158" selection-start-column="0" selection-end-line="158" selection-end-column="0" />
+          <caret line="256" column="0" selection-start-line="256" selection-start-column="0" selection-end-line="256" selection-end-column="0" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://C:/Python27/Lib/site-packages/xlwt/Workbook.py">
+    <entry file="file://$PROJECT_DIR$/control_simulation.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-1.5">
+          <caret line="99" column="10" selection-start-line="99" selection-start-column="10" selection-end-line="99" selection-end-column="10" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/lifetable.py">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
-          <caret line="352" column="8" selection-start-line="352" selection-start-column="8" selection-end-line="352" selection-end-column="8" />
-          <folding>
-            <element signature="e#668#686#0" expanded="true" />
-          </folding>
+          <caret line="16" column="29" selection-start-line="16" selection-start-column="29" selection-end-line="16" selection-end-column="29" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/loader.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="21" column="16" selection-start-line="21" selection-start-column="16" selection-end-line="21" selection-end-column="16" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/random_module.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="36" column="0" selection-start-line="36" selection-start-column="0" selection-end-line="36" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/agent.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-5.0555553">
+          <caret line="58" column="13" selection-start-line="58" selection-start-column="13" selection-end-line="58" selection-end-column="13" />
+          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/data_saver.py">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
-          <caret line="65" column="34" selection-start-line="65" selection-start-column="34" selection-end-line="65" selection-end-column="34" />
+          <caret line="173" column="0" selection-start-line="172" selection-start-column="0" selection-end-line="173" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/utilities.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="0" column="16" selection-start-line="0" selection-start-column="16" selection-end-line="0" selection-end-column="16" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/.PyCharm50/system/python_stubs/-762174762/__builtin__.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="230" column="4" selection-start-line="230" selection-start-column="4" selection-end-line="230" selection-end-column="4" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://C:/Python27/Lib/encodings/__init__.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="144" column="0" selection-start-line="144" selection-start-column="0" selection-end-line="144" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/group.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-4.0555553">
+          <caret line="383" column="72" selection-start-line="383" selection-start-column="72" selection-end-line="383" selection-end-column="72" />
           <folding>
-            <element signature="e#136#161#0" expanded="true" />
+            <element signature="e#295#306#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/simulation.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-2.0555556">
+          <caret line="186" column="0" selection-start-line="186" selection-start-column="0" selection-end-line="186" selection-end-column="0" />
+          <folding>
+            <element signature="e#92#103#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/control_experiment.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.38502672">
-          <caret line="19" column="0" selection-start-line="19" selection-start-column="0" selection-end-line="19" selection-end-column="0" />
+        <state vertical-scroll-proportion="-2.5">
+          <caret line="7" column="26" selection-start-line="7" selection-start-column="26" selection-end-line="7" selection-end-column="26" />
           <folding>
             <element signature="e#0#9#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/dispersal.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.3327616">
+          <caret line="341" column="0" selection-start-line="341" selection-start-column="0" selection-end-line="341" selection-end-column="0" />
+          <folding>
+            <element signature="e#241#254#0" expanded="true" />
           </folding>
         </state>
       </provider>

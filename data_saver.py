@@ -42,24 +42,24 @@ def save_relatedness_data(book, withinmean, withinsd, acrossmean, acrosssd, tota
 
     data_sheet = book.get_sheet(book.get_active_sheet())
 
-    data_sheet.write(0, 7, 'Mean Relatedness Within OMU')
-    data_sheet.write(0, 8, 'SD Relatedness Within OMU')
-    data_sheet.write(0, 9, 'Mean Relatedness Across OMU')
-    data_sheet.write(0, 10, 'SD Relatedness Across OMU')
-    data_sheet.write(0, 11, 'Mean Relatedness all dyads')
-    data_sheet.write(0, 12, 'SD Relatedness all dyads')
-    data_sheet.write(0, 13, 'Mean Relatedness Across OMU Within Band')
-    data_sheet.write(0, 14, 'SD Relatedness Across OMU Within Band')
+    data_sheet.write(0, 9, 'Mean Relatedness Within OMU')
+    data_sheet.write(0, 10, 'SD Relatedness Within OMU')
+    data_sheet.write(0, 11, 'Mean Relatedness Across OMU')
+    data_sheet.write(0, 12, 'SD Relatedness Across OMU')
+    data_sheet.write(0, 13, 'Mean Relatedness all dyads')
+    data_sheet.write(0, 14, 'SD Relatedness all dyads')
+    data_sheet.write(0, 15, 'Mean Relatedness Across OMU Within Band')
+    data_sheet.write(0, 16, 'SD Relatedness Across OMU Within Band')
 
     for i in range(0, len(withinmean)):
-        data_sheet.write(i + 1, 7, withinmean[i])
-        data_sheet.write(i + 1, 8, withinsd[i])
-        data_sheet.write(i + 1, 9, acrossmean[i])
-        data_sheet.write(i + 1, 10, acrosssd[i])
-        data_sheet.write(i + 1, 11, totalmean[i])
-        data_sheet.write(i + 1, 12, totalsd[i])
-        data_sheet.write(i + 1, 13, acrosswithinmean[i])
-        data_sheet.write(i + 1, 14, acrosswithinsd[i])
+        data_sheet.write(i + 1, 9, withinmean[i])
+        data_sheet.write(i + 1, 10, withinsd[i])
+        data_sheet.write(i + 1, 11, acrossmean[i])
+        data_sheet.write(i + 1, 12, acrosssd[i])
+        data_sheet.write(i + 1, 13, totalmean[i])
+        data_sheet.write(i + 1, 14, totalsd[i])
+        data_sheet.write(i + 1, 15, acrosswithinmean[i])
+        data_sheet.write(i + 1, 16, acrosswithinsd[i])
 
 
 def save_age_data(data_list, book):
@@ -156,7 +156,9 @@ def save_experiment_data(book,
                          total_population_list, total_age_list,
                          total_age_sd_list, total_groups_list,
                          total_males_to_females_list,
-                         total_edges_per_agent_list):
+                         total_edges_per_agent_list,
+                         total_real_birth_rate_list,
+                         total_real_death_rate_list):
     data_sheet = book.add_sheet('Data')
 
     data_sheet.write(0, 1, 'Population')
@@ -165,6 +167,8 @@ def save_experiment_data(book,
     data_sheet.write(0, 4, 'Number of groups')
     data_sheet.write(0, 5, 'Females per Male')
     data_sheet.write(0, 6, 'Edges per Agent')
+    data_sheet.write(0, 7, 'Total real birth rate')
+    data_sheet.write(0, 8, 'Total real death rate')
 
     for i in range(0, len(total_population_list)):
         data_sheet.write(i + 1, 0, i)
@@ -173,6 +177,8 @@ def save_experiment_data(book,
         data_sheet.write(i + 1, 3, total_age_sd_list[i])
         data_sheet.write(i + 1, 4, total_groups_list[i])
         data_sheet.write(i + 1, 5, total_males_to_females_list[i])
+        data_sheet.write(i + 1, 7, total_real_birth_rate_list[i])
+        data_sheet.write(i + 1, 8, total_real_death_rate_list[i])
     # data_sheet.write(i+1, 6, total_edges_per_agent_list[i])
 
 

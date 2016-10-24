@@ -182,7 +182,7 @@ class AgentGroup():
         inf_ability = None
 
         if (random_module.roll(PROBABILITY_OF_MALE)):
-            child_sex = "m"
+            inf_sex = "m"
 
         agent_index = \
             self.parent_population.get_new_agent_index()
@@ -221,7 +221,8 @@ class AgentGroup():
         ----------
         agent: agent to mark as dead
         """
-        utilities.consolator((str(agent.index) + " died because " + cause_of_death + "!"))
+        utilities.consolator((str(agent.index) + ", " + agent.sex + " died at age " + str(
+            agent.age) + " because " + cause_of_death + "!"))
         counter.increment()
         if agent.index in self.agent_dict:
             self.agent_dict.pop(agent.index)
@@ -381,9 +382,15 @@ class AgentGroup():
             agent.maleState = MaleState.juvsol
             agent.setOMUID("")
             agent.females = []
-            if agent.parents:
+            if agent.parents and agent.parents[0] in next_generation_pop:
                 simulation.parentage[agent.index] = agent.parents
-                next_generation_pop[agent.parents[0]].offpsring.remove(agent.index)
+                parent = next_generation_pop[agent.parents[0]]
+                try:
+                    getattr(parent, "offspring", []).remove(agent.index)
+                except:
+                    utilities.consolator(
+                        "couldn't remove " + str(agent.index) + " from offspring of parent, as it was not there")
+                    pass
 
         elif agent.age == 6 and agent.sex == "m":
             agent.maleState = MaleState.sol

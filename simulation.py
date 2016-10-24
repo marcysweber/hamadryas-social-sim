@@ -60,6 +60,9 @@ class Simulation:
         self.json_directory = json_directory
         self.recognition = recognition
 
+        self.real_birth_rate = 0.0
+        self.real_death_rate = 0.0
+
         #relatedness
         self.parentage = {}
         self.withinmean = ""
@@ -382,6 +385,10 @@ class Simulation:
                 if agent.sex == "f" and agent.age >= 5:
                     female_OMU_dict[agent.index] = [agent.getOMUID(), agent.bandID]
         #  so female_OMU_dict is now {agentindex : [OMU, band]}
+
+        #  calculate average birth and death rates
+        self.real_birth_rate = sum(real_birth_rate_list) / len(real_birth_rate_list)
+        self.real_death_rate = sum(real_death_rate_list) / len(real_death_rate_list)
 
         #  a function for calculating relatedness
         related_dict = relatedness.main(self.recognition, female_OMU_dict, self.parentage)
