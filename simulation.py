@@ -240,7 +240,7 @@ class Simulation:
                         new_agent = \
                             new_generation.agent_dict[agent_index]
                         #  increment age
-                        new_generation.promote_agent(new_agent, self, new_generation_population_dict)
+                        new_generation.promote_agent(new_agent, self, new_generation_population_dict, avail_females)
 
 
                         if this_agent.sex == "m":

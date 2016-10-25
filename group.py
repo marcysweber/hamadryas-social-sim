@@ -359,7 +359,7 @@ class AgentGroup():
 
         return marked
 
-    def promote_agent(self, agent, simulation, next_generation_pop):
+    def promote_agent(self, agent, simulation, next_generation_pop, avail_females):
         """
         makes an agent older, and if need be, removes them from the
         underage_set
@@ -386,7 +386,7 @@ class AgentGroup():
                 simulation.parentage[agent.index] = agent.parents
                 parent = next_generation_pop[agent.parents[0]]
                 try:
-                    getattr(parent, "offspring", []).remove(agent.index)
+                    parent.offspring.remove(agent.index)
                 except:
                     utilities.consolator(
                         "couldn't remove " + str(agent.index) + " from offspring of parent, as it was not there")
@@ -407,13 +407,17 @@ class AgentGroup():
             if agent.parents:
                 simulation.parentage[agent.index] = agent.parents
                 if agent.parents[0] in next_generation_pop:
-                    mother_of_agent = next_generation_pop[agent.parents[0]]
+                    parent = next_generation_pop[agent.parents[0]]
                     utilities.consolator(
-                        "removing " + str(agent.index) + " from offspring of mother, " + str(mother_of_agent.index))
-                    setattr(mother_of_agent, "offspring", [])
+                            "removing " + str(agent.index) + " from offspring of mother, " + str(parent.index))
+                    parent.offspring.remove(agent.index)
 
         elif agent.age == (self.FEMALE_MATUR_AGE) and agent.sex == "f":
             agent.femaleState = FemaleState.cycling
+            if agent.parents:
+                if agent.getOMUID() == agent.parents[1]:
+                    #  if she's still in her dad's OMU somehow, throw her to aval_females
+                    avail_females.add(agent.index)
 
         agent.age = agent.age + .5
 
