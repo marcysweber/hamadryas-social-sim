@@ -116,7 +116,8 @@ def save_number_of_indivs(data_list, male_data_list,
                           female_data_list,
                           real_birth_rate_list, real_death_rate_list,
                           average_edges_per_agent,
-                          adult_females_per_males_list, birth_interval_list, book):
+                          adult_females_per_males_list, birth_interval_list,
+                          causes_of_death, book):
     """
 	saves data to the specified excel workbook
 

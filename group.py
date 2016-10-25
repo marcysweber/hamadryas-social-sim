@@ -210,7 +210,7 @@ class AgentGroup():
                            avail_females, eligible_males,
                            leaders, lea_for_fol, random_module,
                            population,
-                           cause_of_death,
+                           cause_of_death, cod,
                            population_dict=None):
         """
         marks an agent as having died. Since the self.all_agents
@@ -223,6 +223,7 @@ class AgentGroup():
         """
         utilities.consolator((str(agent.index) + ", " + agent.sex + " died at age " + str(
             agent.age) + " because " + cause_of_death + "!"))
+        cod += [cause_of_death]
         counter.increment()
         if agent.index in self.agent_dict:
             self.agent_dict.pop(agent.index)
@@ -282,7 +283,8 @@ class AgentGroup():
                 eligible_males += agent.getMaleFol()
                 utilities.consolator(("added " + str(agent.getMaleFol()) + " to elig males"))
                 dispersal.inherit_female(self, agent.females,
-                                         agent.getMaleFol(), agent, random_module, counter, eligible_males, population)
+                                         agent.getMaleFol(), agent, random_module, counter, eligible_males, population,
+                                         cod)
                 avail_females = avail_females.union(set(agent.females))
                 utilities.consolator(("added " + str(agent.females) + " to avail females"))
 
@@ -354,7 +356,7 @@ class AgentGroup():
             self.mark_agent_as_dead(
                     self.agent_dict[offspring], counter, avail_females,
                     eligible_males, leaders, lea_for_fol, random_module, population,
-                    "its mother, " + str(agent.index) + " died",
+                    "its mother died", cod,
                     population_dict)
 
         return marked

@@ -10,6 +10,7 @@ Main run loop
 
 """
 
+import collections as tally
 import copy
 import math
 
@@ -73,7 +74,9 @@ class Simulation:
         self.totalrelsd = ""
         self.acrossOMUwithinbandmean = ""
         self.acrossOMUwithinbandsd = ""
+
         self.number_of_generations = number_of_generations
+
 
     def set_number_of_generations(self, number_of_generations):
         self.number_of_generations = number_of_generations
@@ -109,6 +112,8 @@ class Simulation:
         group_composition_list = []
 
         birth_interval_list = []
+
+        causes_of_death_list = []
 
         #  relatedness
 
@@ -172,7 +177,8 @@ class Simulation:
                                                 avail_females=avail_females,
                                                 eligible_males=eligible_males,
                                                 population_dict=new_generation_population_dict,
-                                                population=next_generation_population):
+                                                population=next_generation_population,
+                                                cod=causes_of_death_list):
                             new_generation_population_dict[agent_index] = new_agent
                         else:
                             if new_agent.sex == "f":
@@ -198,7 +204,7 @@ class Simulation:
                                             eligible_males=eligible_males,
                                             deathcounter=death_counter,
                                             population=next_generation_population,
-                                            recognition_bool=self.recognition)
+                                            recognition_bool=self.recognition, cod=causes_of_death_list)
 
             avail_females = set()
             utilities.consolator( "Opp takeovers 1 done.")
@@ -248,7 +254,7 @@ class Simulation:
                                               new_agent, random_module, this_generation_lea_for_fol,
                                               this_generation_leaders, death_counter, avail_females, eligible_males,
                                               population_dict=new_generation_population_dict,
-                                              population=next_generation_population)
+                                              population=next_generation_population, cod=causes_of_death_list)
 
                         if this_agent.sex =="f":
                             # check for preg
@@ -305,7 +311,7 @@ class Simulation:
                 dispersal.opportun_takeover(new_generation_population_dict=new_generation_population_dict,
                                             avail_females=avail_females, eligible_males=eligible_males,
                                             deathcounter=death_counter, population=next_generation_population,
-                                            recognition_bool=self.recognition)
+                                            recognition_bool=self.recognition, cod=causes_of_death_list)
 
             avail_females = []
             utilities.consolator( "Second op takeovers done.")
@@ -390,6 +396,9 @@ class Simulation:
         self.real_birth_rate = sum(real_birth_rate_list) / len(real_birth_rate_list)
         self.real_death_rate = sum(real_death_rate_list) / len(real_death_rate_list)
 
+        causes_of_death = dict(tally.Counter(causes_of_death_list))
+        print causes_of_death
+
         #  a function for calculating relatedness
         related_dict = relatedness.main(self.recognition, female_OMU_dict, self.parentage)
         self.withinmean = related_dict["withinmean"]
@@ -411,7 +420,8 @@ class Simulation:
                        group_composition_list,
                        adult_males_list,
                        adult_females_list,
-                       birth_interval_list)
+                       birth_interval_list,
+                       causes_of_death)
 
         utilities.consolator( ('Total births: ' + str(total_births)))
         utilities.consolator( ('Total deaths: ' + str(total_deaths)))
@@ -484,21 +494,21 @@ class Simulation:
 
     def male_choices(self, this_generation, new_generation, this_agent,
                      new_agent, randommodule, lea_for_fol, leaders,
-                     deathcounter, avail_females, eligible_males, population_dict, population):
+                     deathcounter, avail_females, eligible_males, population_dict, population, cod):
 
         #  FOLLOWERS CHOOSE FIRST
         if new_agent.maleState == MaleState.fol:
-            dispersal.follower_choices(new_generation, this_generation, new_agent, deathcounter, population)
+            dispersal.follower_choices(new_generation, this_generation, new_agent, deathcounter, population, cod)
 
         if new_agent.maleState == MaleState.sol:
             dispersal.solitary_choices(new_generation, this_generation, new_agent,
                                        lea_for_fol, leaders, deathcounter, avail_females,
                                        eligible_males, randommodule, population_dict=population_dict,
-                                       population=population)
+                                       population=population, cod=cod)
 
     def check_for_death(self, lifetable, this_agent,
                         new_agent, new_generation, random_module, counter, avail_females, eligible_males,
-                        population, leaders=[], lea_for_fol=[], population_dict={}):
+                        population, population_dict, cod):
         """
         checks if an agent should die by getting the probability
         from the lifetable, then performing a dieroll for that
@@ -514,9 +524,9 @@ class Simulation:
             this_agent.age, this_agent.sex)
         if random_module.roll(chance_of_death):
             new_generation.mark_agent_as_dead(new_agent, counter, avail_females, eligible_males,
-                                              random_module=random_module, leaders=leaders, lea_for_fol=lea_for_fol,
+                                              random_module=random_module, leaders=[], lea_for_fol=[],
                                               population=population, cause_of_death="the lifetable said so",
-                                              population_dict=population_dict)
+                                              population_dict=population_dict, cod=cod)
             #  utilities.consolator(("dead")
             return False
 
@@ -712,7 +722,8 @@ class Simulation:
                   group_composition_list,
                   adult_males_list,
                   adult_females_list,
-                  birth_interval_list):
+                  birth_interval_list,
+                  causes_of_death):
         """
         saves output data to a file.
 
@@ -732,7 +743,8 @@ class Simulation:
                                          male_population_record_list, female_population_record_list,
                                          real_birth_rate_list, real_death_rate_list,
                                          None,
-                                         adult_females_per_males_list, birth_interval_list, book)
+                                         adult_females_per_males_list, birth_interval_list,
+                                         causes_of_death, book)
 
 
         output_directory = \

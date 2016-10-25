@@ -10,7 +10,7 @@ NUMBER_OF_SIMULATIONS = 10
 def main():
     # disable gc for all experiment
     gc.disable()
-    for number_of_generations in [50, 100, 150, 200, 250, 300]:
+    for number_of_generations in [100, 200, 300, 400, 500, 600, 700]:
         control_experiment = ControlExperiment(number_of_generations, NUMBER_OF_SIMULATIONS)
         control_experiment.run()
 
@@ -146,7 +146,7 @@ class ControlExperiment:
                 total_acrossOMUwithinbandmean_list.append(simulation.acrossOMUwithinbandmean)
                 total_acrossOMUwithinbandsd_list.append(simulation.acrossOMUwithinbandsd)
 
-                print ('End of simulation #' + str(i + 1))
+                print ('End of simulation #' + str(i + 1) + " @ " + str(self.number_of_generations) + " turns")
                 del (simulation)
                 gc.collect()
 

@@ -47,7 +47,6 @@ def main(recognition, OMU_dict, parentage_dict):
     var_acrossOMUwithinband = sum([(i - mean_acrossOMUwithinband)**2.0 for i in acrossOMUwithinband])
     sd_acrossOMUwithinband = math.sqrt(var_acrossOMUwithinband / len(acrossOMUwithinband))
 
-
     print "Mean Within: " + str(mean_within)
     print "Mean Across: " + str(mean_across)
 

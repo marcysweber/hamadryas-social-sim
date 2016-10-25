@@ -322,7 +322,7 @@ Line #      Hits         Time  Per Hit   % Time  Line Contents
    387                                                                  group_composition_list,
    388                                                                  adult_males_list,
    389                                                                  adult_females_list,
-   390                                                                  birth_interval_list)
+   390                                                                  birth_interval_list,)
    391                                           
    392                                                   utilities.consolator( ('Total births: ' + str(total_births)))
    393                                                   utilities.consolator( ('Total deaths: ' + str(total_deaths)))

@@ -47,7 +47,7 @@ class Competitive:
         return ability
 
 
-def attempt_initial_unit(this_generation, new_generation, female, male, deathcounter, population):
+def attempt_initial_unit(this_generation, new_generation, female, male, deathcounter, population, cod):
     this_female = new_generation.agent_dict[female]
     this_male = new_generation.agent_dict[male]
     draw = random.randrange(1, 100)
@@ -55,18 +55,18 @@ def attempt_initial_unit(this_generation, new_generation, female, male, deathcou
     if this_male.getOMUID() == this_female.getOMUID():
         if draw <= 85:
             utilities.consolator( "solitary's initial unit")
-            add_female_to_OMU(this_female, this_male, deathcounter, population)
+            add_female_to_OMU(this_female, this_male, deathcounter, population, cod)
             new_generation.underage_females_for_takeover.remove(this_female.index)
     else:
         if draw <= 50:
             utilities.consolator( "Solitary's initial unit")
-            add_female_to_OMU(this_female, this_male, deathcounter, population)
+            add_female_to_OMU(this_female, this_male, deathcounter, population, cod)
             new_generation.underage_females_for_takeover.remove(this_female.index)
 
 
 
 def solitary_choices(new_generation, this_generation, male, lea_for_fol, leaders, deathcounter, avail_females,
-                     eligible_males, random_module, population_dict, population):
+                     eligible_males, random_module, population_dict, population, cod):
     clan_lea_for_fol = []
     clan_leaders = []
 
@@ -83,30 +83,30 @@ def solitary_choices(new_generation, this_generation, male, lea_for_fol, leaders
         if this_generation.underage_females_for_takeover:
             attempt_initial_unit(this_generation, new_generation,
                                  random.choice(new_generation.underage_females_for_takeover),
-                                 male=male.index, deathcounter=deathcounter, population=population)
+                                 male=male.index, deathcounter=deathcounter, population=population, cod=cod)
     elif clan_lea_for_fol:
         follow(this_generation, new_generation, random.choice(clan_lea_for_fol), male, lea_for_fol)
     elif clan_leaders:
         challenge(this_generation, new_generation, male, random.choice(clan_leaders), deathcounter, avail_females,
                   eligible_males, random_module, leaders, lea_for_fol, population_dict=population_dict,
-                  population=population)
+                  population=population, cod=cod)
 
 
-def follower_choices(new_generation, this_generation, male, deathcounter, population):
+def follower_choices(new_generation, this_generation, male, deathcounter, population, cod):
     if new_generation.underage_females_for_takeover:
         random.shuffle(new_generation.underage_females_for_takeover)
         for female in new_generation.underage_females_for_takeover:
             if new_generation.agent_dict[female].getOMUID() == male.getOMUID():
                 utilities.consolator("Follower's Initial Unit")
                 add_female_to_OMU(new_generation.agent_dict[female],
-                                  male, deathcounter, population)
+                                  male, deathcounter, population, cod)
                 new_generation.underage_females_for_takeover.remove(female)
                 break  # so it'll go randomly thru underage females until it finds one and then stops
                 #  we can come back later and put that followers might go back to being sol here
 
 
 def challenge(this_generation, new_generation, challenger, leader_index, deathcounter, avail_females, eligible_males,
-              random_module, leaders, lea_for_fol, population_dict, population):
+              random_module, leaders, lea_for_fol, population_dict, population, cod):
     #  loss of challenge by either side leads to a 50% chance of death
     leader = new_generation.agent_dict[leader_index]
 
@@ -125,14 +125,14 @@ def challenge(this_generation, new_generation, challenger, leader_index, deathco
             new_generation.mark_agent_as_dead(challenger, deathcounter, avail_females, eligible_males,
                                               leaders, lea_for_fol, random_module, population,
                                               cause_of_death="he was challenged and lost",
-                                              population_dict=population_dict)
+                                              population_dict=population_dict, cod=cod)
     else:
         #  challenger wins
         removeDeadFemales(leader, new_generation)
         utilities.consolator(str(challenger.index) + " won.")
         if leader.females:
             add_female_to_OMU(new_generation.agent_dict[random.choice(leader.females)],
-                              challenger, deathcounter, population)
+                              challenger, deathcounter, population, cod)
         else:
             utilities.consolator("It doesn't look like he had any females.")
 
@@ -141,7 +141,7 @@ def challenge(this_generation, new_generation, challenger, leader_index, deathco
                                               leaders=leaders, lea_for_fol=lea_for_fol, random_module=random_module,
                                               population=population,
                                               cause_of_death="male attack",
-                                              population_dict=population_dict)
+                                              population_dict=population_dict, cod=cod)
 
 
 def removeDeadFemales(leader, new_generation):
@@ -171,7 +171,7 @@ def follow(this_generation, new_generation, leader_index, newfollower, lea_for_f
 
 
 def inherit_female(new_generation, omufemales, OMUfol, deadleader, random_module, deathcounter, eligible_males,
-                   population):
+                   population, cod):
     """
         when the function is called, the male's followers have a high chance of
         "inheriting" one of his females
@@ -188,7 +188,7 @@ def inherit_female(new_generation, omufemales, OMUfol, deadleader, random_module
 
                     if random_module.roll(0.9):
                         utilities.consolator("Inheritance")
-                        add_female_to_OMU(this_female, this_male, deathcounter, population)
+                        add_female_to_OMU(this_female, this_male, deathcounter, population, cod)
                         try:
                             deadleader.females.remove(this_female.index)
                         except ValueError:
@@ -242,7 +242,7 @@ def recognition(new_generation_population_dict, this_female, this_male, reps):
 
 
 def opportun_takeover(new_generation_population_dict, avail_females, eligible_males, deathcounter, population,
-                      recognition_bool):
+                      recognition_bool, cod):
     """
     goes thru the females in avail_females and distributes them to
     "eligible" males
@@ -325,12 +325,12 @@ def opportun_takeover(new_generation_population_dict, avail_females, eligible_ma
             chosen_male = random.choice(eligible_males)
         the_male = new_generation_population_dict[chosen_male]
         utilities.consolator( "Opportunistic")
-        add_female_to_OMU(this_female, the_male, deathcounter, population)
+        add_female_to_OMU(this_female, the_male, deathcounter, population, cod)
     #  so eligible_males is not emptied here, which is GOOD b/c then we can recall the func
                 #  without repopulating this_generation_eligible_males
 
 
-def add_female_to_OMU(female, male, deathcounter, population):
+def add_female_to_OMU(female, male, deathcounter, population, cod):
     her_generation = population.groups[female.bandID]
     his_generation = population.groups[male.bandID]
 
@@ -346,7 +346,7 @@ def add_female_to_OMU(female, male, deathcounter, population):
                             agent=offspring, counter=deathcounter, avail_females=[], eligible_males=[],
                             leaders=[],
                             lea_for_fol=[], random_module=random_module, cause_of_death="infanticide",
-                            population=population)
+                            cod=cod, population=population)
                 else:
                     utilities.consolator("offspring " + str(offspring.index) + " now follows " + str(male.index))
                     offspring.setOMUID(male.index)
