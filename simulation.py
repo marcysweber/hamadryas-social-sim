@@ -397,6 +397,7 @@ class Simulation:
         self.real_death_rate = sum(real_death_rate_list) / len(real_death_rate_list)
 
         causes_of_death = dict(tally.Counter(causes_of_death_list))
+        print this_population_record
         print causes_of_death
 
         #  a function for calculating relatedness

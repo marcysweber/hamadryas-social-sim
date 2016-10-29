@@ -108,7 +108,8 @@ class ControlSimulation(Simulation):
                   group_composition_list,
                   adult_males_list,
                   adult_females_list,
-                  birth_interval_list):
+                  birth_interval_list,
+                  causes_of_death):
         """
 		saves output data to global variables, which are 
 		then saved at the end of the experiment
