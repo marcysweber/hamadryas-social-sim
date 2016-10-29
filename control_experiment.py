@@ -5,17 +5,17 @@ from xlwt import Workbook
 import data_saver
 from control_simulation import ControlSimulation
 
-NUMBER_OF_SIMULATIONS = 10
+NUMBER_OF_SIMULATIONS = 100
 
 def main():
     # disable gc for all experiment
     gc.disable()
-    for number_of_generations in [100, 200, 300, 400, 500, 600, 700]:
-        control_experiment = ControlExperiment(number_of_generations, NUMBER_OF_SIMULATIONS)
-        control_experiment.run()
+    control_experiment = ControlExperiment(300, NUMBER_OF_SIMULATIONS)
+    control_experiment.run()
 
 class ControlExperiment:
     recognition = False
+    output_xl_name = "300turn_control_simulation.xls"
 
     def __init__(self, number_of_generations=1, number_of_simulations=1):
         self.number_of_simulations = number_of_simulations
@@ -61,13 +61,6 @@ class ControlExperiment:
                       total_acrossOMUwithinbandmean_list,
                       total_acrossOMUwithinbandsd_list)
 
-        if self.recognition:
-            #  write to excel file recognitionrelatedness
-            output_xl_name = "recognitionrelatedness.xls"
-        else:
-            #  write to excel file controlrelatedness
-            output_xl_name = "controlrelatedness.xls"
-
         output_book = Workbook()
 
         self.get_output_book(output_book,
@@ -91,7 +84,7 @@ class ControlExperiment:
                              total_acrossOMUwithinbandmean_list,
                              total_acrossOMUwithinbandsd_list)
 
-        output_book.save("output" + str(self.number_of_generations) + ".xls")
+        output_book.save(self.output_xl_name)
 
     def run_loop(self, total_population_record_list,
                  total_age_record_list,
