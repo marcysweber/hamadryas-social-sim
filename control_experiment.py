@@ -7,12 +7,12 @@ from xlwt import Workbook
 import data_saver
 from control_simulation import ControlSimulation
 
-NUMBER_OF_SIMULATIONS = 10
+NUMBER_OF_SIMULATIONS = 100
 ITERATION_SENTINEL = 'STOP'
-NUMBER_OF_PROCESSES = 4
+NUMBER_OF_PROCESSES = 20
 
 def main():
-    control_experiment = ControlExperiment(10, NUMBER_OF_SIMULATIONS)
+    control_experiment = ControlExperiment(30, NUMBER_OF_SIMULATIONS)
     control_experiment.run()
 
 def worker(in_q, out_q):
@@ -144,7 +144,7 @@ class ControlExperiment:
 
         print "simulations complete - draining done_sims"
 
-        while not self.done_queue.empty():
+        for i in range(NUMBER_OF_SIMULATIONS):
                 simulation = self.done_queue.get(True)
                 total_population_record_list.append(
                         simulation.last_gen_population)
