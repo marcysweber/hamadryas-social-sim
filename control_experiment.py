@@ -7,14 +7,12 @@ from xlwt import Workbook
 import data_saver
 from control_simulation import ControlSimulation
 
-NUMBER_OF_SIMULATIONS = 100
+NUMBER_OF_SIMULATIONS = 10
 ITERATION_SENTINEL = 'STOP'
 NUMBER_OF_PROCESSES = 4
 
 def main():
-    # disable gc for all experiment
-    gc.disable()
-    control_experiment = ControlExperiment(300, NUMBER_OF_SIMULATIONS)
+    control_experiment = ControlExperiment(10, NUMBER_OF_SIMULATIONS)
     control_experiment.run()
 
 def worker(in_q, out_q):
@@ -22,7 +20,7 @@ def worker(in_q, out_q):
             simulation = in_q.get()
             try:
                 simulation.run_simulation(False, False)
-                out_q.put(simulation)
+                out_q.put(simulation, True)
                 print ('End of simulation #' + str(simulation.simulation_index + 1 ) + ' turns')
             finally:
                 in_q.task_done()
@@ -144,11 +142,10 @@ class ControlExperiment:
         
         print "simulations complete - saving data"
 
-        self.done_queue.put(ITERATION_SENTINEL)
-
         print "simulations complete - draining done_sims"
 
-        for simulation in iter(self.done_queue.get, ITERATION_SENTINEL):
+        while not self.done_queue.empty():
+                simulation = self.done_queue.get(True)
                 total_population_record_list.append(
                         simulation.last_gen_population)
                 total_age_record_list.append(
