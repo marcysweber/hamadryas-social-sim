@@ -238,7 +238,7 @@ def recognition(new_generation_population_dict, this_female, this_male, reps):
                         recognized = True
                         # this_female is the sibling of someone in that OMU
         if recognized:
-            reps = reps * 10
+            reps = reps * 2
 
 
 def opportun_takeover(new_generation_population_dict, avail_females, eligible_males, deathcounter, population,

@@ -7,14 +7,14 @@ from xlwt import Workbook
 import data_saver
 from control_simulation import ControlSimulation
 
-NUMBER_OF_SIMULATIONS = 300
+NUMBER_OF_SIMULATIONS = 100
 ITERATION_SENTINEL = 'STOP'
 NUMBER_OF_PROCESSES = 4
 
 def main():
     # disable gc for all experiment
     gc.disable()
-    control_experiment = ControlExperiment(100, NUMBER_OF_SIMULATIONS)
+    control_experiment = ControlExperiment(300, NUMBER_OF_SIMULATIONS)
     control_experiment.run()
 
 def worker(in_q, out_q):
@@ -28,8 +28,8 @@ def worker(in_q, out_q):
                 in_q.task_done()
 
 class ControlExperiment:
-    recognition = False
-    output_xl_name = "300turn_control_simulation.xls"
+    recognition = True
+    output_xl_name = "300turn_recognition_2_simulation.xls"
 
     def __init__(self, number_of_generations=1, number_of_simulations=1):
         self.number_of_simulations = number_of_simulations
