@@ -1,50 +1,7 @@
 import random
 
 from agent import MaleState, MakeAgents, FemaleState
-from group import SavannahGroup, HamadryasGroup
-
-
-class SavannahSeed:
-    @staticmethod
-    def makeseed(groupindex, population, sim):
-        group = SavannahGroup(groupindex)
-
-        #  make the seed agents here
-        for i in range(0, 16):
-            #  make 16 adult females of any age
-            SavannahSeed.addagenttoseed(groupindex, group, population, 'f', None, None,
-                                        (float(random.randrange(10, 50)) / 2.0), sim)
-
-        for j in range(0, 15):
-            #  make 15 non-adult females of any age
-            SavannahSeed.addagenttoseed(groupindex, group, population, 'f', None, None,
-                                        (float(random.randrange(0, 9)) / 2.0), sim)
-
-        for k in range(0, 8):
-            #  make 8 adult males of any age
-            SavannahSeed.addagenttoseed(groupindex, group, population, 'm', None, None,
-                                        (float(random.randrange(15, 40)) / 2.0), sim)
-
-        for l in range(0, 15):
-            #  make 15 non-adult males of any age
-            SavannahSeed.addagenttoseed(groupindex, group, population, 'm', None, None,
-                                        (float(random.randrange(0, 14)) / 2.0), sim)
-
-        population.groupsdict[groupindex] = group
-
-        return population
-
-    @staticmethod
-    def addagenttoseed(groupindex, group, population, sex, mother, sire, age, sim):
-        newagent = MakeAgents.makenewsavannah(groupindex, sex, mother, sire, population, sim, age)
-        if newagent.sex == 'm' and newagent.age > 7:
-            newagent.dispersed = True
-        elif newagent.sex == 'f' and newagent.age >= 5:
-            newagent.femaleState = FemaleState.cycling
-
-        population.all.append(newagent.index)
-        population.dict[newagent.index] = newagent
-        group.agents.append(newagent.index)
+from group import HamadryasGroup
 
 
 class HamadryasSeed:

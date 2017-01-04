@@ -11,12 +11,8 @@ from seedgroups import SavannahSeed, HamadryasSeed
 
 def main():
     hamadryas = HamadryasSim()
-    # gelada = GeladaSim()
-    savannah = SavannahSim()
-
     hamadryas.run_simulation()
-    # gelada.run_simulation()
-    savannah.run_simulation()
+
 
 
 class Population(object):
@@ -34,11 +30,6 @@ class HamaPopulation(Population):
         self.eligible_males = []
         self.young_natal_females = []
         super(HamaPopulation, self).__init__()
-
-
-class SavPopulation(Population):
-    def __init__(self):
-        super(SavPopulation, self).__init__()
 
 
 class Simulation(object):
@@ -303,78 +294,3 @@ class HamadryasSim(Simulation):
                         malefol.OMUID = None
                 male.malefols = []
             #  leaders have no choices
-
-
-class GeladaSim(Simulation):
-    #  loop with unique functions when needed
-    def run_simulation(self):
-        pass
-
-class SavannahSim(Simulation):
-    #  loop with unique functions when needed
-    def __init__(self):
-        self.duration = 400
-        super(SavannahSim, self).__init__()
-
-    def run_simulation(self):
-        population = SavPopulation()
-
-        #  loop here for seed group/population
-        for groupindex in range(0, 10):
-            population = SavannahSeed.makeseed(groupindex, population, self)
-
-        for halfyear in range(0, self.duration, 1):
-            population.halfyear = halfyear
-
-            self.mortality_check(population, halfyear)
-
-            self.dispersal_check(population, halfyear)
-
-            for group in population.groupsdict.keys():
-                group = population.groupsdict[group]
-                self.dominance_calc(population, group)
-
-            self.birth_check(population, halfyear)
-            self.promotions(population)
-
-            if len(population.all) == 0:
-                break
-                # print "Savannah half-year " + str(halfyear) + " done!"
-            #  print "Population: " + str(len(population.all))
-            #  print self.get_sex_age_ratios(population)
-
-        #  print "Interbirth Interval: " + str(numpy.mean(self.interbirth_int))
-        ratios = self.get_sex_age_ratios(population)
-        self.siring_success = collections.Counter(self.siring_success.values())
-
-        return {"sires": self.siring_success,
-                "pop size": len(population.all),
-                "adult sex ratio": ratios["adult sex ratio"],
-                "adult to nonadult ratio": ratios["adult to nonadult ratio"]}
-
-    def dispersal_check(self, population, halfyear):
-        for agent in population.dict.values():
-            if agent.sex == 'm' and agent.age >= 7:
-                if agent.last_birth < halfyear - 2:
-                    if population.groupsdict[agent.troopID].get_excess_females(population) < 1:
-                        if random.uniform(0, 1) <= 0.5:
-                            SavannahDispersal.disperse(agent, population, self)
-
-    def dominance_calc(self, population, group):
-
-        agents_in_group = [population.dict[idx] for idx in group.agents]
-        adult_males = [x for x in agents_in_group if x.sex == "m" and x.dispersed]
-        group.sorted_by_rhp = sorted(adult_males, key=lambda agent: agent.get_rhp(), reverse=True)
-        dominance_hierarchy = [agent.index for agent in group.sorted_by_rhp]
-
-        group.dominance_hierarchy = dominance_hierarchy
-
-        if dominance_hierarchy:
-            alpha = population.dict[group.dominance_hierarchy[0]]
-            tenure = alpha.alpha_tenure
-            if tenure is not None:
-                alpha.alpha_tenure += 0.5
-            else:
-                alpha.alpha_tenure = 0.5
-
-

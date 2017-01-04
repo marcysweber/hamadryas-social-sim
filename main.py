@@ -15,8 +15,7 @@ def run(simulation_name, file_name):
 
 
 def main():
-    #  run("HamadryasSim", "hama_out.csv")
-    run("SavannahSim", "sav_out.csv")
+    run("HamadryasSim", "hama_out.csv")
 
 
 if __name__ == "__main__":
