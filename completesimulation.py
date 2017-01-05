@@ -148,6 +148,7 @@ class Simulation(object):
         infant.born = True
         population.all.append(infant.index)
         population.dict[infant.index] = infant
+        self.parent_dict[infant.index] = infant.parents
         population.groupsdict[group].agents.append(infant.index)
 
     def get_sex_age_ratios(self, population):
@@ -190,6 +191,7 @@ class HamadryasSim(Simulation):
         self.duration = 400
         self.recog = False
         self.attraction_strength = 2
+        self.parent_dict = {}
         super(HamadryasSim, self).__init__()
 
     def run_simulation(self):
@@ -231,10 +233,12 @@ class HamadryasSim(Simulation):
 
         ratios = self.get_sex_age_ratios(population)
 
-        related = relatedness.calc_relatedness(population, self)
+        related = relatedness.main(population, self.parent_dict)
 
-        return {"within_omu_relat": related[0],
-                "across_omu_relat": related[1],
+        return {"within_omu_relat_mean": related[0],
+                "within_omu_relat_var": related[1],
+                "across_omu_relat_mean": related[2],
+                "across_omu_relat_var": related[3],
                 "pop_size": len(population.all),
                 "adult_sex_ratio": ratios["adult sex ratio"],
                 "adult_to_nonadult_ratio": ratios["adult to nonadult ratio"]}
@@ -257,7 +261,7 @@ class HamadryasSim(Simulation):
             if agent.sex == 'f':
                 if 2 <= agent.age < 5:
                     population.young_natal_females.append(agent.index)
-                elif agent.age == 5:
+                elif agent.age == 5 and not agent.dispersed:
                     population.avail_females.append(agent.index)
 
     def male_choices(self, male, population):
