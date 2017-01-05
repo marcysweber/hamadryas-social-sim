@@ -67,7 +67,7 @@ class HamadryasDispersal:
 
         # loser dies half of the time
         if random.choice(["alive", "dead"]) == "dead":
-            simulation.killagent(loser, population, population.groupsdict[loser.bandID], population.halfyear)
+            simulation.kill_agent(loser, population, population.groupsdict[loser.bandID], population.halfyear)
 
     @staticmethod
     def fol_choices(male, population, simulation):
@@ -144,6 +144,9 @@ class HamadryasDispersal:
             if male.maleState == MaleState.lea and not male.malefols:
                 reps = reps - int(reps * 0.33)
 
+            if simulation.recog == True:
+                reps = HamadryasDispersal.recognize(reps, male, female, population, simulation)
+
             for i in range(0, reps):
                 lottery += [male.index]
 
@@ -160,9 +163,9 @@ class HamadryasDispersal:
             for offspring in depen_live_offspring:
                 if random.uniform(0, 1) > 0.5:
                     infant = population.dict[offspring]
-                    simulation.killagent(infant, population,
-                                         population.groupsdict[female.bandID],
-                                         population.halfyear)
+                    simulation.kill_agent(infant, population,
+                                          population.groupsdict[female.bandID],
+                                          population.halfyear)
                     female.femaleState = FemaleState.cycling
                 else:
                     infant = population.dict[offspring]
@@ -204,32 +207,26 @@ class HamadryasDispersal:
         female.clanID = male.clanID
         female.OMUID = male.index
 
-
-class SavannahDispersal:
     @staticmethod
-    def disperse(male, pop, sim):
-        if random.uniform(0, 1) > 0.13:
-            cand_groups = []
+    def recognize(reps, male, female, population, simulation):
+        recognized = False
+        if male.females:
+            for omu_female in male.females:
+                omu_female = population.dict[omu_female]
 
-            for group in pop.groupsdict.values():
-                if group.index is not male.troopID:
-                    group.excess_females = group.get_excess_females(pop)
-                    cand_groups.append(group)
+                #  is she my mother?
+                if omu_female.index in female.parents:
+                    recognized = True
 
-            group_lots = []
-            for group in cand_groups:
-                this_group_lots = group.excess_females + 15
-                for i in range(0, this_group_lots):
-                    group_lots.append(group.index)
+                #  is she my daughter?
+                if female.index in omu_female.parents:
+                    recognized = True
 
-            if group_lots:
-                dest_group = random.choice(group_lots)
-                dest_group = pop.groupsdict[dest_group]
+                #  are we sisters?
+                if female.parents[0] in omu_female.parents or female.parents[1] in omu_female.parents:
+                    recognized = True
 
-                pop.groupsdict[male.troopID].agents.remove(male.index)
-                male.troopID = dest_group.index
-                dest_group.agents.append(male.index)
-                if not male.dispersed:
-                    male.dispersed = True
-        else:
-            sim.killagent(male, pop, pop.groupsdict[male.troopID], pop.halfyear)
+        if recognized:
+            reps = reps * simulation.attraction_strength
+
+        return reps

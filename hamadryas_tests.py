@@ -183,10 +183,10 @@ class ChallengeTests(unittest.TestCase):
             start_clan = female_to_disp.clanID
             start_band = female_to_disp.bandID
 
-            band_disp_sim.killagent(band_disp_pop.dict[female_to_disp.OMUID],
-                                    band_disp_pop,
-                                    band_disp_pop.groupsdict[0],
-                                    50)
+            band_disp_sim.kill_agent(band_disp_pop.dict[female_to_disp.OMUID],
+                                     band_disp_pop,
+                                     band_disp_pop.groupsdict[0],
+                                     50)
             band_disp_sim.male_eligibility(band_disp_pop)
             self.assertTrue(band_disp_pop.eligible_males)
 
@@ -256,7 +256,7 @@ class ChallengeTests(unittest.TestCase):
             else:
                 no_females += 1
 
-            inher_sim.killagent(leader_to_kill, inher_pop, inher_pop.groupsdict[0], 50)
+            inher_sim.kill_agent(leader_to_kill, inher_pop, inher_pop.groupsdict[0], 50)
 
             #  self.assertTrue(inher_pop.avail_females)
             if inheritor.maleState == MaleState.lea:
@@ -300,3 +300,6 @@ class ChallengeTests(unittest.TestCase):
         print dispersed, dispersed_across_bands
         self.assertAlmostEqual(90, dispersed, delta=90)
         self.assertAlmostEqual(30, dispersed_across_bands, delta=30)
+
+    def test_recognition(self):
+        pass

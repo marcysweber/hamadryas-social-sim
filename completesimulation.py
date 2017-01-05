@@ -4,9 +4,9 @@ import random
 import aging
 import lifetables
 from agent import MakeAgents, MaleState, FemaleState
-from dispersal import SavannahDispersal, HamadryasDispersal
-from paternity import SavannahPaternity
-from seedgroups import SavannahSeed, HamadryasSeed
+from dispersal import HamadryasDispersal
+from seedgroups import HamadryasSeed
+import relatedness
 
 
 def main():
@@ -36,7 +36,6 @@ class Simulation(object):
     #  to hold generic functions pertaining to any/most sims.
 
     def __init__(self):
-        self.siring_success = {}
         self.interbirth_int = []
 
     def mortality_check(self, population, halfyear):
@@ -55,9 +54,9 @@ class Simulation(object):
                 dieroll = random.uniform(0, 1)
                 if getdeathchance >= dieroll:
                     if agent.taxon == "savannah":
-                        ret += self.killagent(agent, population, population.groupsdict[agent.troopID], halfyear)
+                        ret += self.kill_agent(agent, population, population.groupsdict[agent.troopID], halfyear)
                     elif agent.taxon == "hamadryas":
-                        ret += self.killagent(agent, population, population.groupsdict[agent.bandID], halfyear)
+                        ret += self.kill_agent(agent, population, population.groupsdict[agent.bandID], halfyear)
         return ret
 
     def birth_check(self, population, halfyear):
@@ -72,14 +71,6 @@ class Simulation(object):
                         if birthchance >= dieroll:
                             agent.femaleState = FemaleState.pregnant
                             agent.sire_of_fetus = agent.OMUID
-                    elif agent.taxon == "savannah":
-                        dom_hier = population.groupsdict[agent.troopID].dominance_hierarchy
-                        if dom_hier:
-                            birthchance = lifetables.getbirthchance(agent)
-                            dieroll = random.uniform(0, 1)
-                            if birthchance >= dieroll:
-                                agent.femaleState = FemaleState.pregnant
-                                agent.sire_of_fetus = SavannahPaternity.savannahsire(dom_hier, population, halfyear)
 
                 elif agent.femaleState == FemaleState.pregnant:
                     self.birthagent(agent, population, halfyear)
@@ -92,11 +83,11 @@ class Simulation(object):
             agent = population.dict[agent]
             aging.promote_agent(agent)
 
-    def killagent(self, agent, population, group, halfyear):
+    def kill_agent(self, agent, population, group, halfyear):
         if agent.sex == 'f':
             if agent.offspring and agent.offspring[-1] in population.dict.keys():
                 if population.dict[agent.offspring[-1]].age < 2:
-                    self.killagent(population.dict[agent.offspring[-1]], population, group, halfyear)
+                    self.kill_agent(population.dict[agent.offspring[-1]], population, group, halfyear)
         if agent.taxon == "hamadryas" and agent.sex == 'm':
             if agent.index in population.eligible_males:
                 population.eligible_males.remove(agent.index)
@@ -123,9 +114,7 @@ class Simulation(object):
             if agent.parents:
                 if agent.parents[0] in population.dict.keys():
                     population.dict[agent.parents[0]].femaleState = FemaleState.cycling
-        if agent.sex == 'm' and agent.age > 6.0:
-            if halfyear > 40:
-                self.siring_success[agent.index] = (len(agent.offspring))
+
 
         del population.dict[agent.index]
         population.all.remove(agent.index)
@@ -148,14 +137,6 @@ class Simulation(object):
             infant.OMUID = mother.OMUID
             infant.clanID = mother.clanID
 
-        elif mother.taxon == "savannah":
-            group = mother.troopID
-            sire = mother.sire_of_fetus
-
-            infant = MakeAgents.makenewsavannah(group, sex, mother.index,
-                                                sire,
-                                                population, self)
-
         mother.sire_of_fetus = None
         if not mother.last_birth:
             mother.last_birth = halfyear
@@ -175,8 +156,6 @@ class Simulation(object):
         subadult_females = 0.0
         subadult_males = 0.0
 
-        female_states = collections.Counter(
-            [agent.femaleState for agent in population.dict.values() if agent.sex == "f"])
 
         for agent in population.dict.values():
             if agent.sex == 'f':
@@ -193,8 +172,7 @@ class Simulation(object):
         return {"adult sex ratio": adult_females / adult_males,
                 "adult to nonadult ratio": (adult_females + adult_males) / (subadult_females + subadult_males),
                 "adult females: ": adult_females,
-                "adult males: ": adult_males,
-                "female states: ": female_states}
+                "adult males: ": adult_males}
 
         #  also add here specialized lists!!!
 """
@@ -210,6 +188,8 @@ class HamadryasSim(Simulation):
     #  loop with unique functions when needed
     def __init__(self):
         self.duration = 400
+        self.recog = False
+        self.attraction_strength = 2
         super(HamadryasSim, self).__init__()
 
     def run_simulation(self):
@@ -250,12 +230,14 @@ class HamadryasSim(Simulation):
                 break
 
         ratios = self.get_sex_age_ratios(population)
-        self.siring_success = collections.Counter(self.siring_success.values())
 
-        return {"sires": self.siring_success,
-                "pop size": len(population.all),
-                "adult sex ratio": ratios["adult sex ratio"],
-                "adult to nonadult ratio": ratios["adult to nonadult ratio"]}
+        related = relatedness.calc_relatedness(population, self)
+
+        return {"within_omu_relat": related[0],
+                "across_omu_relat": related[1],
+                "pop_size": len(population.all),
+                "adult_sex_ratio": ratios["adult sex ratio"],
+                "adult_to_nonadult_ratio": ratios["adult to nonadult ratio"]}
 
     def male_eligibility(self, population):
         population.eligible_males = []
