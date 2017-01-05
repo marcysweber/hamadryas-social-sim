@@ -301,5 +301,3 @@ class ChallengeTests(unittest.TestCase):
         self.assertAlmostEqual(90, dispersed, delta=90)
         self.assertAlmostEqual(30, dispersed_across_bands, delta=30)
 
-    def test_recognition(self):
-        pass
