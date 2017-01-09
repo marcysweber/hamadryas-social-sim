@@ -49,7 +49,7 @@ class Simulation(object):
                 if agent.taxon == "savannah":
                     getdeathchance *= 1.41
                 elif agent.taxon == "hamadryas":
-                    getdeathchance *= 1.25
+                    getdeathchance *= 1.24
 
                 dieroll = random.uniform(0, 1)
                 if getdeathchance >= dieroll:

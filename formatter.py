@@ -3,35 +3,25 @@ class Formatter():
         self.data = data
 
     def format(self):
-        total_max = self.get_max() + 1
-        matrix = [[0] * (total_max + 4) for i in range(len(self.data))]
+        matrix = [[0] * 8 for i in range(len(self.data))]
 
         for i in range(len(self.data)):
             row = matrix[i]
             row[0] = i
-            row[1] = self.data[i]["pop size"]
-            row[2] = self.data[i]["adult sex ratio"]
-            row[3] = self.data[i]["adult to nonadult ratio"]
+            row[1] = self.data[i]["pop_size"]
+            row[2] = self.data[i]["adult_sex_ratio"]
+            row[3] = self.data[i]["adult_to_nonadult_ratio"]
 
-            for n_offspring in self.data[i]["sires"].keys():
-                row[n_offspring + 4] = self.data[i]["sires"][n_offspring]
+            row[4] = self.data[i]["within_omu_relat_mean"]
+            row[5] = self.data[i]["within_omu_relat_var"]
+            row[6] = self.data[i]["across_omu_relat_mean"]
+            row[7] = self.data[i]["across_omu_relat_var"]
 
-        headers = ["Rep", "Pop_Size", "Ad_Sex_Ratio", "Ad_Juv_Ratio"] + range(total_max)
+        headers = ["Rep", "Pop_Size", "Ad_Sex_Ratio", "Ad_Juv_Ratio",
+                   "within_omu_relat_mean","within_omu_relat_var","across_omu_relat_mean","across_omu_relat_var"]
 
         matrix.insert(0, headers)
 
         return matrix
 
-    def get_max(self):
-        sires = [x["sires"] for x in self.data]
 
-        sire_max = 0
-
-        for rep in sires:
-            offspring_freq_list = rep.keys()
-            offspring_freq_list.sort()
-            rep_max = offspring_freq_list[-1]
-            if rep_max > sire_max:
-                sire_max = rep_max
-
-        return sire_max

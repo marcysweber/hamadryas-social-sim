@@ -1,4 +1,4 @@
-from completesimulation import SavannahSim, HamadryasSim
+from completesimulation import HamadryasSim
 from multiprocessing import Process, Queue, JoinableQueue
 
 
