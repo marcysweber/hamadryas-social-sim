@@ -86,13 +86,11 @@ class MakeAgents:
         newagent.index = MakeAgents.get_unique_index(population)
 
         #  parents get credit
-        if sire:
-            if sire in population.dict.keys():
+        if sire and sire in population.dict.keys():
                 population.dict[sire].offspring.append(newagent.index)
                 population.dict[sire].last_birth = population.halfyear
-            elif sire in sim.siring_success.keys():
-                sim.siring_success[sire] += 1
-        if mother:
+
+        if mother and mother in population.dict.keys():
             population.dict[mother].offspring.append(newagent.index)
 
         return newagent

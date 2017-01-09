@@ -16,6 +16,7 @@ class FullRunTests(unittest.TestCase):
         print output
         self.assertTrue(output)
 
+
 class ChallengeTests(unittest.TestCase):
     def setup_rhp(self):
         hama_rhp_pop = HamaPopulation()
