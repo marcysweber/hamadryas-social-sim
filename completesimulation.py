@@ -49,7 +49,7 @@ class Simulation(object):
                 if agent.taxon == "savannah":
                     getdeathchance *= 1.41
                 elif agent.taxon == "hamadryas":
-                    getdeathchance *= 1.24
+                    getdeathchance *= 1.245
 
                 dieroll = random.uniform(0, 1)
                 if getdeathchance >= dieroll:
@@ -226,8 +226,8 @@ class HamadryasSim(Simulation):
             self.birth_check(population, halfyear)
             self.promotions(population)
 
-            #  print "Population: " + str(len(population.dict.keys()))
-            # print "Hamadryas half-year " + str(halfyear) + " done!"
+            print "Population: " + str(len(population.dict.keys()))
+            print "Hamadryas half-year " + str(halfyear) + " done!"
             if len(population.all) == 0:
                 break
 

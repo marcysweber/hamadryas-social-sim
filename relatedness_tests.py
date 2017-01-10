@@ -193,6 +193,7 @@ class TestRelatedCalc(unittest.TestCase):
         HamadryasSeed.addagenttoseed(1, group, relat_pop, 'f', None, None, 10.0, relat_sim)
         relat_sim.parent_dict[2] = [2342, 23423]
         HamadryasSeed.addagenttoseed(1, group, relat_pop, 'm', None, None, 10.0, relat_sim)
+        group.leadermales.add(3)
 
         HamadryasSeed.addagenttoseed(1, group, relat_pop, 'f', 2, 1, 10.0, relat_sim)
         relat_sim.parent_dict[4] = [2, 1]
@@ -324,3 +325,25 @@ class TestRelatedCalc(unittest.TestCase):
 
         R = relatedness.calc_relatedness([relat_pop.dict[4], relat_pop.dict[5]], relat_sim.parent_dict)
         self.assertEqual(R, 0.25)
+
+    def test_calc_relat(self):
+        relat_sim = HamadryasSim()
+        relat_pop = HamaPopulation()
+        group = HamadryasGroup(1)
+        relat_pop.groupsdict[1] = group
+        self.setup(relat_sim, relat_pop, group)
+
+        output = relatedness.main(relat_pop, relat_sim.parent_dict)
+
+        self.assertTrue(output)
+
+    def test_calc_relat_duration(self):
+        pass
+
+    def test_full_w_relat(self):
+        hamadryas_sim = HamadryasSim()
+        hamadryas_sim.duration = 200
+        output = hamadryas_sim.run_simulation()
+
+        print output
+        self.assertTrue(output)
