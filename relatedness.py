@@ -28,24 +28,25 @@ def calc_relatedness(dyad, parent_dict):
         relatedness = 0.25
 
     else:
-        #  THIS CREATES A COMPLETE ANCESTRY FOR FEM1
+        #  THIS CREATES An INCOMPLETE ANCESTRY FOR FEM1
 
         #  fem1_ancestors is a dict where the key is the index and
         #  the value is the generational distance from fem1
         fem1_links = 1
-        while ancestors_left:
+        for i in range(0, 10):
             one_generation_back = []
-            for agent in find_the_parents_of:
-                if agent in parent_dict.keys():
-                    parents = parent_dict[agent]
-                    one_generation_back += parents
-                    for agent in parents:
-                        fem1_ancestors[agent] = fem1_links
+            i_have_parents = [agent for agent in find_the_parents_of if agent in parent_dict.keys()]
+            for agent in i_have_parents:
+                parents = parent_dict[agent]
+                one_generation_back += parents
+                for agent in parents:
+                    fem1_ancestors[agent] = fem1_links
             if one_generation_back:
                 find_the_parents_of = one_generation_back
                 fem1_links += 1
             else:
-                ancestors_left = False
+                break
+
 
 
         #  THIS COMPARES ANCESTORS OF FEM2 TO FEM1 ANCESTRY
@@ -58,28 +59,32 @@ def calc_relatedness(dyad, parent_dict):
             relatedness = 0.5**fem1_ancestors[fem2]
         else:
             fem2_links = 0
-            while ancestors_left and not common_ancestor_found:
+            for i in range(0, 10):
                 fem2_links += 1
                 one_generation_back = []
-                for agent in find_the_parents_of:
-                    if agent in parent_dict.keys():
-                        parents = parent_dict[agent]
-                        one_generation_back += parents
-                for agent in one_generation_back:
-                    if agent == fem1:
+                i_have_parents = [agent for agent in find_the_parents_of if agent in parent_dict.keys()]
+                for agent in i_have_parents:
+                    parents = parent_dict[agent]
+                    one_generation_back += parents
+
+                if fem1 in one_generation_back:
                         common_ancestor_found = True
                         grandmother = True
-                    elif agent in fem1_ancestors.keys():
-                        common_ancestor = agent
-                        if common_ancestor_found:
-                            two_common_ancestors_found = True
-                        else:
-                            common_ancestor_found = True
+                elif set(one_generation_back).intersection(fem1_ancestors.keys()):
+                    common_ancestor = list(set(one_generation_back).intersection(fem1_ancestors.keys()))[0]
+                    if len(set(one_generation_back).intersection(fem1_ancestors.keys())) > 1:
+                        two_common_ancestors_found = True
+                        common_ancestor_found = True
+                    else:
+                        common_ancestor_found = True
+
+
                 if one_generation_back:
                     find_the_parents_of = one_generation_back
-
                 else:
-                    ancestors_left = False
+                    break
+                if common_ancestor_found:
+                    break
 
             if common_ancestor_found:
                 if grandmother:
@@ -99,15 +104,19 @@ def main(population, parent_dict):
     adult_female_dict = [agent for agent in population.dict.values() if agent.sex == 'f' and agent.age >= 5]
     dyads = dyad_generator(adult_female_dict)
     within = []
+    within_count = 0
     across = []
+    across_count = 0
 
     for dyad in dyads:
         fem1 = dyad[0]
         fem2 = dyad[1]
         if fem1.OMUID == fem2.OMUID:
             within += [calc_relatedness(dyad, parent_dict)]
+            within_count += 1
         else:
             across += [calc_relatedness(dyad, parent_dict)]
+            across_count += 1
 
     withinmean = numpy.mean(within)
     withinvar = numpy.sum([(i - withinmean)**2.0 for i in within])
@@ -115,5 +124,5 @@ def main(population, parent_dict):
     acrossmean = numpy.mean(across)
     acrossvar = numpy.sum([(i - acrossmean)**2.0 for i in across])
 
-    return [withinmean, withinvar, acrossmean, acrossvar]
+    return [withinmean, withinvar, within_count, acrossmean, acrossvar, across_count]
 

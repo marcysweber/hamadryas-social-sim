@@ -31,7 +31,7 @@ def worker(in_q, out_q, new_sim_func):
     while True:
         ticket = in_q.get()
         try:
-            print "strating sim " + str(ticket)
+            print "starting sim " + str(ticket)
             out_q.put(new_sim_func().run_simulation())
             print "end of sim " + str(ticket)
         except ZeroDivisionError as e:

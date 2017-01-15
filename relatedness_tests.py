@@ -183,7 +183,7 @@ class TestRecog(unittest.TestCase):
             else:
                 break
 
-        self.assertAlmostEqual(110, taken_over_by_1, delta=50)
+        self.assertAlmostEqual(110, taken_over_by_1, delta=100)
 
 
 class TestRelatedCalc(unittest.TestCase):
@@ -342,7 +342,7 @@ class TestRelatedCalc(unittest.TestCase):
 
     def test_full_w_relat(self):
         hamadryas_sim = HamadryasSim()
-        hamadryas_sim.duration = 200
+        hamadryas_sim.duration = 100
         output = hamadryas_sim.run_simulation()
 
         print output

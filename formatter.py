@@ -3,7 +3,7 @@ class Formatter():
         self.data = data
 
     def format(self):
-        matrix = [[0] * 8 for i in range(len(self.data))]
+        matrix = [[0] * 10 for i in range(len(self.data))]
 
         for i in range(len(self.data)):
             row = matrix[i]
@@ -14,8 +14,10 @@ class Formatter():
 
             row[4] = self.data[i]["within_omu_relat_mean"]
             row[5] = self.data[i]["within_omu_relat_var"]
-            row[6] = self.data[i]["across_omu_relat_mean"]
-            row[7] = self.data[i]["across_omu_relat_var"]
+            row[6] = self.data[i]["within_dyads"]
+            row[7] = self.data[i]["across_omu_relat_mean"]
+            row[8] = self.data[i]["across_omu_relat_var"]
+            row[9] = self.data[i]["across_dyads"]
 
         headers = ["Rep", "Pop_Size", "Ad_Sex_Ratio", "Ad_Juv_Ratio",
                    "within_omu_relat_mean","within_omu_relat_var","across_omu_relat_mean","across_omu_relat_var"]

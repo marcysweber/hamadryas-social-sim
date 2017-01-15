@@ -49,7 +49,7 @@ class Simulation(object):
                 if agent.taxon == "savannah":
                     getdeathchance *= 1.41
                 elif agent.taxon == "hamadryas":
-                    getdeathchance *= 1.245
+                    getdeathchance *= 1.25
 
                 dieroll = random.uniform(0, 1)
                 if getdeathchance >= dieroll:
@@ -237,8 +237,10 @@ class HamadryasSim(Simulation):
 
         return {"within_omu_relat_mean": related[0],
                 "within_omu_relat_var": related[1],
-                "across_omu_relat_mean": related[2],
-                "across_omu_relat_var": related[3],
+                "within_dyads": related[2],
+                "across_omu_relat_mean": related[3],
+                "across_omu_relat_var": related[4],
+                "across_dyads": related[5],
                 "pop_size": len(population.all),
                 "adult_sex_ratio": ratios["adult sex ratio"],
                 "adult_to_nonadult_ratio": ratios["adult to nonadult ratio"]}
