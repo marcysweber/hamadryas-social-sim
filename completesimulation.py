@@ -29,6 +29,10 @@ class HamaPopulation(Population):
         self.avail_females = []
         self.eligible_males = []
         self.young_natal_females = []
+        self.count_opportunistic_takeovers = 0
+        self.count_inheritances = 0
+        self.count_challenge_takeovers = 0
+        self.count_initial_units = 0
         super(HamaPopulation, self).__init__()
 
 
@@ -188,10 +192,11 @@ in hamadryas baboons and male dispersal in savannah.
 class HamadryasSim(Simulation):
     #  loop with unique functions when needed
     def __init__(self):
-        self.duration = 400
+        self.duration = 300
         self.recog = False
         self.attraction_strength = 2
         self.parent_dict = {}
+        self.codispersal = False
         super(HamadryasSim, self).__init__()
 
     def run_simulation(self):
@@ -243,7 +248,11 @@ class HamadryasSim(Simulation):
                 "across_dyads": related[5],
                 "pop_size": len(population.all),
                 "adult_sex_ratio": ratios["adult sex ratio"],
-                "adult_to_nonadult_ratio": ratios["adult to nonadult ratio"]}
+                "adult_to_nonadult_ratio": ratios["adult to nonadult ratio"],
+                "initial_units": population.count_initial_units,
+                "opportunistic_takeovers": population.count_opportunistic_takeovers,
+                "inheritances": population.count_inheritances,
+                "challenge_takeovers": population.count_challenge_takeovers}
 
     def male_eligibility(self, population):
         population.eligible_males = []

@@ -62,6 +62,7 @@ class HamadryasDispersal:
             loser = leader
             female = population.dict[random.choice(leader.females)]
             HamadryasDispersal.add_female_to_omu(challenger, female, population, simulation)
+            population.count_challenge_takeovers += 1
         else:
             loser = challenger
 
@@ -110,6 +111,7 @@ class HamadryasDispersal:
             female = population.dict[random.choice(lottery)]
             if random.uniform(0, 1) < chance:
                 HamadryasDispersal.add_female_to_omu(male, female, population, simulation)
+                population.count_initial_units += 1
             else:
                 pass
         else:
@@ -126,6 +128,7 @@ class HamadryasDispersal:
             female = population.dict[female]
             if random.uniform(0, 1) < 0.9:  # 90% chance of inheriting
                 HamadryasDispersal.add_female_to_omu(male, female, population, simulation)
+                population.count_inheritances += 1
 
     @staticmethod
     def opportun_takeover(female, population, simulation):
@@ -152,14 +155,50 @@ class HamadryasDispersal:
 
         if lottery:
             winner = population.dict[random.choice(lottery)]
+
+            if simulation.codispersal == True:
+                female2 = HamadryasDispersal.codispersal(female, population)
+
+                if female2 != 0:
+                    HamadryasDispersal.add_female_to_omu(winner, female2, population, simulation)
+                    population.count_opportunistic_takeovers += 1
+                    population.avail_females.remove(female2.index)
+
             HamadryasDispersal.add_female_to_omu(winner, female, population, simulation)
+            population.count_opportunistic_takeovers += 1
+
+
+    @staticmethod
+    def codispersal(female1, population):
+        female2 = 0
+        # females currently in the same OMU
+        OMUfemales = []
+        for female in population.avail_females:
+            female = population.dict[female]
+            if female1.OMUID == female.OMUID:
+                OMUfemales += [female.index]
+
+        OMUfemales = [female for female in population.avail_females if
+                      female1.OMUID == population.dict[female].OMUID]
+
+        random.shuffle(OMUfemales)
+        # from OMU females, find the first close relative
+        for female in OMUfemales:
+            female = population.dict[female]
+            if female.index == female1.parents[0] or \
+                           female.parents[0] == female1.index or \
+                           female.parents[0] == female1.parents[0]:
+                female2 = female
+                break
+        return female2
 
     @staticmethod
     def add_female_to_omu(male, female, population, simulation):
         #  INFANTICIDE
         if female.offspring:
             depen_live_offspring = [offspring for offspring in female.offspring
-                                    if offspring in population.dict and population.dict[offspring].age < 2]
+                                    if offspring in population.dict and
+                                    population.dict[offspring].age < 2]
             for offspring in depen_live_offspring:
                 if random.uniform(0, 1) > 0.5:
                     infant = population.dict[offspring]

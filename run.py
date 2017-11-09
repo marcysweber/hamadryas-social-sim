@@ -41,14 +41,16 @@ def worker(in_q, out_q, new_sim_func):
 
 
 class ParallelRunner(SerialRunner):
-    def __init__(self, class_name, duration, recognition, attraction_strength, n_replicates, n_processes):
+    def __init__(self, class_name, duration, recognition, attraction_strength, n_replicates, n_processes, codispersal):
         self.n_processes = n_processes
         self.to_do_queue = JoinableQueue()
         self.done_queue = Queue()
         self.recognition = recognition
         self.attraction_strength = attraction_strength
+        self.codispersal = codispersal
 
-        print "starting simulation with recognition, attraction_strength", duration, attraction_strength
+        print "starting simulation with duration, attraction_strength", duration, attraction_strength
+        print "codispersal = " + str(codispersal)
 
         super(ParallelRunner, self).__init__(class_name, duration, n_replicates)
 
@@ -75,4 +77,5 @@ class ParallelRunner(SerialRunner):
         new_sim = super(ParallelRunner, self).new_sim()
         new_sim.recognition = self.recognition
         new_sim.attraction_strength = self.attraction_strength
+        new_sim.codispersal = self.codispersal
         return new_sim

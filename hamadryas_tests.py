@@ -5,7 +5,9 @@ from completesimulation import HamadryasSim, HamaPopulation
 from dispersal import HamadryasDispersal
 from group import HamadryasGroup
 from seedgroups import HamadryasSeed
-
+from formatter import *
+from saver import *
+from main import *
 
 class FullRunTests(unittest.TestCase):
     def test_run(self):
@@ -15,6 +17,22 @@ class FullRunTests(unittest.TestCase):
 
         print output
         self.assertTrue(output)
+
+    def test_output(self):
+        run("HamadryasSim", "test_new_output.csv", False, 0, 100)
+
+        self.assertTrue(1==1)
+
+    def test_takeover_rates(self):
+        run("HamadryasSim", "hama_out_attraction_10.csv", True, 10, 50)
+
+        self.assertTrue(1==1)
+
+
+    def test_codispersal(self):
+        run("HamadryasSim", "hama_out_attraction_10.csv", True, 10, 300, True)
+
+        self.assertTrue(1==1)
 
 
 class ChallengeTests(unittest.TestCase):
@@ -203,14 +221,36 @@ class ChallengeTests(unittest.TestCase):
                 change_band += 1
 
         print "Moved between OMUs: " + str(change_OMU)
-        print "Stayed in natal clan: " + str(1000 - change_band - change_clan)
+        print "Stayed in natal clan: " + str(100 - change_band - change_clan)
         print "Moved between clans within a band: " + str(change_clan)
         print "Moved between bands: " + str(change_band)
 
         self.assertEqual(100, change_OMU)
-        self.assertAlmostEqual(15, change_clan, delta=50)
-        self.assertAlmostEqual(60, change_band, delta=50)
+        self.assertAlmostEqual(15, change_clan, delta=0)
+        self.assertAlmostEqual(60, change_band, delta=0)
 
+    def test_codispersal(self):
+        codi_sim = HamadryasSim()
+        codi_pop = HamaPopulation()
+        codi_sim.codispersal = True
+
+        for i in range(0, 10):
+            codi_pop = HamadryasSeed.makeseed(i, codi_pop, codi_sim)
+
+        HamadryasSeed.addagenttoseed(0, codi_pop.groupsdict[0], codi_pop,
+                                     'f', 100, None, 10, codi_sim)
+        HamadryasSeed.addagenttoseed(0, codi_pop.groupsdict[0], codi_pop,
+                                     'f', 100, None, 10, codi_sim)
+        sister1 = codi_pop.dict[codi_pop.all[-1]]
+        sister2 = codi_pop.dict[codi_pop.all[-2]]
+
+        HamadryasDispersal.add_female_to_omu(codi_pop.dict[sister1.OMUID], sister2, codi_pop, codi_sim)
+
+        codi_sim.kill_agent(codi_pop.dict[sister1.OMUID], codi_pop, codi_pop.groupsdict[0], 0)
+        codi_sim.male_eligibility(codi_pop)
+        HamadryasDispersal.opportun_takeover(sister1, codi_pop, codi_sim)
+
+        self.assertTrue(1 == 1)
 
     def test_infanticide(self):
         infant_died = 0
@@ -240,6 +280,7 @@ class ChallengeTests(unittest.TestCase):
     def test_inherit_works(self):
         inherits = 0
         no_females = 0
+        new_counter = 0
 
         for i in range(0, 1000):
             inher_sim = HamadryasSim()
@@ -263,13 +304,17 @@ class ChallengeTests(unittest.TestCase):
             if inheritor.maleState == MaleState.lea:
                 self.assertIn(inheritor.females[0], leaders_females)
                 inherits += 1
+
+            new_counter += inher_pop.count_inheritances
         print "Inherits: " + str(inherits)
         print "No females to inherit: " + str(no_females)
+        print "New counter: " + str(new_counter)
         self.assertAlmostEqual(900, inherits, delta=900)
 
     def test_initial_unit(self):
         dispersed = 0
         dispersed_across_bands = 0
+        new_counter = 0
 
         for i in range(0, 100):
             init_sim = HamadryasSim()
@@ -298,7 +343,9 @@ class ChallengeTests(unittest.TestCase):
             if our_girl.bandID != start_band:
                 dispersed_across_bands += 1
 
-        print dispersed, dispersed_across_bands
+            new_counter += init_pop.count_initial_units
+
+        print dispersed, dispersed_across_bands, new_counter
         self.assertAlmostEqual(90, dispersed, delta=90)
         self.assertAlmostEqual(30, dispersed_across_bands, delta=30)
 
