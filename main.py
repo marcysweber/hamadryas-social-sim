@@ -5,7 +5,7 @@ from saver import Saver
 
 def run(simulation_name, file_name, recognition, attraction_strength, duration, codispersal=False):
     runner = ParallelRunner(simulation_name, duration, recognition,
-                            attraction_strength, 25, 7, codispersal)
+                            attraction_strength, 100, 7, codispersal)
     output = runner.run()
 
     formatter = Formatter(output)
@@ -28,9 +28,9 @@ def main():
     #run("HamadryasSim", "hama_out_attraction_2.csv", True, 2, 300)
     #run("HamadryasSim", "hama_out_attraction_10.csv", True, 10, 300)
 
-    #run("HamadryasSim", "hama_out_attraction_10_codisp.csv", True, 10, 300, True)
+    run("HamadryasSim", "hama_out_attraction_10_codisp.csv", True, 10, 300, True)
 
-    run("HamadryasSim", "hama_out_takeover_rates.csv", False, 0, 300)
+    #run("HamadryasSim", "hama_out_takeover_rates.csv", False, 0, 300)
 
 if __name__ == "__main__":
     main()
