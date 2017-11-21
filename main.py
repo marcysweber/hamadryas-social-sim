@@ -28,7 +28,8 @@ def main():
     #run("HamadryasSim", "hama_out_attraction_2.csv", True, 2, 300)
     #run("HamadryasSim", "hama_out_attraction_10.csv", True, 10, 300)
 
-    run("HamadryasSim", "hama_out_attraction_10_codisp.csv", True, 10, 300, True)
+    run(simulation_name="HamadryasSim", file_name="hama_out_attraction_10_codisp.csv", recognition=True,
+        attraction_strength=10, duration=300, codispersal=True)
 
     #run("HamadryasSim", "hama_out_takeover_rates.csv", False, 0, 300)
 

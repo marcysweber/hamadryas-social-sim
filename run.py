@@ -75,7 +75,7 @@ class ParallelRunner(SerialRunner):
 
     def new_sim(self):
         new_sim = super(ParallelRunner, self).new_sim()
-        new_sim.recognition = self.recognition
+        new_sim.recog = self.recognition
         new_sim.attraction_strength = self.attraction_strength
         new_sim.codispersal = self.codispersal
         return new_sim
